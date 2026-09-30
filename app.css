@@ -728,6 +728,7 @@ body {
 .nws-phone {
   width: 390px; height: 824px;
   border-radius: 40px; background: var(--naotech-app-color-900); padding: 12px;
+  clip-path: inset(0 round 40px);
   box-shadow: var(--naotech-shadow-large); flex: none;
   transform-origin: center; transition: transform var(--naotech-duration-fast) var(--naotech-animation-standard);
   /* DC-275: solo .nws-phone__screen (el contenido) recortaba overflow; el
@@ -744,6 +745,10 @@ body {
 }
 .nws-phone__screen {
   width: 100%; height: 100%; border-radius: 30px; overflow: hidden;
+  /* overflow+radius NO recorta las capas compuestas (backdrop-filter del
+     cromo iOS, transform de :active, scroll interno): Chrome las pinta con
+     esquinas rectas por fuera de la curva. clip-path sí las recorta. */
+  clip-path: inset(0 round 30px); isolation: isolate;
   background: var(--naotech-app-color-050); display: flex; flex-direction: column;
   /* referencia para lo que flota dentro del teléfono: el toast interno y la
      vista que sale durante una transición (ver .nws-mob__view) */
@@ -870,6 +875,472 @@ body {
 .nwt-toolbar__actions { display: flex; align-items: center; gap: var(--naotech-sizing-10); }
 
 .nws-title-light .nwt-title__description { font-weight: var(--naotech-font-weight-light); }
+
+/* -------------------------------------------------------------------
+   nws-lp — landing pública de Juegos Intercolegiados (perfil Sin login).
+   Copia del Figma «JIN Landing y App», frame 153 (node 10185:14357), a 428
+   px. NO EXISTE EN EL SDK un layout de landing: acá va la composición; los
+   controles son NwtButton / NwtIconButton / NwtCard / NwtDivider.
+   Los grises del Figma son los del SDK (gray-200/300/600/700/900, mismos
+   hex); lo que no está en el SDK es la marca del cliente — violeta JIC, azul
+   50/900 y el azul de gov.co —, declarada una sola vez aquí como token de
+   marca (co-branding), no como hex suelto en las reglas.
+   ------------------------------------------------------------------- */
+.nws-lp {
+  --nws-jic-violeta: #602a8c;       /* Colores Marca/violeta-JIC */
+  --nws-jic-violeta-700: #441e63;   /* Colores Marca/violeta-700 */
+  --nws-jic-azul-050: #ebedf6;      /* Colores Marca/azul-50 */
+  --nws-jic-azul-900: #181e47;      /* Colores Marca/azul-900 */
+  --nws-govco-azul: #0943b5;        /* franja institucional gov.co */
+  --nws-jic-durazno: #f6cdb0;       /* fondo de la pieza de videotutoriales */
+  --nws-jic-violeta-portada: #65267a; /* borde superior de la pieza de portada 2026 */
+  --nws-jic-violeta-900: #28123b;   /* Colores Marca/violeta-900 */
+  --nws-jic-violeta-titular: #691886; /* titular de la portada (Figma 13021:39144) */
+  background: var(--naotech-app-background);
+  color: var(--naotech-color-gray-900);
+}
+/* Marco a la medida del Figma: 428×926 de pantalla + 12 de borde. */
+.nws-phone--lp { width: 428px; height: 926px; } /* es content-box: el borde de 12 va por fuera */
+
+/* Barra: logo · Iniciar sesión · menú, con el divisor gray-300 abajo. */
+.nws-lp__bar {
+  flex: none; display: flex; align-items: center; justify-content: space-between;
+  min-height: var(--naotech-sizing-64); padding: 0 var(--naotech-sizing-20); box-sizing: border-box;
+  background: var(--naotech-app-background); border-bottom: 1px solid var(--naotech-color-gray-300);
+}
+.nws-lp__bar .nws-row--md { gap: var(--naotech-sizing-4); }
+.nws-lp__logo { display: block; width: 110px; height: 40px; object-fit: cover; }
+/* OVERRIDE (marca del cliente): NwtButton small quiet, pintado azul-50 +
+   violeta como en el Figma; alto 32 y radio 8 ya son los del SDK small. */
+.nws-lp .nws-lp__login {
+  --pvt-button-background: var(--nws-jic-azul-050);
+  --pvt-button-background-hover: var(--naotech-color-gray-200);
+  --pvt-button-background-active: var(--naotech-color-gray-300);
+  --pvt-button-font-color: var(--nws-jic-violeta);
+  --pvt-button-padding: var(--naotech-sizing-2) var(--naotech-sizing-12);
+  column-gap: var(--naotech-sizing-6); border-radius: var(--naotech-radius-lg);
+}
+/* Menú: ícono drawer de 32 en gray-700 (Figma). */
+.nws-lp .nws-lp__menu { --pvt-button-dimension: var(--naotech-sizing-32); --naotech-icon-button-sizing: var(--naotech-sizing-32); --pvt-button-font-color: var(--naotech-color-gray-700); }
+
+.nws-lp__scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+/* Sin barra de scroll dentro del teléfono: en iOS no ocupa espacio, y la de
+   la plantilla (8px) le comía el borde derecho al sangrado de la portada. */
+.nws-lp__scroll { scrollbar-width: none; }
+.nws-lp__scroll::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.nws-lp__body { display: flex; flex-direction: column; gap: var(--naotech-sizing-32); padding: var(--naotech-sizing-32) var(--naotech-sizing-16) var(--naotech-sizing-24); }
+
+/* Tipografía del Figma sobre las clases del SDK: heading large 18/22,
+   heading medium 16/20, body 14/18, small 12/16. El SDK trae los mismos
+   tamaños con otro interlineado; se ajusta solo el line-height. */
+.nws-lp__h { margin: 0; color: var(--naotech-color-gray-900); line-height: 22px; }
+.nws-lp__titulo { display: flex; flex-direction: column; gap: var(--naotech-sizing-12); }
+.nws-lp__bajada { margin: 0; line-height: 18px; color: var(--naotech-color-gray-700); }
+.nws-lp__titulo--oscuro .nws-lp__bajada { color: var(--nws-jic-azul-900); }
+.nws-lp__muted { color: var(--naotech-color-gray-700); }
+.nws-lp__clamp2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nws-lp__h--novedades { padding-bottom: var(--naotech-sizing-8); }
+
+/* Banner de la edición: una sola imagen (el botón Inscríbete viene dentro). */
+.nws-lp__hero { display: block; width: 100%; height: 325px; padding: 0; border: 0; border-radius: var(--naotech-radius-xl); overflow: hidden; cursor: pointer; background: var(--naotech-app-color-100); }
+.nws-lp__hero img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 21% 0; }
+
+/* Accesos: dos NwtCard de 121 de alto, radio 20, borde gray-200, sombra low. */
+.nws-lp__accesos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--naotech-sizing-10); }
+/* doble clase: el SDK fija estas variables con [nwt-variant] (0,2,0) */
+.nws-lp .nws-lp__acceso {
+  --pvt-body-border: 1px solid var(--naotech-color-gray-200);
+  --pvt-body-background-color: var(--naotech-app-background);
+  height: 121px; border-radius: var(--naotech-radius-xxl);
+}
+.nws-lp__acceso > .nwt-card__body { height: 100%; border-radius: var(--naotech-radius-xxl); box-shadow: 0 2px 4px 0 rgb(from var(--naotech-color-gray-900) r g b / .1); }
+.nws-lp__acceso .nwt-card__header:empty, .nws-lp__acceso .nwt-card__footer:empty { display: none; }
+.nws-lp__acceso .nwt-card__content { height: 100%; display: flex; align-items: center; padding: var(--naotech-sizing-16); box-sizing: border-box; }
+.nws-lp__acceso__in { display: flex; align-items: center; gap: var(--naotech-sizing-12); }
+/* el Figma fija el texto en ~100px: así corta "Resultados / y medallas" */
+.nws-lp__acceso__in > .nws-col { width: 100px; }
+.nws-lp__acceso__t { line-height: 20px; color: var(--naotech-color-gray-900); }
+.nws-lp__acceso .nwt-caption-font-regular { line-height: 16px; }
+/* Thumbnail del Figma = NwtAvatarIcon de 48 con ícono de 24, en marca JIC. */
+.nws-lp__thumb { --naotech-avatar-icon-dimension: var(--naotech-sizing-48); --naotech-avatar-icon-factor: .5; --naotech-icon-color: var(--nws-jic-violeta-700); background: var(--nws-jic-azul-050); }
+
+/* Novedad principal */
+.nws-lp__novedad { display: flex; flex-direction: column; gap: var(--naotech-sizing-8); cursor: pointer; }
+.nws-lp__novedad__img { display: block; width: 100%; height: 218px; object-fit: cover; border-radius: 10px; }
+.nws-lp__novedad .nwt-smalltext-font-regular { line-height: 18px; }
+
+.nws-lp__div { margin: 0; }
+
+/* Otras noticias: título + Ver más (NwtButton mute primary = orange-700). */
+.nws-lp__fila { display: flex; align-items: center; justify-content: space-between; margin-top: calc(var(--naotech-sizing-12) * -1); }
+.nws-lp .nws-lp__vermas { --pvt-button-padding: var(--naotech-sizing-2) var(--naotech-sizing-16); --naotech-icon-dimension: var(--naotech-sizing-20); column-gap: var(--naotech-sizing-8); margin-right: calc(var(--naotech-sizing-16) * -1); }
+.nws-lp__noticias { display: flex; flex-direction: column; gap: var(--naotech-sizing-12); padding-top: var(--naotech-sizing-12); }
+.nws-lp__noticia { display: grid; grid-template-columns: 96px 1fr; gap: var(--naotech-sizing-12); align-items: center; min-height: 66px; cursor: pointer; }
+.nws-lp__noticia img { display: block; width: 96px; height: 62px; object-fit: cover; border-radius: 10px; }
+.nws-lp__noticia__t { line-height: 20px; }
+.nws-lp__noticia .nwt-caption-font-regular { line-height: 16px; }
+
+/* Galería: carrusel horizontal de fotos 144×228, 12 entre fotos. */
+.nws-lp__carrusel { display: flex; gap: var(--naotech-sizing-12); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--naotech-sizing-16); margin: 0 calc(var(--naotech-sizing-16) * -1); padding: 0 var(--naotech-sizing-16); scrollbar-width: none; }
+.nws-lp__carrusel::-webkit-scrollbar { display: none; }
+.nws-lp__foto { flex: 0 0 144px; height: 228px; padding: 0; border: 0; border-radius: var(--naotech-radius-xl); overflow: hidden; scroll-snap-align: start; cursor: pointer; background: var(--naotech-app-color-100); }
+.nws-lp__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Herramientas: pieza 396×128 + view indicator. */
+.nws-lp__herr { gap: var(--naotech-sizing-12); }
+.nws-lp__pieza { display: block; width: 100%; height: 128px; padding: 0; border: 0; border-radius: var(--naotech-radius-xl); overflow: hidden; cursor: pointer; }
+.nws-lp__pieza img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.nws-lp__dots { display: flex; justify-content: center; gap: var(--naotech-sizing-8); padding: var(--naotech-sizing-6) 0; }
+.nws-lp__dots i { width: 8px; height: 8px; border-radius: var(--naotech-radius-pill); background: rgb(from var(--naotech-color-gray-900) r g b / .3); }
+.nws-lp__dots i.nws-lp__dot--on { background: var(--naotech-color-gray-600); }
+
+/* Pie: MinDeporte | Intercolegiados, sitio web y redes. */
+.nws-lp__pie { display: flex; flex-direction: column; align-items: center; padding-top: var(--naotech-sizing-8); }
+.nws-lp__logos { display: flex; align-items: center; gap: var(--naotech-sizing-8); }
+.nws-lp__logos__div { height: 32px; }
+.nws-lp__logo-box { position: relative; width: 106px; height: 106px; display: flex; align-items: center; justify-content: center; }
+.nws-lp__logo-mindeporte { width: 82px; height: 68px; }
+.nws-lp__logo-jic { width: 85px; height: 35px; object-fit: cover; }
+.nws-lp__sitio { margin: var(--naotech-sizing-2) 0 0; width: 153px; text-align: center; line-height: 12px; color: var(--naotech-color-gray-700); }
+.nws-lp__redes { display: flex; justify-content: center; gap: var(--naotech-sizing-16); padding: var(--naotech-sizing-12) 0 0; }
+.nws-lp__red { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--naotech-radius-lg); background: transparent; color: var(--nws-jic-violeta); cursor: pointer; }
+.nws-lp__red:hover { background: var(--nws-jic-azul-050); }
+
+/* Franja institucional gov.co (obligatoria en sitios del Estado): 72 de alto. */
+.nws-lp__govco { display: flex; align-items: center; justify-content: center; gap: 0; height: 72px; background: var(--nws-govco-azul); }
+.nws-lp__govco__logo { width: 142px; height: 44px; object-fit: contain; }
+.nws-lp__govco__div { width: 1px; height: 28px; margin: 0 14px 0 34px; background: var(--naotech-app-background); }
+.nws-lp__govco__co { width: 41px; height: 40px; object-fit: contain; }
+
+/* Siluetas de la landing */
+.nws-lp__skel-hero { border-radius: var(--naotech-radius-xl); }
+.nws-lp__skel-card { border-radius: var(--naotech-radius-xxl); }
+
+.nws-lp button:focus-visible, .nws-lp [role="button"]:focus-visible { outline: 2px solid var(--nws-jic-violeta); outline-offset: 2px; }
+
+/* -------------------------------------------------------------------
+   nws-lpx / nws-lpa / nws-lpi — la app iOS de Intercolegiados (perfil Sin
+   login). nws-lpx = piezas de app (header, pestañas inferiores, pie
+   compacto); nws-lpa = contenido del inicio; nws-lpi = cromo translúcido.
+   Todo sobre tokens del SDK + los de marca JIC declarados en .nws-lp.
+   ------------------------------------------------------------------- */
+/* Barra de app: 56 de alto (medida de app, no de web), logo más chico,
+   solo íconos a la derecha. Sin divisor fijo: aparece al scrollear. */
+.nws-lpx__bar {
+  flex: none; position: relative; display: flex; align-items: center; justify-content: space-between;
+  height: var(--naotech-sizing-56); padding: 0 var(--naotech-sizing-12) 0 var(--naotech-sizing-16); box-sizing: border-box;
+  background: var(--naotech-app-background); border-bottom: 1px solid transparent;
+  transition: border-color var(--naotech-duration-base) var(--naotech-animation-standard), box-shadow var(--naotech-duration-base) var(--naotech-animation-standard);
+  z-index: 3;
+}
+.nws-lpx__logo { display: block; width: 88px; height: 32px; object-fit: cover; }
+.nws-lpx__acciones { display: flex; align-items: center; gap: var(--naotech-sizing-4); }
+.nws-lp .nws-lpx__accion { --pvt-button-dimension: var(--naotech-sizing-40); --naotech-icon-button-sizing: var(--naotech-sizing-24); --pvt-button-font-color: var(--naotech-color-gray-700); }
+/* El perfil como ícono en círculo azul-50: el "Iniciar sesión" de la web
+   pasa a ser el avatar de la app. */
+.nws-lp .nws-lpx__accion--perfil .nwt-icon-button__content { background: var(--nws-jic-azul-050); color: var(--nws-jic-violeta); border-radius: var(--naotech-radius-circle); }
+.nws-lp .nws-lpx__accion--perfil { --pvt-button-font-color: var(--nws-jic-violeta); }
+/* Título que aparece centrado en la barra al contraerse el título grande (A). */
+.nws-lpx__bar-titulo { position: absolute; left: 50%; transform: translate(-50%, 4px); opacity: 0; pointer-events: none; color: var(--naotech-color-gray-900); transition: opacity var(--naotech-duration-base) var(--naotech-animation-standard), transform var(--naotech-duration-base) var(--naotech-animation-standard); }
+.nws-lpx__bar--compacta { border-bottom-color: var(--naotech-color-gray-200); box-shadow: 0 2px 8px rgb(from var(--naotech-color-gray-900) r g b / .06); }
+.nws-lpx__bar--compacta .nws-lpx__bar-titulo { opacity: 1; transform: translate(-50%, 0); }
+
+.nws-lpx__body { display: flex; flex-direction: column; gap: var(--naotech-sizing-28); padding: var(--naotech-sizing-8) var(--naotech-sizing-16) var(--naotech-sizing-24); }
+.nws-lpx__sec { display: flex; align-items: center; justify-content: space-between; min-height: var(--naotech-sizing-32); margin-bottom: var(--naotech-sizing-12); }
+.nws-lp .nws-lpx__vertodo { --pvt-button-padding: 0 var(--naotech-sizing-8); margin-right: calc(var(--naotech-sizing-8) * -1); }
+
+/* Carril horizontal con snap: el gesto de app para "hay más de esto". */
+.nws-lpx__rail { display: flex; gap: var(--naotech-sizing-12); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--naotech-sizing-16); margin: 0 calc(var(--naotech-sizing-16) * -1); padding: 0 var(--naotech-sizing-16) var(--naotech-sizing-4); scrollbar-width: none; }
+.nws-lpx__rail::-webkit-scrollbar { display: none; }
+.nws-lpx__rail > * { scroll-snap-align: start; }
+.nws-lpx__dots { display: flex; justify-content: center; padding-top: var(--naotech-sizing-12); }
+
+/* Pestañas inferiores = NwtTabs a lo ancho. OVERRIDE de composición: ícono
+   sobre rótulo (así se lee una tab bar), sin línea inferior ni indicador
+   (el indicador de NwtTabs es de pestañas de contenido, arriba); la activa
+   se marca con el color primario que el SDK ya le da al label activo. */
+.nws-lpx__tabbar { flex: none; background: var(--naotech-app-background); border-top: 1px solid var(--naotech-color-gray-200); padding: var(--naotech-sizing-4) var(--naotech-sizing-4) 0; }
+.nws-lpx__tabbar .nwt-tabs__list, .nws-lpx__tabbar .nwt-tabs__tab { height: var(--naotech-sizing-56); }
+.nws-lpx__tabbar .nwt-tabs__divider, .nws-lpx__tabbar .nwt-tabs__indicator { display: none; }
+.nws-lpx__tabbar .nwt-tabs__tab { border-bottom: 0; border-radius: var(--naotech-radius-xl); padding: 0 var(--naotech-sizing-2); }
+.nws-lpx__tabbar .nwt-tabs__tab:hover { background: transparent; }
+.nws-lpx__tabbar .nwt-tabs__label { flex-direction: column; gap: var(--naotech-sizing-4); font-size: var(--naotech-sizing-12); line-height: var(--naotech-sizing-14); font-weight: var(--naotech-font-weight-medium); color: var(--naotech-color-gray-700); }
+.nws-lpx__tabbar .nwt-tabs__label .nwt-icon { --naotech-icon-dimension: var(--naotech-sizing-24); font-size: var(--naotech-sizing-24); }
+.nws-lpx__tabbar .nwt-tabs__tab--active .nwt-tabs__label { color: var(--naotech-primary-color-normal); font-weight: var(--naotech-font-weight-semibold); }
+/* Indicador de inicio del sistema operativo (cromo del dispositivo). */
+.nws-lpx__home { flex: none; height: var(--naotech-sizing-20); background: var(--naotech-app-background); display: flex; align-items: center; justify-content: center; }
+.nws-lpx__home::before { content: ''; width: 134px; height: 5px; border-radius: var(--naotech-radius-pill); background: var(--naotech-color-gray-900); }
+/* Con tab bar el aviso interno sube por encima de ella. */
+.nws-lp--app .nws-mob__toast { bottom: calc(var(--naotech-sizing-64) + var(--naotech-sizing-28)); }
+
+/* Pie compacto: institucional sin dejar de estar, pero como cierre de feed
+   y no como pie de sitio web. */
+.nws-lpx__pie { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-12); padding: var(--naotech-sizing-20) 0 0; border-top: 1px solid var(--naotech-color-gray-200); }
+.nws-lpx__pie .nws-lp__redes { padding: 0; }
+.nws-lpx__pie-logos { display: flex; align-items: center; gap: var(--naotech-sizing-16); }
+.nws-lpx__pie-mindeporte { width: 64px; height: 53px; }
+.nws-lpx__pie-jic { width: 72px; height: 30px; object-fit: cover; }
+.nws-lpx__govco { display: flex; align-items: center; justify-content: center; gap: var(--naotech-sizing-12); width: 100%; height: var(--naotech-sizing-48); border-radius: var(--naotech-radius-xl); background: var(--nws-govco-azul); }
+.nws-lpx__govco-logo { width: 96px; height: 30px; object-fit: contain; }
+.nws-lpx__govco-div { width: 1px; height: 20px; background: var(--naotech-app-background); }
+.nws-lpx__govco-co { width: 28px; height: 27px; object-fit: contain; }
+
+/* ---------- Opción A · iOS ----------
+   Materiales (translucidez) sobre tokens: blanco del SDK a 72% + blur, y
+   el contenido pasa por debajo. Fondo agrupado = gray-100 (#f4f5f9, el
+   equivalente del SDK al gris agrupado de iOS). Tipografía Inter del SDK,
+   con el tracking negativo que iOS usa en títulos grandes. */
+.nws-lp--ios { background: var(--naotech-app-background); }
+.nws-lp--ios .nws-lp__scroll { padding: 101px 0 92px; scroll-padding-top: 101px; }
+
+/* Cromo superior: barra de estado con isla dinámica + barra de navegación,
+   como UNA capa de material. Sin divisor hasta que hay contenido debajo. */
+.nws-lpi__top {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 4;
+  background: rgb(from var(--naotech-app-background) r g b / .86);
+  -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+  /* División del header: fija, gray-300 como en el Figma (antes solo
+     aparecía al scrollear y el header se veía pegado al contenido). */
+  border-bottom: 1px solid var(--naotech-color-gray-300);
+  transition: border-color var(--naotech-duration-base) var(--naotech-animation-standard), background-color var(--naotech-duration-base) var(--naotech-animation-standard);
+}
+.nws-lpi__top--borde { background: rgb(from var(--naotech-app-background) r g b / .78); }
+.nws-lp--ios .nws-mob__status { position: relative; height: 44px; padding: 0 var(--naotech-sizing-32); background: transparent; font-size: var(--naotech-sizing-16); font-weight: var(--naotech-font-weight-semibold); }
+/* Isla dinámica: cromo del dispositivo, negro puro como la cámara del Figma. */
+.nws-lp--ios .nws-mob__status::after { content: ''; position: absolute; top: 9px; left: 50%; width: 112px; height: 32px; transform: translateX(-50%); border-radius: var(--naotech-radius-pill); background: var(--naotech-color-gray-900); }
+.nws-lp--ios .nws-lpx__bar { background: transparent; border-bottom: 0; }
+.nws-lp--ios .nws-lpx__bar-titulo { font-size: var(--naotech-sizing-16); letter-spacing: -0.01em; }
+.nws-lpi__top--compacta .nws-lpx__bar-titulo { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-transparency: reduce) {
+  .nws-lpi__top, .nws-lpi__bottom { background: var(--naotech-app-background); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/* Cromo inferior: pestañas + indicador de inicio, mismo material. */
+.nws-lpi__bottom {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+  background: rgb(from var(--naotech-app-background) r g b / .78);
+  -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+  border-top: .5px solid rgb(from var(--naotech-color-gray-900) r g b / .14);
+}
+.nws-lp--ios .nws-lpx__tabbar, .nws-lp--ios .nws-lpx__home { background: transparent; border-top: 0; }
+.nws-lp--ios .nws-lpx__tabbar .nwt-tabs__list, .nws-lp--ios .nws-lpx__tabbar .nwt-tabs__tab { height: 52px; }
+.nws-lp--ios .nws-lpx__tabbar .nwt-tabs__label { font-size: var(--naotech-sizing-10); line-height: var(--naotech-sizing-12); font-weight: var(--naotech-font-weight-medium); letter-spacing: .01em; }
+.nws-lp--ios .nws-lpx__tabbar .nwt-tabs__label .nwt-icon { --naotech-icon-dimension: 26px; font-size: 26px; }
+.nws-lp--ios .nws-lpx__home { height: 26px; }
+.nws-lp--ios .nws-mob__toast { bottom: 100px; }
+
+/* Splash: capa sobre TODO el teléfono (incluido el cromo), imagen a
+   sangre, barra de estado en blanco e ícono de carga en y 564 del Figma. */
+.nws-lps { position: absolute; inset: 0; z-index: 8; background: var(--nws-jic-violeta); transition: opacity 420ms var(--naotech-animation-standard), transform 420ms var(--naotech-animation-standard); }
+.nws-lps[hidden] { display: none; }
+.nws-lps__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.nws-lps__estado { position: relative; color: var(--naotech-app-background); }
+.nws-lp--ios .nws-lps__estado .nws-mob__status { color: var(--naotech-app-background); }
+.nws-lps__carga { position: absolute; top: 564px; left: 50%; width: var(--naotech-sizing-48); height: var(--naotech-sizing-48); margin-left: calc(var(--naotech-sizing-24) * -1); display: flex; align-items: center; justify-content: center; --naotech-icon-dimension: var(--naotech-sizing-32); --naotech-icon-color: var(--naotech-app-background); color: var(--naotech-app-background); }
+.nws-lps__carga .nwt-icon { font-size: var(--naotech-sizing-32); animation: nws-gira 1s linear infinite; }
+@keyframes nws-gira { to { transform: rotate(360deg); } }
+/* Salida del splash: se desvanece y se agranda apenas (se "abre"). */
+.nws-lps--fuera { opacity: 0; transform: scale(1.04); pointer-events: none; }
+/* Entrada de la home, escalonada (≈1 s, curva de iOS): la foto se asienta
+   con un leve zoom, el titular sube, los tres accesos suben de a uno, el
+   mazo entra último; header y pestañas aparecen con un fundido. Solo
+   transform/opacity. */
+.nws-lp--entra .nws-lpv__portada img { animation: nws-asienta 900ms cubic-bezier(.32, .72, 0, 1) both; }
+.nws-lp--entra .nws-lpv__titular { animation: nws-sube 620ms cubic-bezier(.32, .72, 0, 1) 140ms both; }
+.nws-lp--entra .nws-lpv__app { animation: nws-sube 560ms cubic-bezier(.32, .72, 0, 1) both; }
+.nws-lp--entra .nws-lpv__app:nth-child(1) { animation-delay: 240ms; }
+.nws-lp--entra .nws-lpv__app:nth-child(2) { animation-delay: 300ms; }
+.nws-lp--entra .nws-lpv__app:nth-child(3) { animation-delay: 360ms; }
+.nws-lp--entra .nws-lpv__mazo { animation: nws-sube-lejos 680ms cubic-bezier(.32, .72, 0, 1) 440ms both; }
+.nws-lp--entra .nws-lpi__top { animation: nws-aparece 420ms ease-out 120ms both; }
+.nws-lp--entra .nws-lpi__bottom { animation: nws-sube 520ms cubic-bezier(.32, .72, 0, 1) 200ms both; }
+@keyframes nws-asienta { from { transform: scale(1.06); } to { transform: none; } }
+@keyframes nws-sube { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes nws-sube-lejos { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes nws-aparece { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .nws-lps__carga .nwt-icon { animation-duration: 2.4s; }
+  .nws-lps--fuera { transform: none; }
+  .nws-lp--entra * { animation: none !important; }
+}
+
+/* =====================================================================
+   nws-lpv — inicio inmersivo (Figma frame 153 v2, node 13004:13907).
+   Sombras: dos capas (contacto corto + ambiente largo) teñidas con
+   azul-900 de la marca, no gris neutro — se leen como luz sobre la marca.
+   ===================================================================== */
+.nws-lp--inmersiva {
+  --nws-sombra-1: 0 1px 2px rgb(from var(--nws-jic-azul-900) r g b / .06), 0 6px 14px -4px rgb(from var(--nws-jic-azul-900) r g b / .14);
+  --nws-sombra-2: 0 2px 6px rgb(from var(--nws-jic-azul-900) r g b / .08), 0 22px 44px -12px rgb(from var(--nws-jic-azul-900) r g b / .34);
+}
+/* La portada va detrás del estado y del header: sin padding arriba. */
+.nws-lp--inmersiva .nws-lp__scroll { padding-top: 0; scroll-padding-top: 101px; }
+
+/* Header sobre la portada: sin material ni división, texto e íconos
+   blancos y un velo arriba para que se lean sobre cualquier foto. */
+.nws-lpi__top--sobre { background: transparent; border-bottom-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* sin velo: la portada arranca con una banda violeta sólida */
+.nws-lpi__top--sobre .nws-mob__status { color: var(--naotech-app-background); }
+.nws-lp .nws-lpi__top--sobre .nws-lpx__accion { --pvt-button-font-color: var(--naotech-app-background); }
+.nws-lp .nws-lpi__top--sobre .nws-lpx__accion--perfil .nwt-icon-button__content { background: var(--naotech-app-background); color: var(--nws-jic-violeta); box-shadow: var(--nws-sombra-1); }
+/* perfil: círculo de 44 del Figma */
+.nws-lp .nws-lpx__accion--perfil { --pvt-button-dimension: 44px; }
+/* sobre la foto el logo va en blanco (el violeta se pierde en lo oscuro) */
+.nws-lpi__top--sobre .nws-lpx__logo { filter: brightness(0) invert(1) drop-shadow(0 1px 4px rgb(from var(--nws-jic-azul-900) r g b / .5)); }
+.nws-lpx__logo { transition: filter var(--naotech-duration-base) var(--naotech-animation-standard); }
+.nws-lpi__top { transition: background-color var(--naotech-duration-base) var(--naotech-animation-standard), border-color var(--naotech-duration-base) var(--naotech-animation-standard), backdrop-filter var(--naotech-duration-base) var(--naotech-animation-standard); }
+
+/* Portada: foto a sangre de 600, esquinas inferiores redondeadas (hoja),
+   degradé del azul de la cancha al azul-900 de la marca para el titular. */
+/* Portada (Figma 13016:39009): la foto trae su propio fundido a blanco.
+   Va 9 abajo y 5 más ancha por lado (438 a lo ancho de 428), como en el
+   Figma; la banda violeta de arriba es el fondo de la portada. */
+.nws-lpv__portada { position: relative; overflow: hidden; padding-top: 9px; cursor: pointer; background: linear-gradient(180deg, var(--nws-jic-violeta-portada) 0 60px, var(--naotech-app-background) 60px); }
+.nws-lpv__portada img { display: block; width: 438px; max-width: none; margin-left: -5px; height: auto; aspect-ratio: 876 / 1478; }
+/* El cuerpo sube sobre la parte blanca de la foto: titular en y 511. */
+.nws-lpv__portada + .nws-lpv__cuerpo { position: relative; z-index: 1; margin-top: -237px; padding-top: 0; gap: 0; }
+/* 36/38: más grande y con interlineado apretado (1,05), tracking negativo
+   como corresponde a un titular. Titular en y 511, 30 hasta los accesos. */
+.nws-lpv__titular { margin: 0 0 30px 47px; font-size: var(--naotech-sizing-36); line-height: 38px; font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.02em; color: var(--nws-jic-violeta-titular); }
+/* Accesos: rótulo violeta-900 14/16 en dos líneas si hace falta. */
+.nws-lpv__accesos .nws-lpv__menu { padding: 0 24px 0 17px; gap: 0; }
+.nws-lpv__accesos .nws-lpv__app { gap: 6px; }
+.nws-lpv__accesos .nws-lpv__app-l { max-width: 81px; font-size: var(--naotech-sizing-14); line-height: 16px; font-weight: var(--naotech-font-weight-semibold); color: var(--nws-jic-violeta-900); }
+/* Íconos de los accesos: NwtAvatarIcon (círculo de 64 del SDK) en blanco,
+   ícono violeta-700 y una sombra sutil. */
+.nws-lpv__accesos .nwt-avatar-icon { background: var(--naotech-app-background); --naotech-icon-color: var(--nws-jic-violeta-700); box-shadow: 0 2px 10px rgb(from var(--nws-jic-azul-900) r g b / .10), 0 1px 2px rgb(from var(--nws-jic-azul-900) r g b / .06); }
+/* Espaciado entre secciones: 40 menú→noticias, 48 entre las demás. */
+.nws-lpv__novedades { margin-top: 40px; }
+.nws-lpv__cuerpo > .nws-lpv__novedades ~ section { margin-top: var(--naotech-sizing-48); }
+.nws-lpv__skel-portada { border-radius: 0; }
+
+.nws-lpv__cuerpo { display: flex; flex-direction: column; gap: var(--naotech-sizing-32); padding: var(--naotech-sizing-24) 0 var(--naotech-sizing-24); }
+.nws-lpv__cuerpo > section { display: flex; flex-direction: column; }
+.nws-lpv__h2 { margin: 0 var(--naotech-sizing-24) var(--naotech-sizing-16); font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-32); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-color-gray-800); }
+
+/* Menú: íconos de app (NwtAvatarIcon 68 en cuadrado redondeado blanco). */
+.nws-lpv__menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--naotech-sizing-16); padding: 0 var(--naotech-sizing-24); }
+.nws-lpv__app { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-10); padding: 0; border: 0; background: transparent; cursor: pointer; }
+.nws-lpv__app-l { max-width: 10ch; font-size: var(--naotech-sizing-14); line-height: 16px; text-align: center; color: var(--naotech-color-gray-800); }
+
+/* Mazo de noticias: 3 cartas 303 de ancho, la de adelante 437 de alto; las
+   de atrás asoman a la derecha y más bajas (Figma: 382 y 318). */
+.nws-lpv__mazo { position: relative; height: 460px; margin: 0 var(--naotech-sizing-24); touch-action: pan-y; isolation: isolate; /* los z-index de las cartas no salen del mazo (no tapan header ni pestañas) */ }
+.nws-lpv__carta { position: absolute; top: 50%; left: 0; width: 303px; height: 437px; border-radius: var(--naotech-radius-xxl); overflow: hidden; background: var(--nws-jic-azul-900); box-shadow: var(--nws-sombra-2); cursor: grab; user-select: none; -webkit-user-select: none;
+  translate: 0 -50%;
+  /* resorte (leve sobrepaso) para lo que se reacomoda solo al soltar */
+  transition: left 460ms cubic-bezier(.34, 1.36, .64, 1), height 460ms cubic-bezier(.34, 1.36, .64, 1), transform 460ms cubic-bezier(.34, 1.36, .64, 1), filter 300ms var(--naotech-animation-standard), opacity 300ms var(--naotech-animation-standard); }
+.nws-lpv__carta[data-pos="1"] { left: 36px; height: 382px; filter: brightness(.92); }
+.nws-lpv__carta[data-pos="2"] { left: 72px; height: 318px; filter: brightness(.84); }
+.nws-lpv__carta:not([data-pos="0"]) .nws-lpv__carta-txt, .nws-lpv__carta:not([data-pos="0"]) .nws-lpv__compartir { opacity: 0; }
+/* durante el arrastre todo sigue al dedo, sin transición */
+.nws-lpv__carta--arrastra, .nws-lpv__carta--arrastra img { transition: none !important; }
+.nws-lpv__carta--arrastra { cursor: grabbing; }
+/* salida de lado: acelera (no rebota), se achica y se desvanece */
+.nws-lpv__carta--sale { transition: transform 320ms cubic-bezier(.4, 0, .2, 1), opacity 320ms linear; opacity: 0; }
+.nws-lpv__carta--sin, .nws-lpv__carta--sin img { transition: none !important; }
+.nws-lpv__carta-foto { position: absolute; inset: 0; overflow: hidden; }
+.nws-lpv__carta img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; transform: scale(1.2); transition: transform 460ms cubic-bezier(.34, 1.36, .64, 1); }
+.nws-lpv__carta::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgb(from var(--nws-jic-azul-900) r g b / .55) 58%, rgb(from var(--nws-jic-azul-900) r g b / .92) 100%); pointer-events: none; }
+.nws-lpv__carta-txt { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; flex-direction: column; gap: var(--naotech-sizing-8); padding: var(--naotech-sizing-20); transition: opacity 200ms var(--naotech-animation-standard); }
+/* titular de la carta: grande (24/28) y corto — 2 líneas con puntos suspensivos */
+.nws-lpv__carta-t { margin: 0; font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-28); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.02em; color: var(--naotech-app-background); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nws-lpv__carta-meta { display: flex; gap: var(--naotech-sizing-20); }
+.nws-lpv__meta { --naotech-icon-label-color: rgb(from var(--naotech-app-background) r g b / .78); --naotech-icon-dimension: var(--naotech-sizing-18); }
+.nws-lpv__meta > span { font-size: var(--naotech-sizing-12); line-height: var(--naotech-sizing-16); font-weight: var(--naotech-font-weight-semibold); }
+/* Compartir: Thumbnail del Figma = NwtIconButton en círculo blanco. */
+.nws-lp .nws-lpv__compartir { position: absolute; top: var(--naotech-sizing-14); right: var(--naotech-sizing-14); z-index: 2; --pvt-button-dimension: var(--naotech-sizing-36); --naotech-icon-button-sizing: var(--naotech-sizing-18); --pvt-button-font-color: var(--nws-jic-violeta-700); transition: opacity 200ms var(--naotech-animation-standard); }
+.nws-lp .nws-lpv__compartir .nwt-icon-button__content { background: rgb(from var(--naotech-app-background) r g b / .92); border-radius: var(--naotech-radius-circle); box-shadow: var(--nws-sombra-1); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+@media (prefers-reduced-motion: reduce) { .nws-lpv__carta { transition-timing-function: var(--naotech-animation-standard); transition-duration: 1ms; } }
+
+/* Detalle de la noticia: foto a sangre arriba (470, detrás del estado) con
+   fundido a blanco hacia el texto; contenido del Figma frame 102. Capa
+   sobre todo (z 7; el splash es 8). Las animaciones son Web Animations en
+   JS (transform + clip-path + opacity), acá solo el estado final. */
+.nws-lpd { position: absolute; inset: 0; z-index: 7; background: var(--naotech-app-background); }
+.nws-lpd__scroll { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.nws-lpd__scroll::-webkit-scrollbar { display: none; }
+.nws-lpd__foto { position: relative; height: 470px; overflow: hidden; background: var(--nws-jic-azul-900); }
+.nws-lpd__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* velo arriba (para que el estado y volver se lean) y fundido a blanco
+   abajo, hacia el texto */
+.nws-lpd__foto::after, .nws-lpd__vuela-fundido { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgb(from var(--nws-jic-azul-900) r g b / .45) 0, transparent 24%, transparent 52%, rgb(from var(--naotech-app-background) r g b / .7) 80%, var(--naotech-app-background) 100%); }
+.nws-lpd__estado { position: absolute; top: 0; left: 0; right: 0; z-index: 2; pointer-events: none; }
+.nws-lpd__estado .nws-mob__status { background: transparent; color: var(--naotech-app-background); }
+.nws-lp .nws-lpd__volver { position: absolute; top: 54px; left: var(--naotech-sizing-16); z-index: 3; --pvt-button-dimension: 40px; --naotech-icon-button-sizing: 22px; --pvt-button-font-color: var(--nws-jic-violeta-700); }
+.nws-lp .nws-lpd__volver .nwt-icon-button__content { background: rgb(from var(--naotech-app-background) r g b / .92); border-radius: var(--naotech-radius-circle); box-shadow: var(--nws-sombra-1); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+/* columna de 396 (16 por lado), 24 entre bloques; sube sobre el fundido */
+.nws-lpd__art { position: relative; display: flex; flex-direction: column; gap: var(--naotech-sizing-24); margin-top: -24px; padding: 0 var(--naotech-sizing-16) var(--naotech-sizing-40); }
+.nws-lpd__fecha { margin: 0; line-height: 18px; color: var(--naotech-color-gray-700); }
+.nws-lpd__t { margin: 0; font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-28); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-color-gray-900); }
+.nws-lpd__cuerpo { display: flex; flex-direction: column; gap: 14px; }
+.nws-lpd__autoria { margin: 0; font-size: var(--naotech-sizing-14); line-height: 18px; font-style: italic; color: var(--naotech-color-gray-700); }
+.nws-lpd__texto { margin: 0; font-size: var(--naotech-sizing-14); line-height: 20px; color: var(--nws-jic-azul-900); }
+.nws-lpd__acc { padding-top: var(--naotech-sizing-8); }
+.nws-lp .nws-lpd__leer { width: 100%; }
+/* la foto que viaja: caja final fija, solo transform/clip-path animados */
+.nws-lpd__vuela { position: absolute; top: 0; left: 0; z-index: 9; overflow: hidden; pointer-events: none; transform-origin: 0 0; will-change: transform, clip-path; }
+.nws-lpd__vuela img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.nws-lpv__mas { display: flex; justify-content: center; padding-top: var(--naotech-sizing-24); }
+
+/* Galería: mosaico horizontal en columnas de 2 (alta+baja / baja+alta). */
+.nws-lpv__mosaico { display: flex; gap: var(--naotech-sizing-16); overflow-x: auto; padding: 0 var(--naotech-sizing-24) var(--naotech-sizing-12); scroll-snap-type: x mandatory; scroll-padding-inline: var(--naotech-sizing-24); scrollbar-width: none; }
+.nws-lpv__mosaico::-webkit-scrollbar { display: none; }
+.nws-lpv__col { flex: 0 0 166px; display: grid; grid-template-rows: 205px 150px; gap: var(--naotech-sizing-14); scroll-snap-align: start; }
+.nws-lpv__col--inv { grid-template-rows: 150px 205px; }
+.nws-lpv__tesela { padding: 0; border: 0; border-radius: var(--naotech-radius-xxl); overflow: hidden; cursor: pointer; background: var(--naotech-app-color-100); box-shadow: var(--nws-sombra-1); }
+.nws-lpv__tesela img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Respuesta al tocar: al presionar (no al soltar), rápida. */
+.nws-ios-press { transition: transform 100ms var(--naotech-animation-standard), filter 100ms var(--naotech-animation-standard); -webkit-tap-highlight-color: transparent; }
+.nws-ios-press:active { transform: scale(.97); filter: brightness(.96); }
+.nws-lp--ios .nwt-tabs__tab:active .nwt-tabs__label { opacity: .5; }
+@media (prefers-reduced-motion: reduce) { .nws-ios-press:active { transform: none; } }
+
+.nws-lp--ios .nws-lpx__body { gap: var(--naotech-sizing-32); padding: var(--naotech-sizing-24) var(--naotech-sizing-16) var(--naotech-sizing-24); }
+/* Header del Figma dentro del material: sin fondo ni borde propios (los
+   pone .nws-lpi__top). */
+.nws-lp--ios .nws-lp__bar { background: transparent; border-bottom: 0; }
+/* Título grande: 34 de iOS ≈ token 32 del SDK, tracking negativo. */
+.nws-lpa__saludo { display: flex; flex-direction: column; gap: var(--naotech-sizing-2); margin-bottom: calc(var(--naotech-sizing-16) * -1); will-change: opacity; }
+.nws-lpa__overline { color: var(--nws-jic-violeta); text-transform: uppercase; letter-spacing: .06em; }
+.nws-lpa__titulo { margin: 0; max-width: 15ch; font-size: var(--naotech-sizing-32); line-height: var(--naotech-sizing-36); font-weight: var(--naotech-font-weight-bold); color: var(--naotech-color-gray-900); letter-spacing: -0.02em; }
+.nws-lpa__h2, .nws-lpa__sec .nws-lp__h { margin: 0; font-size: var(--naotech-sizing-20); line-height: var(--naotech-sizing-24); font-weight: var(--naotech-font-weight-bold); color: var(--naotech-color-gray-900); letter-spacing: -0.01em; }
+.nws-lpa__cabecera { display: flex; flex-direction: column; gap: var(--naotech-sizing-2); margin-bottom: var(--naotech-sizing-14); }
+.nws-lpa__sec { margin-bottom: var(--naotech-sizing-10); }
+
+/* Radio de "tarjeta de iOS" (20 = radius-xxl del SDK) en todo lo grande. */
+.nws-lpa__hero { height: 300px; border-radius: var(--naotech-radius-xxl); box-shadow: 0 4px 16px rgb(from var(--naotech-color-gray-900) r g b / .12); }
+/* Accesos = íconos de app: cuadrado redondeado de 60, no círculo. */
+.nws-lpa__accesos { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--naotech-sizing-8); }
+.nws-lpa__acceso { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-6); padding: 0; border: 0; background: transparent; color: var(--naotech-color-gray-900); cursor: pointer; }
+.nws-lpa__acceso-ic { --naotech-avatar-icon-dimension: 60px; --naotech-avatar-icon-factor: .45; border-radius: 14px; background: var(--naotech-app-background); box-shadow: 0 1px 3px rgb(from var(--naotech-color-gray-900) r g b / .1); }
+/* Novedad destacada: tarjeta blanca de iOS, imagen a sangre arriba. */
+.nws-lpa__destacada { display: flex; flex-direction: column; background: var(--naotech-app-background); border-radius: var(--naotech-radius-xxl); overflow: hidden; box-shadow: 0 1px 3px rgb(from var(--naotech-color-gray-900) r g b / .08); cursor: pointer; }
+.nws-lpa__destacada img { display: block; width: 100%; height: 200px; object-fit: cover; }
+.nws-lpa__destacada-txt { display: flex; flex-direction: column; gap: var(--naotech-sizing-6); padding: var(--naotech-sizing-14) var(--naotech-sizing-16) var(--naotech-sizing-16); }
+/* Lista agrupada (inset grouped): una tarjeta, separadores con sangría
+   desde el texto (no de borde a borde) y chevron al final. */
+.nws-lpa__grupo { margin-top: var(--naotech-sizing-12); background: var(--naotech-app-background); border-radius: var(--naotech-radius-xl); overflow: hidden; }
+.nws-lpa__fila { position: relative; display: grid; grid-template-columns: 64px 1fr 16px; align-items: center; gap: var(--naotech-sizing-12); padding: var(--naotech-sizing-10) var(--naotech-sizing-12) var(--naotech-sizing-10) var(--naotech-sizing-12); cursor: pointer; transition: background-color 100ms var(--naotech-animation-standard); }
+.nws-lpa__fila:active { background: var(--naotech-color-gray-200); }
+.nws-lpa__fila + .nws-lpa__fila::before { content: ''; position: absolute; top: 0; left: calc(var(--naotech-sizing-12) + 64px + var(--naotech-sizing-12)); right: 0; height: .5px; background: rgb(from var(--naotech-color-gray-900) r g b / .16); }
+.nws-lpa__fila img { display: block; width: 64px; height: 48px; object-fit: cover; border-radius: var(--naotech-radius-lg); }
+.nws-lpa__fila-txt { display: flex; flex-direction: column; gap: var(--naotech-sizing-2); min-width: 0; }
+.nws-lpa__fila-t { color: var(--naotech-color-gray-900); line-height: 18px; }
+.nws-lpa__chev { --naotech-icon-dimension: var(--naotech-sizing-16); font-size: var(--naotech-sizing-16); color: var(--naotech-color-gray-400); }
+.nws-lpa__foto { flex: 0 0 132px; height: 200px; border-radius: var(--naotech-radius-xl); }
+/* Galería en mosaico: 2 columnas, la primera tesela en 2 filas. */
+.nws-lpa__mosaico { display: grid; grid-template-columns: 1.25fr 1fr; grid-template-rows: 150px 150px; gap: var(--naotech-sizing-8); }
+.nws-lpa__tesela { position: relative; padding: 0; border: 0; border-radius: var(--naotech-radius-xl); overflow: hidden; cursor: pointer; background: var(--naotech-app-color-100); }
+.nws-lpa__tesela:first-child { grid-row: span 2; }
+.nws-lpa__tesela img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.nws-lpa__tesela-mas { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--naotech-sizing-4); color: var(--naotech-app-background); background: rgb(from var(--naotech-color-gray-900) r g b / .45); --naotech-icon-color: var(--naotech-app-background); }
+.nws-lpa__tesela-mas .nwt-icon { font-size: var(--naotech-sizing-24); }
+.nws-lpa__pieza { border-radius: var(--naotech-radius-xxl); }
+.nws-lp--ios .nws-lpx__pie { border-top: 0; padding-top: var(--naotech-sizing-8); }
+.nws-lp--ios .nws-lpx__govco { border-radius: var(--naotech-radius-xl); }
 
 /* -------------------------------------------------------------------
    Angosto (< 900px). El producto es de escritorio; acá solo se garantiza

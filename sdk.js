@@ -210,10 +210,28 @@ window.SDK = (function () {
         h('div', { class: 'nwt-progress-bar__fill', style: 'width:' + v + '%' })));
   }
 
-  /* NwtDivider */
+  /* NwtIconLabel — ícono + texto (IconLabel.tsx: div.nwt-icon-label >
+     NwtIcon + span). */
+  function iconLabel(o) {
+    return h('div', { class: cls('nwt-icon-label', o.cls), id: o.id, 'nwt-theme': o.theme }, o.icon && icon(o.icon), h('span', null, esc(o.label)));
+  }
+
+  /* NwtViewIndicator — indicador NO interactivo de posición en un conjunto
+     de vistas (carruseles). nwtDirection default 'horizontal'; el punto
+     activo se estira (foundations). */
+  function viewIndicator(o) {
+    var dots = [];
+    for (var i = 0; i < (o.total || 0); i++) { dots.push(h('span', { class: cls('nwt-view-indicator__dot', i === (o.current || 0) && 'nwt-view-indicator__dot--active') })); }
+    return h('div', { class: cls('nwt-view-indicator', o.cls), id: o.id, 'nwt-direction': o.direction || 'horizontal' }, dots.join(''));
+  }
+
+  /* NwtDivider — orientation default 'horizontal'. Divider.tsx emite SIEMPRE
+     el modificador de orientación (renderClassStatus con {[orientation]:true}):
+     sin `--horizontal` el divisor mide 0 de alto y no se ve. */
   function divider(o) {
     o = o || {};
-    return h('div', { class: cls('nwt-divider', o.vertical && 'nwt-divider--vertical', o.cls), 'nwt-direction': o.vertical ? 'vertical' : undefined });
+    var orientacion = o.vertical ? 'vertical' : 'horizontal';
+    return h('div', { class: cls('nwt-divider', 'nwt-divider--' + orientacion, o.cls), role: 'separator', 'aria-orientation': orientacion });
   }
 
   /* NwtCard — default nwtVariant 'quiet', nwtSize 'medium'.
@@ -632,6 +650,8 @@ window.SDK = (function () {
     inputBox: inputBox, searchbox: searchbox, textField: textField, textArea: textArea, stepper: stepper,
     timeline: timeline, detailGroup: detailGroup, alert: alert, modal: modal, confirmation: confirmation,
     toast: toast, breadcrumb: breadcrumb, datatable: datatable, pagination: pagination, sidebar: sidebar,
-    profileCard: profileCard
+    profileCard: profileCard,
+    viewIndicator: viewIndicator,
+    iconLabel: iconLabel
   };
 })();

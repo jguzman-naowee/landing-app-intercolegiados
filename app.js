@@ -37,7 +37,9 @@
      cargarlo en dev.html y registrar aquí su ruta. */
   var RUTAS = {
     '#/':          { pantalla: 'login' },
-    '#/conductor': { pantalla: 'conductor-app', rol: 'conductor' }
+    /* el perfil "Sin login" (id conductor) abre la landing pública; la app del
+       conductor queda en su archivo, sin ruta */
+    '#/conductor': { pantalla: 'landing-app', rol: 'conductor' }
   };
 
   /* ---------- toast ----------
@@ -79,7 +81,14 @@
   /* Botones marcados a mano con data-toast: el rótulo que se le muestra al
      usuario en el aviso. Si no está acá se toma del propio botón. */
   var FUERA = {
-    exportar: 'Exportar'
+    exportar: 'Exportar',
+    /* landing pública: piezas cuyo aria-label es largo (el titular, el alt
+       del banner) y no sirve como rótulo del aviso */
+    inscribete: 'Inscripciones',
+    novedad: 'Novedades',
+    noticia: 'Noticias',
+    galeria: 'Galería multimedia',
+    videotutoriales: 'Videotutoriales'
   };
 
   /* Red de seguridad: cualquier control que se vea clickeable y no tenga a

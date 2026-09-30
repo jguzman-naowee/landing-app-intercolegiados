@@ -13,6 +13,14 @@
  * menus    = { [rolId]: [{ section, id, label, icon, route }] } para los roles
  *            que usan el shell con sidebar (los fullscreen no lo necesitan).
  *
+ * landing  = contenido de la landing pública de Intercolegiados (perfil Sin
+ *            login). Copia del Figma «JIN Landing y App», frame 153
+ *            (node 10185:14357). Las imágenes viven en assets/landing/.
+ *            landing.app = lo propio de la app (Figma frame 13004:13907):
+ *            portada, menú, pestañas inferiores, mosaico de la galería.
+ *            `resumen` de cada noticia = TEXTO DE EJEMPLO (el Figma no lo
+ *            trae): reemplazar por el resumen real de la nota.
+ *
  * TODO ES DE DEMOSTRACIÓN. Ningún dato sale de un sistema real.
  */
 window.DATOS = {
@@ -25,7 +33,7 @@ window.DATOS = {
   "roles": [
     {
       "id": "conductor",
-      "rol": "Conductor",
+      "rol": "Sin login",
       "nombre": "C. Mendoza",
       "iniciales": "CM",
       "organizacion": "Cliente demo · Camión 12",
@@ -238,5 +246,212 @@ window.DATOS = {
         "novedades": 3
       }
     ]
+  },
+  "landing": {
+    "hora": "9:30",
+    "hero": {
+      "img": "assets/landing/hero-edicion-2026.jpg",
+      "alt": "La edición 2026 de los Juegos Intercolegiados Nacionales ¡ya arranca! · Inscríbete",
+      "accion": "Inscríbete"
+    },
+    "conoce": {
+      "titulo": "Conoce más",
+      "bajada": "sobre el desarrollo de los juegos",
+      "accesos": [
+        {
+          "id": "calendario",
+          "icono": "calendar",
+          "titulo": "Calendario",
+          "texto": "Sigue el paso de los eventos."
+        },
+        {
+          "id": "resultados",
+          "icono": "mercado-lider",
+          "titulo": "Resultados y medallas",
+          "texto": "Conoce a los ganadores"
+        }
+      ]
+    },
+    "novedad": {
+      "img": "assets/landing/novedad-principal.jpg",
+      "titulo": "Más de 1600 colombianos participaron en la consulta ciudadana que define los criterios de selección de deportes y Para deportes en los Juegos Intercolegiados",
+      "fecha": "Bogotá, 24 de febrero de 2026",
+      "resumen": "Desde los patios escolares de los municipios más apartados hasta los escenarios internacionales, la consulta ciudadana recogió los aportes de más de 1600 colombianos.",
+      "autoria": "Autoría: Miguel Guavita, prensa Ministerio del Deporte",
+      "fechaCorta": "24 feb 2026",
+      "lugar": "Bogotá",
+      "corto": "Más de 1600 colombianos participaron en la consulta ciudadana",
+      "cuerpo": "Desde los patios escolares de los municipios más apartados hasta los escenarios internacionales, el Deporte Escolar se consolidó en 2025 como uno de los pilares estratégicos del Ministerio del Deporte para la formación integral de niñas, niños y jóvenes en Colombia. A través de dos programas bandera, la Jornada Deportiva Escolar Complementaria y los Juegos Intercolegiados, el país fortaleció no solo la práctica deportiva, sino también los procesos de inclusión, equidad, permanencia escolar y proyección del talento joven en el deporte nacional e internacional."
+    },
+    "noticias": [
+      {
+        "img": "assets/landing/noticia-1.jpg",
+        "titulo": "Abierta la consulta ciudadana con el proyecto de resolución que define los criterios de selección de deportes",
+        "fecha": "Bogotá, 24 de febrero de 2026",
+        "resumen": "Ya puedes revisar el proyecto de resolución y dejar tus comentarios sobre los criterios de selección de deportes.",
+        "fechaCorta": "24 feb 2026",
+        "lugar": "Bogotá",
+        "categoria": "recientes"
+      },
+      {
+        "img": "assets/landing/noticia-2.jpg",
+        "titulo": "Este 12 de marzo se abren las inscripciones para los Juegos Intercolegiados Nacionales 2026",
+        "fecha": "Bogotá, 24 de febrero de 2026",
+        "resumen": "Colegios de todo el país podrán inscribir a sus deportistas desde el 12 de marzo. Te contamos cómo hacerlo.",
+        "fechaCorta": "24 feb 2026",
+        "lugar": "Bogotá",
+        "categoria": "inscripciones"
+      }
+    ],
+    "galeria": {
+      "titulo": "Galería multimedia",
+      "bajada": "explora las imágenes de la competencia",
+      "fotos": [
+        {
+          "img": "assets/landing/galeria-a.jpg",
+          "pos": "38% 50%"
+        },
+        {
+          "img": "assets/landing/galeria-b.jpg",
+          "pos": "55% 50%"
+        },
+        {
+          "img": "assets/landing/galeria-c.jpg",
+          "pos": "67% 50%"
+        }
+      ]
+    },
+    "herramientas": {
+      "titulo": "Nuestras herramientas",
+      "piezas": [
+        {
+          "img": "assets/landing/herramientas-videotutoriales.jpg",
+          "alt": "¿Tienes dudas sobre algún proceso? Consulta nuestros videotutoriales"
+        }
+      ],
+      "paginas": 2
+    },
+    "sitio": "juegosintercolegiados.com.co",
+    "redes": [
+      {
+        "id": "facebook",
+        "nombre": "Facebook"
+      },
+      {
+        "id": "instagram",
+        "nombre": "Instagram"
+      },
+      {
+        "id": "youtube",
+        "nombre": "YouTube"
+      },
+      {
+        "id": "xing",
+        "nombre": "Xing"
+      },
+      {
+        "id": "tiktok",
+        "nombre": "TikTok"
+      }
+    ],
+    "app": {
+      "tabs": [
+        {
+          "id": "inicio",
+          "icono": "home",
+          "label": "Inicio"
+        },
+        {
+          "id": "calendario",
+          "icono": "calendar",
+          "label": "Calendario"
+        },
+        {
+          "id": "resultados",
+          "icono": "mercado-lider",
+          "label": "Resultados"
+        }
+      ],
+      "cuenta": {
+        "nombre": "Juegos Intercolegiados",
+        "lugar": "Bogotá"
+      },
+      "categorias": [
+        {
+          "id": "recientes",
+          "label": "Recientes"
+        },
+        {
+          "id": "inscripciones",
+          "label": "Inscripciones"
+        },
+        {
+          "id": "regionales",
+          "label": "Regionales"
+        }
+      ],
+      "splash": {
+        "img": "assets/landing/splash-2026.jpg",
+        "alt": "Juegos Intercolegiados 2026 · Ministerio del Deporte",
+        "ms": 2200
+      },
+      "portada": {
+        "img": "assets/landing/portada-2026.jpg",
+        "titular": [
+          "En este 2026",
+          "vamos por más"
+        ],
+        "alt": "Juegos Intercolegiados 2026"
+      },
+      "menu": [
+        {
+          "id": "medallas",
+          "icono": "mercado-lider",
+          "label": "Medallas"
+        },
+        {
+          "id": "tutoriales",
+          "icono": "play",
+          "label": "Videos tutoriales"
+        },
+        {
+          "id": "certificados",
+          "icono": "file",
+          "label": "Certificados"
+        }
+      ],
+      "mosaico": [
+        {
+          "img": "assets/landing/galeria-a.jpg",
+          "pos": "38% 30%",
+          "alto": "alto"
+        },
+        {
+          "img": "assets/landing/noticia-1.jpg",
+          "pos": "50% 50%",
+          "alto": "bajo"
+        },
+        {
+          "img": "assets/landing/novedad-principal.jpg",
+          "pos": "50% 50%",
+          "alto": "bajo"
+        },
+        {
+          "img": "assets/landing/galeria-b.jpg",
+          "pos": "55% 30%",
+          "alto": "alto"
+        },
+        {
+          "img": "assets/landing/galeria-c.jpg",
+          "pos": "67% 50%",
+          "alto": "alto"
+        },
+        {
+          "img": "assets/landing/noticia-2.jpg",
+          "pos": "50% 40%",
+          "alto": "bajo"
+        }
+      ]
+    }
   }
 };

@@ -50,8 +50,18 @@ out = ['<meta charset="utf-8">', titulo, descr,
 for h in hojas:
     out.append('<style data-origen="%s">\n%s\n</style>' % (h, css_con_fuentes(h)))
 out.append(resto)
+# Imágenes de la maqueta (assets/…): los scripts las nombran como texto
+# ('assets/landing/hero.jpg'); acá ese texto se cambia por su data URI para
+# que la página siga siendo UN archivo. Mismo archivo, mismo lugar.
+MIME = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp'}
+def embeber_assets(js):
+    def sub(m):
+        rel = m.group(2)
+        return m.group(1) + data_uri(rel, MIME[pathlib.Path(rel).suffix.lower()]) + m.group(1)
+    return re.sub(r'([\'"])(assets/[^\'"]+)\1', sub, js)
+
 for s in scripts:
-    js = (raiz / s).read_text(encoding='utf8')
+    js = embeber_assets((raiz / s).read_text(encoding='utf8'))
     assert '</script' not in js, s
     out.append('<script data-origen="%s">\n%s\n</script>' % (s, js))
 

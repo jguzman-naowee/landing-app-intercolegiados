@@ -17,7 +17,10 @@ Link directo a una pantalla: `index.html?rol=conductor#/conductor`.
 
 | Rol | Pantallas |
 |---|---|
-| Conductor | `#/conductor` app móvil (hoy → mi ruta → marcar parada → ruta cerrada · historial) |
+| Sin login | `#/conductor` landing pública de Juegos Intercolegiados en marco de teléfono de 428 px (Figma «JIN Landing y App», frame 153) |
+
+La app del conductor (`pantallas/conductor-app.js` + `mapa.js`) sigue en la
+carpeta como referencia, sin ruta.
 
 ## Cómo sumar un cliente / un rol
 
@@ -58,6 +61,8 @@ app.css         lo que el SDK no tiene (prefijo nws-), todo en tokens
 sdk.js          anatomía de los Nwt*, leída del compilado
 mapa.js         motor de mapa (retícula de calles, rutas, camión animado)
 marca.js        logo e isotipo de Naowee (SVG inline) + favicon
+marca-jic.js    marca del cliente: logos JIC/MinDeporte/gov.co + íconos de redes
+assets/landing/ imágenes de la landing (publicar.py las embebe como data URI)
 datos.js        los datos, en JSON
 app.js          sesión por rol, router por hash, shell (sidebar + toolbar)
 pantallas/      login.js (selector) + una por pantalla de rol
