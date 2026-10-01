@@ -158,6 +158,23 @@ window.SDK = (function () {
         icon(o.icon)));
   }
 
+  /* NwtSwitch */
+  function switchControl(o) {
+    o = o || {};
+    var checked = Boolean(o.checked);
+    var a = {
+      role: 'switch',
+      'aria-checked': checked ? 'true' : 'false',
+      'aria-label': o.label || '',
+      class: cls('nwt-switch', checked && 'nwt-switch--checked', o.disabled && 'nwt-switch--disabled', o.cls)
+    };
+    if (o.id) { a.id = o.id; }
+    Object.assign(a, o.attrs || {});
+    return h('button', Object.assign({ type: 'button' }, a),
+      h('span', { class: 'nwt-switch__component' },
+        h('span', { class: 'nwt-switch__component__element' })));
+  }
+
   /* NwtBadge — default nwtVariant 'loud' NO cumple AA (medido 2.9–3.2:1).
      Acá el default es 'quiet' a propósito; ver INVENTARIO. */
   function badge(o) {
@@ -644,7 +661,7 @@ window.SDK = (function () {
 
   return {
     esc: esc, h: h, cls: cls, repintar: repintar,
-    icon: icon, spinner: spinner, button: button, iconButton: iconButton, badge: badge, tag: tag, avatar: avatar,
+    icon: icon, spinner: spinner, button: button, iconButton: iconButton, switchControl: switchControl, 'switch': switchControl, badge: badge, tag: tag, avatar: avatar,
     avatarIcon: avatarIcon, progress: progress, divider: divider, card: card, emptyState: emptyState,
     statCard: statCard, title: title, toolbar: toolbar, subheader: subheader, tabs: tabs, tagGroup: tagGroup,
     inputBox: inputBox, searchbox: searchbox, textField: textField, textArea: textArea, stepper: stepper,

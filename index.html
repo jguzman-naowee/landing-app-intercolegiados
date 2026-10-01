@@ -12303,6 +12303,160 @@ body {
 @keyframes nws-lps2-zoom { from { transform: scale(1); } to { transform: scale(1.69); } }
 @media (prefers-reduced-motion: reduce) { .nws-lps--kb .nws-lps__logo-jic { animation: none; transform: scale(1.69); } }
 
+/* -------------------------------------------------------------------
+   Control de visualización: Capa de presentación vs Vista plana
+   ------------------------------------------------------------------- */
+.nws-switch-flotante {
+  position: fixed;
+  top: var(--naotech-sizing-14, 14px);
+  right: var(--naotech-sizing-16, 16px);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--naotech-sizing-10, 10px);
+  padding: 6px 12px 6px 14px;
+  background: var(--naotech-app-background, #fff);
+  border: 1px solid var(--naotech-app-color-300, #cbd5e1);
+  border-radius: var(--naotech-radius-pill, 9999px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  transition: all var(--naotech-duration-fast, 150ms) var(--naotech-animation-standard, ease);
+}
+.nws-switch-flotante:hover {
+  background: var(--naotech-app-color-050, #f8fafc);
+  border-color: var(--naotech-app-color-400, #94a3b8);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+.nws-switch-flotante__txt {
+  font-size: var(--naotech-sizing-14, 14px);
+  font-weight: var(--naotech-font-weight-semibold, 600);
+  line-height: 1;
+  color: var(--naotech-app-color-800, #1e293b);
+  letter-spacing: -0.01em;
+}
+.nws-switch-flotante .nwt-switch {
+  min-height: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+}
+.nws-switch-flotante .nwt-switch:focus-visible {
+  outline: 2px solid var(--nws-jic-violeta, #691886);
+  outline-offset: 2px;
+  border-radius: var(--naotech-radius-pill);
+}
+
+/* -------------------------------------------------------------------
+   Modo Plano: sin capa de presentación, vista completa como imagen
+   ------------------------------------------------------------------- */
+html.nws-modo-plano,
+body.nws-modo-plano {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  background: var(--naotech-app-color-100, #f1f5f9) !important;
+}
+
+/* Ocultar elementos de la capa de presentación */
+body.nws-modo-plano .nwt-toolbar,
+body.nws-modo-plano .nws-phone-zoom,
+body.nws-modo-plano #lps {
+  display: none !important;
+}
+
+/* El cascarón exterior pasa a flujo vertical con scroll natural */
+body.nws-modo-plano #app,
+body.nws-modo-plano .nws-col {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+body.nws-modo-plano #stage {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  padding: 32px 16px 64px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  background: transparent !important;
+}
+
+/* El marco de teléfono se retira y queda el lienzo plano de 428px */
+body.nws-modo-plano #phone {
+  width: 428px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  clip-path: none !important;
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transform: none !important;
+  overflow: visible !important;
+  flex: none !important;
+}
+
+/* La pantalla interna se despliega completa sin corte de scroll */
+body.nws-modo-plano #mob {
+  width: 428px !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  clip-path: none !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  background: var(--naotech-app-background, #fff) !important;
+}
+
+/* El scroll interno se abre por completo para mostrar toda la pantalla */
+body.nws-modo-plano #lp-scroll {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  flex: none !important;
+  padding-bottom: 0 !important;
+}
+
+/* La barra de estado y cabecera quedan en la parte superior del lienzo */
+body.nws-modo-plano #lpi-top {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 4 !important;
+}
+
+/* El pie finaliza con espaciado limpio */
+body.nws-modo-plano .nws-lpv__pie {
+  margin-bottom: 0 !important;
+  padding-bottom: var(--naotech-sizing-40, 40px) !important;
+}
+
+/* La barra inferior de pestañas y home indicator se sitúan al final de la vista plana */
+body.nws-modo-plano .nws-lpi__bottom {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  background: var(--naotech-app-background, #fff) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top: 1px solid var(--naotech-color-gray-200, #e5e7eb) !important;
+  z-index: 2 !important;
+}
+
 </style>
 <div id="app" style="height:100%"></div>
 <!-- pantallas por rol: una línea por archivo, antes de app.js -->
@@ -12465,6 +12619,23 @@ window.SDK = (function () {
     return h('span', a,
       h('button', { class: 'nwt-icon-button__content', type: 'button', 'aria-label': o.label, disabled: !!o.disabled },
         icon(o.icon)));
+  }
+
+  /* NwtSwitch */
+  function switchControl(o) {
+    o = o || {};
+    var checked = Boolean(o.checked);
+    var a = {
+      role: 'switch',
+      'aria-checked': checked ? 'true' : 'false',
+      'aria-label': o.label || '',
+      class: cls('nwt-switch', checked && 'nwt-switch--checked', o.disabled && 'nwt-switch--disabled', o.cls)
+    };
+    if (o.id) { a.id = o.id; }
+    Object.assign(a, o.attrs || {});
+    return h('button', Object.assign({ type: 'button' }, a),
+      h('span', { class: 'nwt-switch__component' },
+        h('span', { class: 'nwt-switch__component__element' })));
   }
 
   /* NwtBadge — default nwtVariant 'loud' NO cumple AA (medido 2.9–3.2:1).
@@ -12953,7 +13124,7 @@ window.SDK = (function () {
 
   return {
     esc: esc, h: h, cls: cls, repintar: repintar,
-    icon: icon, spinner: spinner, button: button, iconButton: iconButton, badge: badge, tag: tag, avatar: avatar,
+    icon: icon, spinner: spinner, button: button, iconButton: iconButton, switchControl: switchControl, 'switch': switchControl, badge: badge, tag: tag, avatar: avatar,
     avatarIcon: avatarIcon, progress: progress, divider: divider, card: card, emptyState: emptyState,
     statCard: statCard, title: title, toolbar: toolbar, subheader: subheader, tabs: tabs, tagGroup: tagGroup,
     inputBox: inputBox, searchbox: searchbox, textField: textField, textArea: textArea, stepper: stepper,
@@ -14173,7 +14344,28 @@ window.PANTALLAS['landing-app'] = (function () {
 
     render: function (ctx) {
       var S = ctx.S, rol = ctx.rol, L = ctx.D.landing;
+      var plana = false;
+      try {
+        plana = /[?&]plana\b/.test(location.search) || localStorage.getItem('proto.vistaPlana') === '1';
+      } catch (e) {}
+      if (plana) {
+        document.documentElement.classList.add('nws-modo-plano');
+        document.body.classList.add('nws-modo-plano');
+      } else {
+        document.documentElement.classList.remove('nws-modo-plano');
+        document.body.classList.remove('nws-modo-plano');
+      }
+
+      var switchHtml = S.h('div', { class: 'nws-switch-flotante', id: 'ctrl-vista-plana', role: 'group', 'aria-label': 'Modo de visualización', title: 'Alternar entre capa de presentación y vista plana' },
+        S.h('span', { class: 'nws-switch-flotante__txt' }, 'Vista plana'),
+        S.switchControl({
+          id: 'btn-switch-plana',
+          checked: plana,
+          label: 'Alternar entre capa de presentación y vista plana'
+        }));
+
       return S.h('div', { class: 'nws-col', style: 'height:100%;background:var(--naotech-app-color-100)' },
+        switchHtml,
         S.toolbar({
           body: S.h('div', { class: 'nws-row nws-title-light' }, S.h('div', { class: 'nws-title__naowee' }, window.NAOWEE.icono), S.title({ text: 'App JIN', subtitle: 'Juegos Intercolegiados' })),
           actions: ''
@@ -14194,6 +14386,10 @@ window.PANTALLAS['landing-app'] = (function () {
     ajustar: function (root, ctx, mult) {
       var stage = root.querySelector('#stage'), phone = root.querySelector('#phone');
       if (!stage || !phone) { return; }
+      if (document.body.classList.contains('nws-modo-plano')) {
+        phone.style.transform = 'none';
+        return;
+      }
       var r = stage.getBoundingClientRect();
       var fit = Math.min((r.width - 48) / (ANCHO + BORDE * 2), (r.height - 48) / (ALTO + BORDE * 2), 1);
       phone.style.transform = 'scale(' + (fit * (mult || 1)).toFixed(3) + ')';
@@ -14201,7 +14397,7 @@ window.PANTALLAS['landing-app'] = (function () {
 
     mount: function (root, ctx) {
       var S = ctx.S, L = ctx.D.landing, self = this;
-      var mob = root.querySelector('#mob');
+      var mob = root.querySelector('#mob'), phone = root.querySelector('#phone');
       var sc = mob.querySelector('#lp-scroll'), top = mob.querySelector('#lpi-top');
 
       /* El contenido se pinta debajo del splash; el splash se va cuando
@@ -14289,6 +14485,45 @@ window.PANTALLAS['landing-app'] = (function () {
 
       var zoom = { mult: 1 };
       function aplicarZoom() { self.ajustar(root, ctx, zoom.mult); }
+
+      var ctrlPlana = root.querySelector('#ctrl-vista-plana');
+      var btnPlana = root.querySelector('#btn-switch-plana');
+
+      function toggleVistaPlana(forzar) {
+        var activa = typeof forzar === 'boolean' ? forzar : !document.body.classList.contains('nws-modo-plano');
+        document.documentElement.classList.toggle('nws-modo-plano', activa);
+        document.body.classList.toggle('nws-modo-plano', activa);
+        if (btnPlana) {
+          btnPlana.classList.toggle('nwt-switch--checked', activa);
+          btnPlana.setAttribute('aria-checked', activa ? 'true' : 'false');
+        }
+        try { localStorage.setItem('proto.vistaPlana', activa ? '1' : '0'); } catch (e) {}
+
+        if (activa) {
+          var sp = mob.querySelector('#lps');
+          if (sp) { sp.hidden = true; sp.classList.add('nws-lps--fuera'); }
+          phone.style.transform = 'none';
+        } else {
+          aplicarZoom();
+        }
+        ctx.posicionarIndicadores(mob);
+      }
+
+      function onSwitchClick(ev) {
+        ev.preventDefault();
+        toggleVistaPlana();
+      }
+
+      if (ctrlPlana) {
+        ctrlPlana.addEventListener('click', onSwitchClick);
+      }
+
+      if (document.body.classList.contains('nws-modo-plano')) {
+        var spInicial = mob.querySelector('#lps');
+        if (spInicial) { spInicial.hidden = true; spInicial.classList.add('nws-lps--fuera'); }
+        phone.style.transform = 'none';
+      }
+
       function onClick(ev) {
         var z = ev.target.closest('[data-zoom]');
         if (z) {
@@ -14324,6 +14559,9 @@ window.PANTALLAS['landing-app'] = (function () {
       onScroll();
       aplicarZoom();
       return function () {
+        document.documentElement.classList.remove('nws-modo-plano');
+        document.body.classList.remove('nws-modo-plano');
+        if (ctrlPlana) { ctrlPlana.removeEventListener('click', onSwitchClick); }
         timers.forEach(clearTimeout);
         offMazo();
         vistas.destruir();

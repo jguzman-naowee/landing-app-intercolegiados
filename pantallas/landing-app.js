@@ -474,7 +474,28 @@ window.PANTALLAS['landing-app'] = (function () {
 
     render: function (ctx) {
       var S = ctx.S, rol = ctx.rol, L = ctx.D.landing;
+      var plana = false;
+      try {
+        plana = /[?&]plana\b/.test(location.search) || localStorage.getItem('proto.vistaPlana') === '1';
+      } catch (e) {}
+      if (plana) {
+        document.documentElement.classList.add('nws-modo-plano');
+        document.body.classList.add('nws-modo-plano');
+      } else {
+        document.documentElement.classList.remove('nws-modo-plano');
+        document.body.classList.remove('nws-modo-plano');
+      }
+
+      var switchHtml = S.h('div', { class: 'nws-switch-flotante', id: 'ctrl-vista-plana', role: 'group', 'aria-label': 'Modo de visualización', title: 'Alternar entre capa de presentación y vista plana' },
+        S.h('span', { class: 'nws-switch-flotante__txt' }, 'Vista plana'),
+        S.switchControl({
+          id: 'btn-switch-plana',
+          checked: plana,
+          label: 'Alternar entre capa de presentación y vista plana'
+        }));
+
       return S.h('div', { class: 'nws-col', style: 'height:100%;background:var(--naotech-app-color-100)' },
+        switchHtml,
         S.toolbar({
           body: S.h('div', { class: 'nws-row nws-title-light' }, S.h('div', { class: 'nws-title__naowee' }, window.NAOWEE.icono), S.title({ text: 'App JIN', subtitle: 'Juegos Intercolegiados' })),
           actions: ''
@@ -495,6 +516,10 @@ window.PANTALLAS['landing-app'] = (function () {
     ajustar: function (root, ctx, mult) {
       var stage = root.querySelector('#stage'), phone = root.querySelector('#phone');
       if (!stage || !phone) { return; }
+      if (document.body.classList.contains('nws-modo-plano')) {
+        phone.style.transform = 'none';
+        return;
+      }
       var r = stage.getBoundingClientRect();
       var fit = Math.min((r.width - 48) / (ANCHO + BORDE * 2), (r.height - 48) / (ALTO + BORDE * 2), 1);
       phone.style.transform = 'scale(' + (fit * (mult || 1)).toFixed(3) + ')';
@@ -502,7 +527,7 @@ window.PANTALLAS['landing-app'] = (function () {
 
     mount: function (root, ctx) {
       var S = ctx.S, L = ctx.D.landing, self = this;
-      var mob = root.querySelector('#mob');
+      var mob = root.querySelector('#mob'), phone = root.querySelector('#phone');
       var sc = mob.querySelector('#lp-scroll'), top = mob.querySelector('#lpi-top');
 
       /* El contenido se pinta debajo del splash; el splash se va cuando
@@ -590,6 +615,45 @@ window.PANTALLAS['landing-app'] = (function () {
 
       var zoom = { mult: 1 };
       function aplicarZoom() { self.ajustar(root, ctx, zoom.mult); }
+
+      var ctrlPlana = root.querySelector('#ctrl-vista-plana');
+      var btnPlana = root.querySelector('#btn-switch-plana');
+
+      function toggleVistaPlana(forzar) {
+        var activa = typeof forzar === 'boolean' ? forzar : !document.body.classList.contains('nws-modo-plano');
+        document.documentElement.classList.toggle('nws-modo-plano', activa);
+        document.body.classList.toggle('nws-modo-plano', activa);
+        if (btnPlana) {
+          btnPlana.classList.toggle('nwt-switch--checked', activa);
+          btnPlana.setAttribute('aria-checked', activa ? 'true' : 'false');
+        }
+        try { localStorage.setItem('proto.vistaPlana', activa ? '1' : '0'); } catch (e) {}
+
+        if (activa) {
+          var sp = mob.querySelector('#lps');
+          if (sp) { sp.hidden = true; sp.classList.add('nws-lps--fuera'); }
+          phone.style.transform = 'none';
+        } else {
+          aplicarZoom();
+        }
+        ctx.posicionarIndicadores(mob);
+      }
+
+      function onSwitchClick(ev) {
+        ev.preventDefault();
+        toggleVistaPlana();
+      }
+
+      if (ctrlPlana) {
+        ctrlPlana.addEventListener('click', onSwitchClick);
+      }
+
+      if (document.body.classList.contains('nws-modo-plano')) {
+        var spInicial = mob.querySelector('#lps');
+        if (spInicial) { spInicial.hidden = true; spInicial.classList.add('nws-lps--fuera'); }
+        phone.style.transform = 'none';
+      }
+
       function onClick(ev) {
         var z = ev.target.closest('[data-zoom]');
         if (z) {
@@ -625,6 +689,9 @@ window.PANTALLAS['landing-app'] = (function () {
       onScroll();
       aplicarZoom();
       return function () {
+        document.documentElement.classList.remove('nws-modo-plano');
+        document.body.classList.remove('nws-modo-plano');
+        if (ctrlPlana) { ctrlPlana.removeEventListener('click', onSwitchClick); }
         timers.forEach(clearTimeout);
         offMazo();
         vistas.destruir();

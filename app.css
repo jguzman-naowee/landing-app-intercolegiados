@@ -1449,3 +1449,157 @@ body {
 .nws-lps--kb .nws-lps__logo-jic { animation: nws-lps2-zoom var(--nws-lps-carga, 2200ms) cubic-bezier(.16, 1, .3, 1) 0ms both; }
 @keyframes nws-lps2-zoom { from { transform: scale(1); } to { transform: scale(1.69); } }
 @media (prefers-reduced-motion: reduce) { .nws-lps--kb .nws-lps__logo-jic { animation: none; transform: scale(1.69); } }
+
+/* -------------------------------------------------------------------
+   Control de visualización: Capa de presentación vs Vista plana
+   ------------------------------------------------------------------- */
+.nws-switch-flotante {
+  position: fixed;
+  top: var(--naotech-sizing-14, 14px);
+  right: var(--naotech-sizing-16, 16px);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--naotech-sizing-10, 10px);
+  padding: 6px 12px 6px 14px;
+  background: var(--naotech-app-background, #fff);
+  border: 1px solid var(--naotech-app-color-300, #cbd5e1);
+  border-radius: var(--naotech-radius-pill, 9999px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  transition: all var(--naotech-duration-fast, 150ms) var(--naotech-animation-standard, ease);
+}
+.nws-switch-flotante:hover {
+  background: var(--naotech-app-color-050, #f8fafc);
+  border-color: var(--naotech-app-color-400, #94a3b8);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+.nws-switch-flotante__txt {
+  font-size: var(--naotech-sizing-14, 14px);
+  font-weight: var(--naotech-font-weight-semibold, 600);
+  line-height: 1;
+  color: var(--naotech-app-color-800, #1e293b);
+  letter-spacing: -0.01em;
+}
+.nws-switch-flotante .nwt-switch {
+  min-height: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+}
+.nws-switch-flotante .nwt-switch:focus-visible {
+  outline: 2px solid var(--nws-jic-violeta, #691886);
+  outline-offset: 2px;
+  border-radius: var(--naotech-radius-pill);
+}
+
+/* -------------------------------------------------------------------
+   Modo Plano: sin capa de presentación, vista completa como imagen
+   ------------------------------------------------------------------- */
+html.nws-modo-plano,
+body.nws-modo-plano {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  background: var(--naotech-app-color-100, #f1f5f9) !important;
+}
+
+/* Ocultar elementos de la capa de presentación */
+body.nws-modo-plano .nwt-toolbar,
+body.nws-modo-plano .nws-phone-zoom,
+body.nws-modo-plano #lps {
+  display: none !important;
+}
+
+/* El cascarón exterior pasa a flujo vertical con scroll natural */
+body.nws-modo-plano #app,
+body.nws-modo-plano .nws-col {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+body.nws-modo-plano #stage {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  padding: 32px 16px 64px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  background: transparent !important;
+}
+
+/* El marco de teléfono se retira y queda el lienzo plano de 428px */
+body.nws-modo-plano #phone {
+  width: 428px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  clip-path: none !important;
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transform: none !important;
+  overflow: visible !important;
+  flex: none !important;
+}
+
+/* La pantalla interna se despliega completa sin corte de scroll */
+body.nws-modo-plano #mob {
+  width: 428px !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  clip-path: none !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  background: var(--naotech-app-background, #fff) !important;
+}
+
+/* El scroll interno se abre por completo para mostrar toda la pantalla */
+body.nws-modo-plano #lp-scroll {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  flex: none !important;
+  padding-bottom: 0 !important;
+}
+
+/* La barra de estado y cabecera quedan en la parte superior del lienzo */
+body.nws-modo-plano #lpi-top {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 4 !important;
+}
+
+/* El pie finaliza con espaciado limpio */
+body.nws-modo-plano .nws-lpv__pie {
+  margin-bottom: 0 !important;
+  padding-bottom: var(--naotech-sizing-40, 40px) !important;
+}
+
+/* La barra inferior de pestañas y home indicator se sitúan al final de la vista plana */
+body.nws-modo-plano .nws-lpi__bottom {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  background: var(--naotech-app-background, #fff) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top: 1px solid var(--naotech-color-gray-200, #e5e7eb) !important;
+  z-index: 2 !important;
+}
