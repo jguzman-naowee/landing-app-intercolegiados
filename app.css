@@ -1214,6 +1214,36 @@ body {
 .nws-lpv__mosaico { display: flex; gap: var(--naotech-sizing-16); overflow-x: auto; padding: 0 var(--naotech-sizing-24) var(--naotech-sizing-12); scroll-snap-type: x mandatory; scroll-padding-inline: var(--naotech-sizing-24); scrollbar-width: none; }
 .nws-lpv__mosaico::-webkit-scrollbar { display: none; }
 
+/* Galería: título + control de vista en una fila; la fila deja los 20px al contenido. */
+.nws-lpv__h2-fila { display: flex; align-items: center; justify-content: space-between; gap: var(--naotech-sizing-12); margin: 0 var(--naotech-sizing-24) var(--nws-gap-titulo); }
+.nws-lpv__h2-fila > .nws-lpv__h2 { margin: 0; min-width: 0; }
+/* Control segmentado: botón de 44 de área táctil con el círculo visible de 40; el activo en violeta suave, como los avatares de las tarjetas. */
+.nws-lpv__vistas { flex: none; display: inline-flex; border: 1px solid var(--naotech-color-gray-300); border-radius: var(--naotech-radius-pill); background: var(--naotech-app-background); }
+.nws-lpv__vista-btn { position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: var(--naotech-radius-pill); background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nws-lpv__vista-btn::before { content: ''; position: absolute; inset: 2px; border-radius: var(--naotech-radius-circle); transition: background-color 200ms var(--naotech-animation-standard); }
+.nws-lpv__vista-btn[aria-pressed="true"]::before { background: color-mix(in srgb, var(--nws-jic-violeta-titular) 12%, white); }
+.nws-lpv__vista-btn .nwt-icon { position: relative; margin: 0; font-size: 22px; --naotech-icon-dimension: 22px; --naotech-icon-color: var(--naotech-color-gray-700); }
+.nws-lpv__vista-btn[aria-pressed="true"] .nwt-icon { --naotech-icon-color: var(--nws-jic-violeta-700); }
+.nws-lpv__vista-btn:focus-visible { outline: 2px solid var(--nws-jic-violeta-titular); outline-offset: 1px; }
+.nws-lpv__vista[hidden] { display: none; }
+
+/* Carrusel «una a la vez»: foto cuadrada de 380 por vez; sin aire a los lados para que la sombra de la siguiente no asome. */
+.nws-lpv__pista { position: relative; box-sizing: border-box; display: flex; gap: var(--naotech-sizing-12); margin: -4px var(--naotech-sizing-24) 0; padding: 4px 0 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.nws-lpv__pista::-webkit-scrollbar { display: none; }
+.nws-lpv__pista:focus { outline: none; }
+.nws-lpv__pista--arrastra { scroll-snap-type: none; cursor: grabbing; }
+.nws-lpv__slide { position: relative; flex: 0 0 100%; aspect-ratio: 1 / 1; border-radius: var(--naotech-radius-xxl); overflow: hidden; background: var(--naotech-app-color-100); box-shadow: var(--nws-sombra-1); scroll-snap-align: start; scroll-snap-stop: always; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.nws-lpv__slide img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.nws-lpv__pista:focus-visible .nws-lpv__slide { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: -3px; }
+/* Dots: punto de 8 (activo, pastilla de 20) dentro de un botón de 24×44. */
+.nws-lpv__dots { display: flex; justify-content: center; height: 28px; margin-top: -4px; }
+.nws-lpv__dot { position: relative; flex: none; width: 24px; height: 44px; margin: -8px 0; padding: 0; border: 0; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nws-lpv__dot::before { content: ''; position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; translate: -50% -50%; border-radius: var(--naotech-radius-pill); background: color-mix(in srgb, var(--nws-jic-violeta-700) 45%, white); transition: width 200ms var(--naotech-animation-standard), background-color 200ms var(--naotech-animation-standard); }
+.nws-lpv__dot--activo::before { width: 20px; background: var(--nws-jic-violeta-700); }
+.nws-lpv__dot:focus-visible { outline: none; }
+.nws-lpv__dot:focus-visible::before { outline: 2px solid var(--nws-jic-violeta-titular); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .nws-lpv__dot::before, .nws-lpv__vista-btn::before { transition: none; } }
+
 /* Pie de la app: sube de transparente a violeta; el padding inferior cubre el tabbar flotante (100px). */
 /* DC-092: el pie sube sobre el aire inferior de la cita (el degradé nace transparente) y el morado queda pegado al texto. */
 .nws-lpv__pie { margin-top: calc(var(--naotech-sizing-16) * -1); margin-bottom: -100px; padding: 96px var(--naotech-sizing-24) calc(100px + var(--naotech-sizing-16) + var(--naotech-sizing-24)); display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-16); text-align: center; background: linear-gradient(to bottom, rgb(from var(--nws-jic-violeta-700) r g b / 0) 0, var(--nws-jic-violeta-700) 45%, var(--nws-jic-violeta-900) 100%); color: var(--naotech-color-white, #fff); }

@@ -171,27 +171,46 @@ window.LANDING_DEV = {
   galeria: {
     titulo: 'Galería multimedia',
     ui: [
-      'Mosaico horizontal con la ciudad en un badge. Nivel 3: se explora más de lo que se lee.',
-      'Columnas alternadas (alta+baja / baja+alta); la siguiente asoma e invita al gesto.'
+      'Por defecto, carrusel «una a la vez»: una foto cuadrada por vez con dots debajo, como Instagram o las historias de WhatsApp. Pedido del Director Ejecutivo.',
+      'A la derecha del título, un control de dos opciones (una a la vez / cuadrícula). La cuadrícula es el mosaico de columnas alternadas de antes.',
+      'La ciudad va en un badge sobre cada foto, en las dos vistas.'
     ],
     logica: [
-      'Scroll horizontal con snap por columna, sin barra visible.',
-      'Cada tesela responde al toque (escala .97); hoy avisa «Disponible próximamente».'
+      'Carrusel con `scroll-snap` (`mandatory`, `stop: always`): una foto por gesto; los dots siguen al scroll y el activo es una pastilla.',
+      'Tocar la foto avanza a la siguiente y, desde la última, vuelve a la primera. Los dots y las flechas ←/→ también navegan.',
+      'Tocar una tesela de la cuadrícula abre el carrusel en esa foto, sin animación de scroll. No es una salida: nada navega.',
+      'La vista elegida vive solo en memoria: cada carga arranca en carrusel. El cambio de vista es un fundido de 200 ms (sin animación con «reducir movimiento»).'
     ],
     flutter: {
       widgets: [
-        '`SizedBox(height: 346)` + `ListView.builder(scrollDirection: Axis.horizontal)`; cada columna, un `Column` con dos `Expanded(flex: ...)`.',
-        'Snap por columna: `PageView.builder(padEnds: false)` con `PageController(viewportFraction: ...)`, o un `ScrollPhysics` propio (verificar).',
-        'Foto: `ClipRRect(borderRadius: ...)` + `Image.network(fit: BoxFit.cover)` (o `cached_network_image`); badge con `Positioned(left: 8, bottom: 8)`.',
-        'Badge: `Container` con `BorderRadius.circular(999)` y `Row(mainAxisSize: MainAxisSize.min)` con `Icon` y `Text(overflow: TextOverflow.ellipsis)`.'
+        'Carrusel: `SizedBox(height: 392)` + `PageView.builder` con `PageController(viewportFraction: 1)`; cada página, `AspectRatio(aspectRatio: 1)` + `ClipRRect(borderRadius: BorderRadius.circular(20))`. `PageView` no tiene alto propio: sin `SizedBox` o `Expanded` falla.',
+        'Márgenes: `Padding(horizontal: 18)` fuera del `PageView` y `Padding(horizontal: 6)` por página dan foto de 380 y 12 entre fotos, igual que el prototipo.',
+        'Foto: `Image.network(fit: BoxFit.cover, alignment: Alignment(x, y))`, donde `x = 2 * pos - 1` (el `pos` del prototipo en porcentaje). Badge con `Positioned(left: 8, bottom: 8)`.',
+        'Tocar para avanzar: `GestureDetector` o `InkWell` con `controller.nextPage(duration:, curve:)`; en la última, `controller.animateToPage(0, duration:, curve:)`. Con `MediaQuery.disableAnimationsOf(context)` usar `jumpToPage`.',
+        'Dots: `Row` de `AnimatedContainer` (ancho 8, o 20 el activo) dentro de un `SizedBox(width: 24, height: 44)` tocable, con `Semantics(label: ..., selected: ...)`; o el paquete `smooth_page_indicator` (verificar).',
+        'Toggle: `SegmentedButton<VistaGaleria>` (Material 3) con `ButtonSegment(icon:, tooltip:)` y `selected: {vista}`, o `ToggleButtons`.',
+        'Cuadrícula: `ListView.builder(scrollDirection: Axis.horizontal)` con una `Column` de 2 teselas por columna. `GridView.builder` sirve si las teselas son iguales; para alturas alternadas, `flutter_staggered_grid_view` (verificar).',
+        'Fundido entre vistas: `AnimatedSwitcher(duration: Duration(milliseconds: 200))` con una `ValueKey` por vista.'
       ],
-      tip: 'Dale `cacheExtent` al `ListView` para que la foto de la siguiente columna ya esté cargada cuando asoma.'
+      tip: 'Guardá el índice en el estado de la pantalla y creá el `PageController(initialPage: indice)` al montar el carrusel: con la cuadrícula visible el `PageView` no existe y `jumpToPage` fallaría.',
+      codigo: [
+        'PageView.builder(',
+        '  controller: PageController(viewportFraction: 1, initialPage: indice),',
+        '  itemCount: fotos.length,',
+        '  onPageChanged: (i) => setState(() => indice = i),',
+        '  itemBuilder: (_, i) => GestureDetector(',
+        '    onTap: avanzar, // nextPage; en la última, animateToPage(0)',
+        '    child: Padding(padding: const EdgeInsets.symmetric(horizontal: 6),',
+        '      child: AspectRatio(aspectRatio: 1, child: FotoConCiudad(fotos[i])))),',
+        ');'
+      ].join('\n')
     },
     medidas: [
-      'Columnas de 166 px, gap 16; filas de 205 + 150 px con 14 de separación (alternadas 150 + 205).',
-      'Margen lateral 24 y 12 px abajo para la sombra; radio 20; sombra `--nws-sombra-1`.',
-      'Badge: 13/16 semibold, padding 4/8, pastilla violeta-700 al 88 %, a 8 px de la esquina inferior izquierda.',
-      'Sección a 48 px de la anterior.'
+      'Foto cuadrada de 380 px (margen lateral 24), radio 20, sombra `--nws-sombra-1`, 12 px entre fotos.',
+      'Dots: punto de 8 px, activo en pastilla de 20×8, violeta-700; área táctil de 24×44. Van a unos 16 px de la foto.',
+      'Control de vista: dos botones de 44 px (círculo visible de 40), ícono de 22, borde de 1 px gray-300, pastilla; activo en violeta al 12 %.',
+      'Título y control en una fila; 20 px hasta la foto. Cuadrícula: columnas de 166 px (205 + 150, alternadas), gap 16, 14 entre filas.',
+      'Badge: 13/16 semibold, padding 4/8, pastilla violeta-700 al 88 %, a 8 px de la esquina inferior izquierda. Sección a 48 px de la anterior.'
     ]
   },
 

@@ -11,7 +11,7 @@
  * Estructura: portada inmersiva (foto a sangre detrás del estado y del
  * header, titular blanco sobre degradé) → Menú (íconos de app) → Novedades
  * como mazo de tarjetas que se desliza con el dedo → Descubre más noticias →
- * Galería en mosaico horizontal. Pestañas abajo.
+ * Galería (carrusel una a la vez o mosaico horizontal). Pestañas abajo.
  *
  * Del SDK: NwtIconButton, NwtButton, NwtAvatarIcon (íconos del menú),
  * NwtTabs (pestañas), NwtIconLabel (fecha/lugar), NwtDivider, NwtToast
@@ -105,12 +105,42 @@ window.PANTALLAS['landing-app'] = (function () {
       '</div></div>';
   }
 
+  /* Galería: carrusel «una a la vez» (por defecto) y cuadrícula comparten
+     `A.mosaico`; la foto N tiene el mismo índice (`data-i`) en las dos vistas. */
+  var VISTAS_GALERIA = [
+    { id: 'una', icono: 'view-galery', label: 'Ver una foto a la vez' },
+    { id: 'grid', icono: 'view-grid', label: 'Ver en cuadrícula' }
+  ];
+  function seccionGaleria(S, L, fotos) {
+    var e = S.esc, total = fotos.length, cols = [];
+    for (var c = 0; c < total; c += 2) { cols.push(fotos.slice(c, c + 2)); } /* columnas de 2 teselas (alta+baja / baja+alta) */
+    function foto(f) { return S.h('img', { src: f.img, alt: '', style: 'object-position:' + f.pos, draggable: 'false' }); }
+    function ciudad(f) { return f.ciudad ? S.h('span', { class: 'nws-lpv__ciudad', 'aria-hidden': 'true' }, S.icon('gps-pin-filled') + S.h('span', null, e(f.ciudad))) : ''; }
+    return S.h('section', { class: 'nws-lpv__galeria', id: 'lpv-galeria', 'data-dev': 'galeria' },
+      S.h('div', { class: 'nws-lpv__h2-fila' },
+        S.h('h2', { class: 'nws-lpv__h2' }, e(L.galeria.titulo)),
+        S.h('div', { class: 'nws-lpv__vistas', role: 'group', 'aria-label': 'Vista de la galería' }, VISTAS_GALERIA.map(function (v, i) {
+          return S.h('button', { type: 'button', class: 'nws-lpv__vista-btn', 'data-gal-vista': v.id, 'aria-pressed': i === 0 ? 'true' : 'false', 'aria-label': v.label, title: v.label }, S.icon(v.icono));
+        }))),
+      S.h('div', { class: 'nws-lpv__vista', id: 'lpv-gal-una' },
+        S.h('div', { class: 'nws-lpv__pista', role: 'region', 'aria-roledescription': 'carrusel', 'aria-label': 'Galería multimedia', tabindex: 0 }, fotos.map(function (f, i) {
+          return S.h('div', { class: 'nws-lpv__slide', 'data-i': i, role: 'group', 'aria-roledescription': 'diapositiva', 'aria-label': (i + 1) + ' de ' + total + (f.ciudad ? ' · ' + f.ciudad : '') }, foto(f), ciudad(f));
+        })),
+        S.h('div', { class: 'nws-lpv__dots' }, fotos.map(function (f, i) {
+          return S.h('button', { type: 'button', class: S.cls('nws-lpv__dot', i === 0 && 'nws-lpv__dot--activo'), 'data-i': i, 'aria-label': 'Ir a la foto ' + (i + 1) + ' de ' + total, 'aria-current': i === 0 ? 'true' : null });
+        }))),
+      S.h('div', { class: 'nws-lpv__vista', id: 'lpv-gal-grid', hidden: true },
+        S.h('div', { class: 'nws-lpv__mosaico', role: 'group', 'aria-label': 'Galería multimedia en cuadrícula' }, cols.map(function (col, k) {
+          return S.h('div', { class: S.cls('nws-lpv__col', k % 2 && 'nws-lpv__col--inv') }, col.map(function (f, j) {
+            var i = k * 2 + j;
+            return S.h('button', { type: 'button', class: 'nws-lpv__tesela nws-ios-press', 'data-i': i, 'aria-label': 'Foto ' + (i + 1) + ' de ' + total + (f.ciudad ? ' · ' + f.ciudad : '') + ' · ver en grande' }, foto(f), ciudad(f));
+          }).join(''));
+        }))));
+  }
+
   function contenido(S, L) {
     var e = S.esc, A = L.app, P = A.portada, V = A.videotutoriales;
     var noticias = [L.novedad].concat(L.noticias);
-    /* el mosaico se arma en columnas de 2 teselas (alta+baja / baja+alta) */
-    var cols = [];
-    for (var c = 0; c < A.mosaico.length; c += 2) { cols.push(A.mosaico.slice(c, c + 2)); }
     return S.h('div', { class: 'nws-lpv' },
       /* Portada (Figma 13016:39009): fondo violeta animado en vez de foto
          (DC-005), a sangre detrás del estado y del header, con fundido a blanco */
@@ -143,15 +173,7 @@ window.PANTALLAS['landing-app'] = (function () {
             noticias.map(function (n, i) { return tarjeta(S, n, i); }).reverse().join('')),
           S.h('div', { class: 'nws-lpv__mas' },
             S.button({ label: 'Descubre más noticias', size: 'large', theme: 'primary', attrs: { 'data-toast': 'Otras noticias' } }))),
-        S.h('section', { 'data-dev': 'galeria' },
-          tituloSeccion(S, L.galeria.titulo),
-          S.h('div', { class: 'nws-lpv__mosaico', role: 'list' }, cols.map(function (col, k) {
-            return S.h('div', { class: S.cls('nws-lpv__col', k % 2 && 'nws-lpv__col--inv') }, col.map(function (f, j) {
-              return S.h('button', { type: 'button', class: 'nws-lpv__tesela nws-ios-press', role: 'listitem', 'data-toast': 'galeria', 'aria-label': 'Foto ' + (k * 2 + j + 1) + ' de la galería' + (f.ciudad ? ' · ' + f.ciudad : '') },
-                S.h('img', { src: f.img, alt: '', style: 'object-position:' + f.pos, draggable: 'false' }),
-                f.ciudad ? S.h('span', { class: 'nws-lpv__ciudad', 'aria-hidden': 'true' }, S.icon('gps-pin-filled') + S.h('span', null, e(f.ciudad))) : '');
-            }).join(''));
-          }))),
+        seccionGaleria(S, L, A.mosaico),
         S.h('section', { class: 'nws-lpv__videos', 'data-dev': 'video', 'aria-label': V.titulo },
           tituloSeccion(S, V.titulo),
           S.h('div', { class: 'nws-lpv__vt' },
@@ -467,6 +489,102 @@ window.PANTALLAS['landing-app'] = (function () {
     document.addEventListener('keydown', esc);
   }
 
+  /* ---------- galería: carrusel con scroll-snap + cuadrícula ----------
+     Solo en memoria. Tocar la foto avanza (la última vuelve a la primera);
+     tocar una tesela abre el carrusel en esa foto. */
+  function galeria(sec) {
+    var pista = sec.querySelector('.nws-lpv__pista');
+    var slides = Array.prototype.slice.call(sec.querySelectorAll('.nws-lpv__slide'));
+    var dots = Array.prototype.slice.call(sec.querySelectorAll('.nws-lpv__dot'));
+    var botones = Array.prototype.slice.call(sec.querySelectorAll('[data-gal-vista]'));
+    var vistas = { una: sec.querySelector('#lpv-gal-una'), grid: sec.querySelector('#lpv-gal-grid') };
+    var n = slides.length, idx = 0, vista = 'una', rumbo = -1, raf = 0, timer = 0, arr = null, suprimir = false;
+    if (!pista || !n) { return function () {}; }
+    function reducido() { return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    /* px de layout entre una foto y la siguiente: el teléfono se escala con transform */
+    function paso() { return n > 1 ? slides[1].offsetLeft - slides[0].offsetLeft : pista.clientWidth; }
+    function izqDe(i) { return slides[i].offsetLeft - slides[0].offsetLeft; }
+
+    function marcar(i) {
+      idx = i;
+      dots.forEach(function (d, k) {
+        d.classList.toggle('nws-lpv__dot--activo', k === i);
+        if (k === i) { d.setAttribute('aria-current', 'true'); } else { d.removeAttribute('aria-current'); }
+      });
+    }
+    /* Con un scroll programado en curso se ignora el scroll intermedio: si no, los dots
+       volverían atrás a mitad de camino. `rumbo` es la foto a la que se va. */
+    function leer() {
+      raf = 0;
+      var p = paso(); if (!p) { return; }
+      var i = Math.max(0, Math.min(n - 1, Math.round(pista.scrollLeft / p)));
+      if (rumbo >= 0) { if (i !== rumbo) { return; } rumbo = -1; }
+      if (i !== idx) { marcar(i); }
+    }
+    function ir(i, suave) {
+      i = Math.max(0, Math.min(n - 1, i));
+      marcar(i); rumbo = i;
+      pista.scrollTo({ left: izqDe(i), behavior: suave && !reducido() ? 'smooth' : 'auto' });
+      clearTimeout(timer);
+      timer = setTimeout(function () { rumbo = -1; leer(); }, suave ? 1000 : 80);
+    }
+    function cambiar(v) {
+      if (v === vista) { return; }
+      vista = v; rumbo = -1;
+      Object.keys(vistas).forEach(function (k) { vistas[k].hidden = k !== v; });
+      botones.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-gal-vista') === v ? 'true' : 'false'); });
+      if (v === 'una') { pista.scrollLeft = izqDe(idx); } /* oculto pierde el scroll: se reubica ya visible */
+      if (vistas[v].animate && !reducido()) { vistas[v].animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'cubic-bezier(.4, 0, .2, 1)' }); }
+    }
+
+    function alClic(ev) {
+      if (suprimir) { suprimir = false; ev.preventDefault(); ev.stopPropagation(); return; }
+      var t = ev.target, el;
+      if ((el = t.closest('[data-gal-vista]'))) { cambiar(el.getAttribute('data-gal-vista')); }
+      else if ((el = t.closest('.nws-lpv__dot'))) { ir(+el.getAttribute('data-i'), true); }
+      else if (t.closest('.nws-lpv__slide')) { ir(idx + 1 < n ? idx + 1 : 0, true); }
+      else if ((el = t.closest('.nws-lpv__tesela'))) { marcar(+el.getAttribute('data-i')); cambiar('una'); }
+    }
+    function alTeclear(ev) {
+      var d = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { ev.preventDefault(); ir(idx + d, true); }
+    }
+    function alScroll() { if (!raf) { raf = requestAnimationFrame(leer); } }
+    function alTocar() { rumbo = -1; } /* el dedo o la rueda toman el mando */
+
+    /* Con mouse el overflow nativo no se arrastra: se sigue el puntero sin snap y al soltar se asienta. */
+    function alBajar(ev) {
+      if (ev.pointerType !== 'mouse' || ev.button !== 0) { return; }
+      arr = { x: ev.clientX, izq: pista.scrollLeft, mov: false }; rumbo = -1;
+    }
+    function alMover(ev) {
+      if (!arr) { return; }
+      var dx = ev.clientX - arr.x;
+      if (!arr.mov && Math.abs(dx) > 5) { arr.mov = true; pista.classList.add('nws-lpv__pista--arrastra'); try { pista.setPointerCapture(ev.pointerId); } catch (e) {} }
+      if (arr.mov) { pista.scrollLeft = arr.izq - dx; }
+    }
+    function alSoltar(ev) {
+      var a = arr; arr = null;
+      if (!a || !a.mov) { return; }
+      pista.classList.remove('nws-lpv__pista--arrastra');
+      var dx = ev.clientX - a.x, p = paso() || 1, i = Math.round(a.izq / p);
+      ir(dx < -p * 0.2 ? i + 1 : dx > p * 0.2 ? i - 1 : i, true);
+      suprimir = true; setTimeout(function () { suprimir = false; }, 0); /* el clic que sigue al arrastre no avanza */
+    }
+
+    sec.addEventListener('click', alClic);
+    pista.addEventListener('keydown', alTeclear);
+    pista.addEventListener('scroll', alScroll, { passive: true });
+    pista.addEventListener('scrollend', function () { if (rumbo < 0 || Math.abs(pista.scrollLeft - izqDe(rumbo)) < 2) { rumbo = -1; leer(); } });
+    pista.addEventListener('touchstart', alTocar, { passive: true });
+    pista.addEventListener('wheel', alTocar, { passive: true });
+    pista.addEventListener('pointerdown', alBajar);
+    pista.addEventListener('pointermove', alMover);
+    pista.addEventListener('pointerup', alSoltar);
+    pista.addEventListener('pointercancel', alSoltar);
+    return function () { clearTimeout(timer); cancelAnimationFrame(raf); sec.removeEventListener('click', alClic); };
+  }
+
   /* ---------- modo dev (DC-084): notas por sección sobre la vista plana ----------
      Herramienta del prototipo, no de la app. Ancho: notas a la derecha con conector;
      angosto: <details> bajo cada sección. Texto en pantallas/landing-dev.js. */
@@ -707,6 +825,7 @@ window.PANTALLAS['landing-app'] = (function () {
          el splash no suman dos esperas) y la home entra escalonada. */
       mob.querySelector('#lp-view').innerHTML = contenido(S, L);
       ctx.posicionarIndicadores(mob);
+      var offGaleria = galeria(mob.querySelector('#lpv-galeria'));
       var noticias = [L.novedad].concat(L.noticias);
       var offMazo = mazo(mob.querySelector('#lpv-mazo'), null, sc, function (carta, alCerrar) {
         ctx.cerrarToast();
@@ -895,6 +1014,7 @@ window.PANTALLAS['landing-app'] = (function () {
         notasDev.destruir();
         timers.forEach(clearTimeout);
         offMazo();
+        offGaleria();
         vistas.destruir();
         if (vigia) { vigia.disconnect(); }
         sc.removeEventListener('scroll', onScroll);
