@@ -114,27 +114,28 @@ window.PANTALLAS['landing-app'] = (function () {
     return S.h('div', { class: 'nws-lpv' },
       /* Portada (Figma 13016:39009): fondo violeta animado en vez de foto
          (DC-005), a sangre detrás del estado y del header, con fundido a blanco */
-      S.h('section', { class: 'nws-lpv__portada', 'data-toast': 'inscribete', role: 'button', tabindex: 0, 'aria-label': P.alt },
+      S.h('section', { class: 'nws-lpv__portada', 'data-dev': 'hero', 'data-toast': 'inscribete', role: 'button', tabindex: 0, 'aria-label': P.alt },
         escenaPortada(),
         /* DC-015: deportista recortada sobre el fondo de marca; el fundido va en la caja y el zoom en la imagen */
         S.h('div', { class: 'nws-lpv__atleta', 'aria-hidden': 'true' },
           S.h('img', { src: P.img, alt: '', draggable: 'false' }))),
       S.h('div', { class: 'nws-lpv__cuerpo' },
         /* Titular (texto real, no en la imagen) sobre el fundido */
-        S.h('h1', { class: 'nws-lpv__titular' }, e(P.titular[0]) + '<br>' + e(P.titular[1])),
+        S.h('h1', { class: 'nws-lpv__titular', 'data-dev': 'titular' },e(P.titular[0]) + '<br>' + e(P.titular[1])),
         /* DC-070: título de sección en vez de repetir «competencias» en cada tarjeta */
-        S.h('section', { class: 'nws-lpv__accesos', 'aria-label': A.competencias.titulo },
+        S.h('section', { class: 'nws-lpv__accesos', 'data-dev': 'competencias', 'aria-label': A.competencias.titulo },
           tituloSeccion(S, A.competencias.titulo),
-          /* Accesos: NwtAvatarIcon del SDK tal cual (tema primario) */
+          /* Accesos: NwtAvatarIcon del SDK tal cual (tema primario). Sin salidas,
+             `data-inerte` cuenta como gancho en app.js: el toque no hace nada. */
           S.h('div', { class: 'nws-lpv__menu' }, A.menu.map(function (m) {
-            return S.h('button', { type: 'button', class: 'nws-lpv__app nws-ios-press', 'data-vista': m.vista, 'aria-label': m.label },
+            return S.h('button', Object.assign({ type: 'button', class: 'nws-lpv__app nws-ios-press', 'aria-label': m.label }, A.salidas ? { 'data-vista': m.vista } : { 'data-inerte': '1' }),
               S.avatarIcon({ icon: m.icono, theme: 'primary' }),
               S.h('span', { class: 'nws-lpv__app-txt' },
                 S.h('span', { class: 'nws-lpv__app-l' },
                   S.h('span', { class: 'nws-lpv__app-l1' }, e(m.label)))),
               S.icon('chevron-right', 'nws-lpv__app-c'));
           }))),
-        S.h('section', { class: 'nws-lpv__novedades', 'aria-label': A.novedades.titulo },
+        S.h('section', { class: 'nws-lpv__novedades', 'data-dev': 'novedades', 'aria-label': A.novedades.titulo },
           tituloSeccion(S, A.novedades.titulo),
           /* Mazo: la de adelante se arrastra con el dedo; al soltarla con
              fuerza (o pasado el umbral) se va y queda al fondo */
@@ -142,7 +143,7 @@ window.PANTALLAS['landing-app'] = (function () {
             noticias.map(function (n, i) { return tarjeta(S, n, i); }).reverse().join('')),
           S.h('div', { class: 'nws-lpv__mas' },
             S.button({ label: 'Descubre más noticias', size: 'large', theme: 'primary', attrs: { 'data-toast': 'Otras noticias' } }))),
-        S.h('section', null,
+        S.h('section', { 'data-dev': 'galeria' },
           tituloSeccion(S, L.galeria.titulo),
           S.h('div', { class: 'nws-lpv__mosaico', role: 'list' }, cols.map(function (col, k) {
             return S.h('div', { class: S.cls('nws-lpv__col', k % 2 && 'nws-lpv__col--inv') }, col.map(function (f, j) {
@@ -151,7 +152,7 @@ window.PANTALLAS['landing-app'] = (function () {
                 f.ciudad ? S.h('span', { class: 'nws-lpv__ciudad', 'aria-hidden': 'true' }, S.icon('gps-pin-filled') + S.h('span', null, e(f.ciudad))) : '');
             }).join(''));
           }))),
-        S.h('section', { class: 'nws-lpv__videos', 'aria-label': V.titulo },
+        S.h('section', { class: 'nws-lpv__videos', 'data-dev': 'video', 'aria-label': V.titulo },
           tituloSeccion(S, V.titulo),
           S.h('div', { class: 'nws-lpv__vt' },
             S.h('div', { class: 'nws-lpv__vt-media' },
@@ -159,26 +160,24 @@ window.PANTALLAS['landing-app'] = (function () {
               S.h('span', { class: 'nws-lpv__vt-play', 'aria-hidden': 'true' }, S.icon('play'))),
             S.h('div', { class: 'nws-lpv__vt-info' },
               S.h('h3', { class: 'nws-lpv__vt-t' }, e(V.nombre)),
-              S.h('a', { class: 'nws-lpv__vt-a', href: V.url, target: '_blank', rel: 'noopener' }, e(V.enlace)))))),
+              S.h('a', Object.assign({ class: 'nws-lpv__vt-a' }, A.salidas ? { href: V.url, target: '_blank', rel: 'noopener' } : { role: 'button', tabindex: 0, 'data-toast': 'Video tutoriales' }), e(V.enlace)))))),
       conector(S, A.quote),
-      pie(S, A.footer));
+      pie(S, A.footer, A.version));
   }
 
-  /* DC-080: la frase institucional va como cita sobre el fondo de la app,
-     antes del degradé del pie; la comilla es solo decoración. */
+  /* DC-080/083: la frase institucional va sola, como cita sobre el fondo de la app,
+     antes del degradé del pie (sin filete ni comilla decorativa). */
   function conector(S, Q) {
-    return S.h('blockquote', { class: 'nws-lpv__quote' },
-      S.h('span', { class: 'nws-lpv__quote-filete', 'aria-hidden': 'true' }),
-      S.h('span', { class: 'nws-lpv__quote-marca', 'aria-hidden': 'true' }, '“'),
+    return S.h('blockquote', { class: 'nws-lpv__quote', 'data-dev': 'cita' },
       S.h('p', { class: 'nws-lpv__quote-t' }, S.esc(Q.texto)));
   }
 
   /* Pie de la app: logos en blanco (filtro solo en los de color único)
      para que lean sobre el morado; nada navega, todo es maqueta. */
-  function pie(S, F) {
+  function pie(S, F, version) {
     var g = window.JIC.logos;
     function logo(src, cls, alt) { return S.h('img', { class: 'nws-lpv__pie-logo ' + cls, src: src, alt: alt, draggable: 'false' }); }
-    return S.h('footer', { class: 'nws-lpv__pie' },
+    return S.h('footer', { class: 'nws-lpv__pie', 'data-dev': 'footer' },
       logo(g.mindeporte, 'nws-lpv__pie-logo--blanco nws-lpv__pie-logo--principal', 'Ministerio del Deporte'),
       S.h('div', { class: 'nws-lpv__pie-logos' },
         logo(g.intercolegiadosPie, 'nws-lpv__pie-logo--blanco', 'Juegos Intercolegiados'),
@@ -186,7 +185,8 @@ window.PANTALLAS['landing-app'] = (function () {
         logo(g.govco, '', 'gov.co')),
       S.h('p', { class: 'nws-lpv__pie-legal' },
         S.h('span', { class: 'nws-lpv__pie-legal-l' }, S.esc(F.legal1)),
-        S.h('span', { class: 'nws-lpv__pie-legal-l' }, S.esc(F.legal2))));
+        S.h('span', { class: 'nws-lpv__pie-legal-l' }, S.esc(F.legal2))),
+      S.h('p', { class: 'nws-lpv__pie-version' }, S.esc(version)));
   }
 
   /* Splash: imagen con Ken Burns (DC-010, en vez de loader) y el logo de
@@ -206,9 +206,9 @@ window.PANTALLAS['landing-app'] = (function () {
   /* Pantalla del teléfono: estado + header y pestañas + indicador de inicio
      son capas SOBRE el scroll (el contenido pasa por debajo). */
   function pantalla(S, L, cuerpo) {
-    return S.h('div', { class: 'nws-lpi__top nws-lpi__top--sobre', id: 'lpi-top' }, barraEstado(S, L.hora), header(S)) +
+    return S.h('div', { class: 'nws-lpi__top nws-lpi__top--sobre', id: 'lpi-top', 'data-dev': 'header' }, barraEstado(S, L.hora), header(S)) +
       S.h('div', { class: 'nws-lp__scroll', id: 'lp-scroll' }, S.h('div', { id: 'lp-view' }, cuerpo)) +
-      S.h('div', { class: 'nws-lpi__bottom' }, tabbar(S, L.app), homeIndicator(S)) +
+      S.h('div', { class: 'nws-lpi__bottom', 'data-dev': 'tabbar' }, tabbar(S, L.app), homeIndicator(S)) +
       S.h('div', { class: 'nws-mob__toast', id: 'mob-toast' }) +
       splash(S, L);
   }
@@ -467,6 +467,169 @@ window.PANTALLAS['landing-app'] = (function () {
     document.addEventListener('keydown', esc);
   }
 
+  /* ---------- modo dev (DC-084): notas por sección sobre la vista plana ----------
+     Herramienta del prototipo, no de la app. Ancho: notas a la derecha con conector;
+     angosto: <details> bajo cada sección. Texto en pantallas/landing-dev.js. */
+  var ORDEN_DEV = ['header', 'hero', 'titular', 'competencias', 'novedades', 'galeria', 'video', 'cita', 'footer', 'tabbar'];
+  var DEV_ANCHO_MIN = 1100, DEV_NOTA = 440, DEV_SEPARA = 44;
+  var DEV_ABIERTO = /[?&]abierto\b/.test(location.search); /* ?plana&dev&abierto despliega todo (capturas) */
+  function modoDev(S, mob) {
+    var stage = mob.closest('#stage');
+    var capa = null, extra = [], vigentes = [], notas = [], ro = null, activo = false, ancho = false, raf = 0;
+
+    function fmt(t) { return S.esc(t).replace(/`([^`]+)`/g, '<code>$1</code>'); }
+    function lista(a) { return a && a.length ? S.h('ul', null, a.map(function (t) { return S.h('li', null, fmt(t)); })) : ''; }
+    function bloque(clave, rotulo, html) {
+      return html ? S.h('div', { class: 'nws-dev__b' }, S.h('span', { class: 'nws-dev__pill nws-dev__pill--' + clave }, rotulo), html) : '';
+    }
+    /* ancho: UI y lógica a la vista, Flutter y medidas a pedido (si no, las notas se acumulan hacia abajo) */
+    function cuerpo(n, plegar) {
+      var f = n.flutter || {};
+      var mas = bloque('flutter', 'Flutter', lista(f.widgets) +
+          (f.tip ? S.h('p', { class: 'nws-dev__tip' }, S.h('strong', null, 'Tip ') + fmt(f.tip)) : '') +
+          (f.codigo ? S.h('pre', null, S.h('code', null, S.esc(f.codigo))) : '')) +
+        bloque('medidas', 'Medidas', lista(n.medidas));
+      return bloque('ui', 'UI', lista(n.ui)) + bloque('logica', 'Lógica', lista(n.logica)) +
+        (plegar ? S.h('details', { class: 'nws-dev__mas', open: DEV_ABIERTO }, S.h('summary', null, 'Flutter y medidas'), mas) : mas);
+    }
+    function titulo(it) { return S.h('span', { class: 'nws-dev__n', 'aria-hidden': 'true' }, it.num) + S.h('span', null, S.esc(it.n.titulo)); }
+
+    /* offsetTop sumado hasta #mob: no lo alteran los transform de las animaciones de entrada */
+    function topDe(el) { var y = 0; for (var n = el; n && n !== mob; n = n.offsetParent) { y += n.offsetTop; } return y; }
+
+    function secciones() {
+      var d = window.LANDING_DEV || {}, out = [];
+      ORDEN_DEV.forEach(function (id, i) {
+        var el = mob.querySelector('[data-dev="' + id + '"]');
+        if (el && d[id]) { out.push({ id: id, num: i + 1, el: el, n: d[id] }); }
+      });
+      return out;
+    }
+
+    function limpiar() {
+      if (capa) { capa.remove(); capa = null; }
+      extra.forEach(function (e) { e.remove(); }); extra = [];
+      mob.querySelectorAll('.nws-dev--foco').forEach(function (e) { e.classList.remove('nws-dev--foco'); });
+      if (stage) { stage.style.removeProperty('padding-bottom'); }
+    }
+
+    /* Las notas fijas de la derecha no deben quedar bajo los switches flotantes (arriba a la derecha). */
+    function bajoSwitch(izq, w) {
+      var sw = document.getElementById('ctrl-modo-dev'); if (!sw) { return 0; }
+      var r = sw.getBoundingClientRect(), b = mob.getBoundingClientRect();
+      return b.left + izq + w > r.left ? Math.max(0, r.bottom + 8 - (b.top + window.scrollY)) : 0;
+    }
+
+    function colocar() {
+      if (!capa) { return; }
+      var m = mob.offsetWidth, adentro = mob.getBoundingClientRect().left < 36, previa = -1e9;
+      vigentes.forEach(function (it) {
+        it.top = topDe(it.el);
+        it.badge = Math.max(it.top + 6, previa + 24); previa = it.badge; /* header y hero comparten borde superior */
+        var b = capa.querySelector('[data-dev-num="' + it.id + '"]');
+        b.style.top = it.badge + 'px'; b.style.left = (adentro ? 6 : -28) + 'px';
+      });
+      if (!ancho) { return; }
+      var izq = m + DEV_SEPARA;
+      var w = Math.max(240, Math.min(DEV_NOTA, ((stage ? stage.clientWidth : window.innerWidth) - m) / 2 - DEV_SEPARA - 12));
+      var libre = bajoSwitch(izq, w), trazos = '';
+      notas.forEach(function (it, i) {
+        var nota = capa.querySelector('[data-dev-nota="' + it.id + '"]');
+        nota.style.left = izq + 'px'; nota.style.width = w + 'px';
+        var t = Math.max(it.el ? it.top : 0, libre); /* si dos notas se pisan, la siguiente baja lo mínimo */
+        nota.style.top = t + 'px';
+        libre = t + nota.offsetHeight + 12;
+        if (!it.el) { return; }
+        var y1 = it.badge + 10, y2 = t + 23, xm = m + 10 + (i % 8) * 4;
+        trazos += '<path d="M' + m + ' ' + y1 + ' H' + xm + (y2 !== y1 ? ' V' + y2 : '') + ' H' + izq + '"/><circle cx="' + m + '" cy="' + y1 + '" r="3"/>';
+      });
+      capa.querySelector('.nws-dev__lineas').innerHTML = trazos;
+      /* las notas son absolutas: se amplía el escenario para que la página las alcance */
+      if (stage) { stage.style.setProperty('padding-bottom', (64 + Math.max(0, libre - mob.offsetHeight)) + 'px', 'important'); }
+    }
+
+    function insertar() {
+      var grupo = null;
+      notas.forEach(function (it) {
+        var d = document.createElement('details');
+        d.className = 'nws-dev__nota nws-dev__nota--inline' + (it.id === 'cita' ? ' nws-dev__nota--sobre-pie' : '');
+        d.setAttribute('data-dev-nota', it.id);
+        d.innerHTML = S.h('summary', { class: 'nws-dev__t' }, titulo(it)) + cuerpo(it.n, false);
+        d.open = DEV_ABIERTO;
+        extra.push(d);
+        if (!it.el) { mob.appendChild(d); return; }
+        /* header, hero y titular se solapan: sus notas van juntas tras el titular, sin separar portada y cuerpo */
+        if (it.id === 'header' || it.id === 'hero' || it.id === 'titular') {
+          if (!grupo) {
+            grupo = document.createElement('div'); grupo.className = 'nws-dev__grupo';
+            mob.querySelector('[data-dev="titular"]').insertAdjacentElement('afterend', grupo); extra.push(grupo);
+          }
+          grupo.appendChild(d);
+        } else { it.el.insertAdjacentElement('afterend', d); }
+      });
+    }
+
+    function pintar() {
+      limpiar();
+      vigentes = secciones(); if (!vigentes.length) { return; }
+      var t = (window.LANDING_DEV || {}).transversales;
+      notas = vigentes.concat(t ? [{ id: 'transversales', num: 'T', el: null, n: t }] : []);
+      ancho = window.innerWidth >= DEV_ANCHO_MIN;
+      capa = document.createElement('div');
+      capa.className = 'nws-dev'; capa.setAttribute('role', 'region'); capa.setAttribute('aria-label', 'Anotaciones del modo desarrollador');
+      capa.innerHTML = (ancho ? '<svg class="nws-dev__lineas" aria-hidden="true"></svg>' : '') +
+        vigentes.map(function (it) { return S.h('span', { class: 'nws-dev__num', 'data-dev-num': it.id, 'aria-hidden': 'true' }, it.num); }).join('') +
+        (ancho ? notas.map(function (it) {
+          return S.h('aside', { class: 'nws-dev__nota', 'data-dev-nota': it.id, 'aria-label': 'Nota ' + it.num + ': ' + it.n.titulo },
+            S.h('div', { class: 'nws-dev__t' }, titulo(it)), cuerpo(it.n, true));
+        }).join('') : '');
+      capa.addEventListener('toggle', alCambiar, true); /* toggle no burbujea: al plegar o desplegar se reacomodan las notas */
+      mob.appendChild(capa);
+      if (!ancho) { insertar(); }
+      colocar();
+    }
+
+    /* un solo repintado por cuadro: resize y cambios de alto llegan en ráfagas */
+    function alCambiar() {
+      if (raf || !activo) { return; }
+      raf = requestAnimationFrame(function () {
+        raf = 0;
+        if (activo) { (window.innerWidth >= DEV_ANCHO_MIN) !== ancho ? pintar() : colocar(); }
+      });
+    }
+    function resaltar(ev) {
+      var n = ev.target.closest && ev.target.closest('[data-dev-nota]');
+      mob.querySelectorAll('.nws-dev--foco').forEach(function (e) { e.classList.remove('nws-dev--foco'); });
+      var s = n && mob.querySelector('[data-dev="' + n.getAttribute('data-dev-nota') + '"]');
+      if (s) { s.classList.add('nws-dev--foco'); }
+    }
+
+    function ocultar() {
+      if (!activo) { return; }
+      activo = false;
+      document.removeEventListener('mouseover', resaltar);
+      window.removeEventListener('resize', alCambiar);
+      if (ro) { ro.disconnect(); ro = null; }
+      cancelAnimationFrame(raf); raf = 0;
+      limpiar();
+    }
+    return {
+      mostrar: function () {
+        if (activo) { return; }
+        activo = true;
+        document.addEventListener('mouseover', resaltar);
+        window.addEventListener('resize', alCambiar);
+        if (window.ResizeObserver) {
+          ro = new ResizeObserver(alCambiar);
+          ro.observe(mob); ro.observe(mob.querySelector('#lp-view'));
+        }
+        pintar();
+      },
+      ocultar: ocultar,
+      destruir: ocultar
+    };
+  }
+
   return {
     fullscreen: true,
     estable: true,
@@ -485,8 +648,16 @@ window.PANTALLAS['landing-app'] = (function () {
         document.documentElement.classList.remove('nws-modo-plano');
         document.body.classList.remove('nws-modo-plano');
       }
+      /* Modo dev: la preferencia se recuerda aparte, pero solo actúa con la vista plana. */
+      var dev = false;
+      try { dev = /[?&]dev\b/.test(location.search) || localStorage.getItem('proto.modoDev') === '1'; } catch (e) {}
+      document.body.classList.toggle('nws-modo-dev', plana && dev);
 
-      var switchHtml = S.h('div', { class: 'nws-switch-flotante', id: 'ctrl-vista-plana', role: 'group', 'aria-label': 'Modo de visualización', title: 'Alternar entre capa de presentación y vista plana' },
+      var switchDev = S.h('div', { class: 'nws-switch-flotante nws-switch-flotante--dev', id: 'ctrl-modo-dev', role: 'group', 'aria-label': 'Modo desarrollador', title: 'Anotar cada sección con su UI, su lógica y su traducción a Flutter' },
+        S.h('span', { class: 'nws-switch-flotante__txt' }, 'Modo dev'),
+        S.switchControl({ id: 'btn-switch-dev', checked: dev, label: 'Activar modo desarrollador' }));
+
+      var switchHtml =S.h('div', { class: 'nws-switch-flotante', id: 'ctrl-vista-plana', role: 'group', 'aria-label': 'Modo de visualización', title: 'Alternar entre capa de presentación y vista plana' },
         S.h('span', { class: 'nws-switch-flotante__txt' }, 'Vista plana'),
         S.switchControl({
           id: 'btn-switch-plana',
@@ -496,6 +667,7 @@ window.PANTALLAS['landing-app'] = (function () {
 
       return S.h('div', { class: 'nws-col', style: 'height:100%;background:var(--naotech-app-color-100)' },
         switchHtml,
+        switchDev,
         S.toolbar({
           body: S.h('div', { class: 'nws-row nws-title-light' }, S.h('div', { class: 'nws-title__naowee' }, window.NAOWEE.icono), S.title({ text: 'App JIN', subtitle: 'Juegos Intercolegiados' })),
           actions: ''
@@ -538,6 +710,8 @@ window.PANTALLAS['landing-app'] = (function () {
       var noticias = [L.novedad].concat(L.noticias);
       var offMazo = mazo(mob.querySelector('#lpv-mazo'), null, sc, function (carta, alCerrar) {
         ctx.cerrarToast();
+        /* landing.app.salidas = false: la home no navega, solo avisa (se reactiva en datos.js). */
+        if (!L.app.salidas) { ctx.proximamente('Detalle de noticia', carta); alCerrar(); return; }
         detalle(S, L, mob, noticias[+carta.getAttribute('data-i')], carta, alCerrar);
       });
       var vistas = window.LANDING_VISTAS.montar(S, L, mob, { barraEstado: barraEstado, posicionarIndicadores: ctx.posicionarIndicadores });
@@ -618,6 +792,10 @@ window.PANTALLAS['landing-app'] = (function () {
 
       var ctrlPlana = root.querySelector('#ctrl-vista-plana');
       var btnPlana = root.querySelector('#btn-switch-plana');
+      var ctrlDev = root.querySelector('#ctrl-modo-dev');
+      var btnDev = root.querySelector('#btn-switch-dev');
+      var notasDev = modoDev(S, mob);
+      var prefDev = !!btnDev && btnDev.getAttribute('aria-checked') === 'true'; /* ya resuelta en render: ?dev o lo recordado */
 
       function toggleVistaPlana(forzar) {
         var activa = typeof forzar === 'boolean' ? forzar : !document.body.classList.contains('nws-modo-plano');
@@ -637,6 +815,7 @@ window.PANTALLAS['landing-app'] = (function () {
           aplicarZoom();
         }
         ctx.posicionarIndicadores(mob);
+        aplicarDev();
       }
 
       function onSwitchClick(ev) {
@@ -648,11 +827,30 @@ window.PANTALLAS['landing-app'] = (function () {
         ctrlPlana.addEventListener('click', onSwitchClick);
       }
 
+      /* El modo dev solo actúa con la vista plana: al apagarla se oculta y la preferencia queda guardada. */
+      function aplicarDev() {
+        var activo = prefDev && document.body.classList.contains('nws-modo-plano');
+        document.body.classList.toggle('nws-modo-dev', activo);
+        if (btnDev) {
+          btnDev.classList.toggle('nwt-switch--checked', prefDev);
+          btnDev.setAttribute('aria-checked', prefDev ? 'true' : 'false');
+        }
+        if (activo) { notasDev.mostrar(); } else { notasDev.ocultar(); }
+      }
+      function onDevClick(ev) {
+        ev.preventDefault();
+        prefDev = !prefDev;
+        try { localStorage.setItem('proto.modoDev', prefDev ? '1' : '0'); } catch (e) {}
+        aplicarDev();
+      }
+      if (ctrlDev) { ctrlDev.addEventListener('click', onDevClick); }
+
       if (document.body.classList.contains('nws-modo-plano')) {
         var spInicial = mob.querySelector('#lps');
         if (spInicial) { spInicial.hidden = true; spInicial.classList.add('nws-lps--fuera'); }
         phone.style.transform = 'none';
       }
+      aplicarDev();
 
       function onClick(ev) {
         var z = ev.target.closest('[data-zoom]');
@@ -692,6 +890,9 @@ window.PANTALLAS['landing-app'] = (function () {
         document.documentElement.classList.remove('nws-modo-plano');
         document.body.classList.remove('nws-modo-plano');
         if (ctrlPlana) { ctrlPlana.removeEventListener('click', onSwitchClick); }
+        document.body.classList.remove('nws-modo-dev');
+        if (ctrlDev) { ctrlDev.removeEventListener('click', onDevClick); }
+        notasDev.destruir();
         timers.forEach(clearTimeout);
         offMazo();
         vistas.destruir();

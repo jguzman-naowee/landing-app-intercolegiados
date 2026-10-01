@@ -62,7 +62,7 @@ De arriba abajo, de lo más importante a lo más institucional:
 
 | Nivel | Qué | Cómo se resuelve |
 |---|---|---|
-| 1. Mensaje | Titular contextual («¡Es octubre, vamos a la nacional!») | h1 de 36 px sobre el hero, con halo para leerse sobre el degradé |
+| 1. Mensaje | Titular contextual («¡Ya jugamos la fase regional!») | h1 de 36 px sobre el hero, con halo para leerse sobre el degradé |
 | 2. Marca y emoción | Hero con la deportista sobre morado animado | Imagen a sangre bajo el estado y el header; fundido a blanco |
 | 3. Acción | **Competencias**: Calendario y Resultados | Dos tarjetas a ancho completo, ícono + rótulo, abren vistas inmersivas |
 | 4. Actualidad | **Novedades**: mazo de noticias | Tarjetas deslizables, título a 2 líneas, detalle expandible |

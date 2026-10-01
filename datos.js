@@ -158,6 +158,7 @@ window.DATOS = {
       }
     ],
     "app": {
+      "salidas": false,
       "quote": {
         "texto": "Juegos Intercolegiados es una iniciativa del Ministerio del Deporte de Colombia."
       },
@@ -165,6 +166,8 @@ window.DATOS = {
         "legal1": "© 2026 Ministerio del Deporte.",
         "legal2": "Todos los derechos reservados."
       },
+      /* DC-088: VALOR DE EJEMPLO, no hay número de versión oficial; confirmar con Mindeporte. */
+      "version": "App JIN · v1.0.0 · prototipo",
       "tabs": [
         {
           "id": "inicio",
@@ -177,7 +180,7 @@ window.DATOS = {
           "label": "Medallas",
           "toast": {
             "_ejemplo": "TEXTO DE EJEMPLO: fecha tomada del calendario de ejemplo (inicio de la fase nacional)",
-            "titulo": "Aún no hay medallas",
+            "titulo": "Medallería disponible en la fase nacional",
             "desde": "Disponible desde el 26 de octubre de 2026"
           }
         },
@@ -187,8 +190,8 @@ window.DATOS = {
           "label": "Certificados",
           "toast": {
             "_ejemplo": "TEXTO DE EJEMPLO: fecha tomada del calendario de ejemplo (ceremonia de clausura)",
-            "titulo": "Sin certificados aún",
-            "desde": "Disponible desde el 31 de octubre de 2026"
+            "titulo": "Disponible próximamente",
+            "desde": ""
           }
         }
       ],
@@ -387,8 +390,8 @@ window.DATOS = {
       },
       "portada": {
         "titular": [
-          "¡Es octubre, vamos",
-          "a la nacional!"
+          "¡Ya jugamos la",
+          "fase regional!"
         ],
         "alt": "Juegos Intercolegiados 2026",
         "img": "assets/landing/deportista.png"

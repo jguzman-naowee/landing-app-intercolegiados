@@ -810,6 +810,9 @@ body {
    la plantilla (8px) le comía el borde derecho al sangrado de la portada. */
 .nws-lp__scroll { scrollbar-width: none; }
 .nws-lp__scroll::-webkit-scrollbar { display: none; width: 0; height: 0; }
+/* DC-085: Inicio no desborda a los lados. El pie cuelga 100px bajo el cuerpo (bajo el tabbar):
+   el padding lo deja dentro de la caja para que hidden no lo recorte; el margin lo compensa. */
+#lp-view { overflow: hidden; padding-bottom: 100px; margin-bottom: -100px; }
 .nws-lp__body { display: flex; flex-direction: column; gap: var(--naotech-sizing-32); padding: var(--naotech-sizing-32) var(--naotech-sizing-16) var(--naotech-sizing-24); }
 
 /* Tipografía del Figma sobre las clases del SDK: heading large 18/22,
@@ -1121,6 +1124,7 @@ body {
 .nws-lpv__vt-video { display: block; width: 100%; aspect-ratio: 16 / 9; min-width: 0; object-fit: cover; object-position: 50% 50%; background: var(--naotech-app-color-100); pointer-events: none; }
 .nws-lpv__vt-info { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: var(--naotech-sizing-12) var(--naotech-sizing-16); }
 .nws-lpv__vt-t { margin: 0; font-size: var(--naotech-sizing-16); line-height: 20px; font-weight: 400; color: var(--nws-jic-violeta-900); }
+.nws-lpv__vt-a[role="button"] { cursor: pointer; }
 .nws-lpv__vt-a { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; font-size: var(--naotech-sizing-14); line-height: 20px; font-weight: var(--naotech-font-weight-semibold); color: var(--nws-jic-violeta-titular); text-decoration: underline; }
 .nws-lpv__vt-a:focus-visible { outline: 2px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
 /* Espaciado entre secciones: 40 menú→noticias, 48 entre las demás (galería, videos y pie). */
@@ -1130,7 +1134,7 @@ body {
 
 .nws-lpv__cuerpo { --nws-gap-titulo: 20px; /* DC-071: título → contenido */ display: flex; flex-direction: column; gap: var(--naotech-sizing-32); padding: var(--naotech-sizing-24) 0 var(--naotech-sizing-24); }
 .nws-lpv__cuerpo > section { display: flex; flex-direction: column; }
-.nws-lpv__h2 { margin: 0 var(--naotech-sizing-24) var(--nws-gap-titulo); font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-32); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-color-gray-800); }
+.nws-lpv__h2 { margin: 0 var(--naotech-sizing-24) var(--nws-gap-titulo); font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-32); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-color-gray-900); /* DC-087: más oscuro, mismo gris del sistema */ }
 /* DC-075/076: Competencias y Novedades pegan el título a su contenido; Galería y Video siguen a 20px. */
 .nws-lpv__accesos > .nws-lpv__h2, .nws-lpv__novedades > .nws-lpv__h2 { margin-bottom: 0; }
 
@@ -1202,8 +1206,8 @@ body {
 .nws-lpd__vuela img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .nws-lpv__mas { display: flex; justify-content: center; padding-top: var(--naotech-sizing-24); }
 /* DC-007: violeta de marca con texto blanco (>9:1); hover/active oscurecen dentro de la paleta JIC. */
-.nws-lp .nws-lpv__mas .nwt-button { --pvt-button-background: var(--nws-jic-violeta-titular); --pvt-button-background-hover: var(--nws-jic-violeta-700); --pvt-button-background-active: var(--nws-jic-violeta-900); --pvt-button-font-color: #fff; min-height: 56px; height: 56px; --pvt-button-font-size: 20px; font-size: 20px; font-weight: var(--naotech-font-weight-semibold); }
-.nws-lp .nws-lpv__mas .nwt-button__content { font-size: 20px; font-weight: var(--naotech-font-weight-semibold); }
+.nws-lp .nws-lpv__mas .nwt-button { --pvt-button-background: var(--nws-jic-violeta-titular); --pvt-button-background-hover: var(--nws-jic-violeta-700); --pvt-button-background-active: var(--nws-jic-violeta-900); --pvt-button-font-color: #fff; min-height: 56px; height: 56px; --pvt-button-font-size: var(--naotech-sizing-18); font-size: var(--naotech-sizing-18); font-weight: var(--naotech-font-weight-semibold); }
+.nws-lp .nws-lpv__mas .nwt-button__content { font-size: var(--naotech-sizing-18); font-weight: var(--naotech-font-weight-semibold); }
 .nws-lp .nws-lpv__mas .nwt-button:focus-visible { outline: 2px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
 
 /* Galería: mosaico horizontal en columnas de 2 (alta+baja / baja+alta). */
@@ -1211,8 +1215,8 @@ body {
 .nws-lpv__mosaico::-webkit-scrollbar { display: none; }
 
 /* Pie de la app: sube de transparente a violeta; el padding inferior cubre el tabbar flotante (100px). */
-/* margin-top negativo = el gap del cuerpo: el degradé arranca justo bajo la tarjeta de video (DC-023). */
-.nws-lpv__pie { margin-top: calc(var(--naotech-sizing-32) * -1); margin-bottom: -100px; padding: 96px var(--naotech-sizing-24) calc(100px + var(--naotech-sizing-16)); display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-16); text-align: center; background: linear-gradient(to bottom, rgb(from var(--nws-jic-violeta-700) r g b / 0) 0, var(--nws-jic-violeta-700) 45%, var(--nws-jic-violeta-900) 100%); color: var(--naotech-color-white, #fff); }
+/* DC-092: el pie sube sobre el aire inferior de la cita (el degradé nace transparente) y el morado queda pegado al texto. */
+.nws-lpv__pie { margin-top: calc(var(--naotech-sizing-16) * -1); margin-bottom: -100px; padding: 96px var(--naotech-sizing-24) calc(100px + var(--naotech-sizing-16) + var(--naotech-sizing-24)); display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-16); text-align: center; background: linear-gradient(to bottom, rgb(from var(--nws-jic-violeta-700) r g b / 0) 0, var(--nws-jic-violeta-700) 45%, var(--nws-jic-violeta-900) 100%); color: var(--naotech-color-white, #fff); }
 .nws-lpv__pie-logos { display: flex; align-items: center; justify-content: center; gap: var(--naotech-sizing-20, 20px); flex-wrap: wrap; }
 .nws-lpv__pie-logo { height: var(--naotech-sizing-32); width: auto; max-width: 96px; object-fit: contain; }
 .nws-lpv__pie-logo--blanco { filter: brightness(0) invert(1); }
@@ -1220,10 +1224,9 @@ body {
 .nws-lpv__pie-logo--principal { height: var(--naotech-sizing-64); max-width: 192px; margin-bottom: var(--naotech-sizing-8); }
 .nws-lpv__pie-legal { margin: 0; font-size: var(--naotech-sizing-14); line-height: 20px; opacity: .85; }
 .nws-lpv__pie-legal-l { display: block; }
-/* El pie conserva su margin-top negativo: cancela el gap y el degradé arranca bajo la cita. */
-.nws-lpv__quote { margin: 0; padding: var(--naotech-sizing-8) var(--naotech-sizing-24) var(--naotech-sizing-40, 40px); display: flex; flex-direction: column; align-items: center; text-align: center; background: var(--naotech-app-background); }
-.nws-lpv__quote-filete { width: var(--naotech-sizing-40, 40px); height: 3px; border-radius: 2px; background: var(--nws-jic-violeta-700); }
-.nws-lpv__quote-marca { margin-top: var(--naotech-sizing-8); font-size: 64px; line-height: 48px; height: 32px; font-weight: 700; color: rgb(from var(--nws-jic-violeta-700) r g b / .2); }
+/* DC-088: 11px por pedido explícito (excepción a la escala mínima de 14px); margin de 8px reales: resta el gap de 16 del pie. */
+.nws-lpv__pie-version { margin: calc(var(--naotech-sizing-8) - var(--naotech-sizing-16)) 0 0; font-size: 11px; line-height: 16px; opacity: .7; }
+.nws-lpv__quote { margin: 0; padding: var(--naotech-sizing-32, 32px) var(--naotech-sizing-24) var(--naotech-sizing-16); display: flex; flex-direction: column; align-items: center; text-align: center; background: var(--naotech-app-background); }
 .nws-lpv__quote-t { margin: 0; font-size: 19px; line-height: 28px; font-weight: 500; color: var(--nws-jic-violeta-700); text-wrap: balance; }
 .nws-lpv__col { flex: 0 0 166px; display: grid; grid-template-rows: 205px 150px; gap: var(--naotech-sizing-14); scroll-snap-align: start; }
 .nws-lpv__col--inv { grid-template-rows: 150px 205px; }
@@ -1575,6 +1578,12 @@ body.nws-modo-plano #lp-scroll {
   padding-bottom: 0 !important;
 }
 
+/* En plana el pie ya no cuelga (margin-bottom 0): sin el padding de compensación */
+body.nws-modo-plano #lp-view {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
 /* La barra de estado y cabecera quedan en la parte superior del lienzo */
 body.nws-modo-plano #lpi-top {
   position: absolute !important;
@@ -1603,3 +1612,52 @@ body.nws-modo-plano .nws-lpi__bottom {
   border-top: 1px solid var(--naotech-color-gray-200, #e5e7eb) !important;
   z-index: 2 !important;
 }
+
+/* Modo dev (DC-084): anotaciones por sección sobre la vista plana.
+   Herramienta del prototipo, no de la app: todo cuelga de body.nws-modo-dev. */
+/* Segundo switch bajo el de vista plana (38 de alto + 8 de aire); solo existe con la vista plana. */
+.nws-switch-flotante--dev { top: calc(var(--naotech-sizing-14, 14px) + 46px); display: none; }
+body.nws-modo-plano .nws-switch-flotante--dev { display: inline-flex; }
+
+/* El contorno va hacia adentro y no ocupa espacio: no mueve nada de la app. */
+body.nws-modo-dev [data-dev] { outline: 1.5px dashed var(--nws-jic-violeta); outline-offset: -2px; }
+body.nws-modo-dev [data-dev].nws-dev--foco { outline: 2.5px solid var(--nws-jic-violeta); }
+
+.nws-dev { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.nws-dev__lineas { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; }
+.nws-dev__lineas path { fill: none; stroke: var(--nws-jic-violeta); stroke-width: 1; opacity: .5; }
+.nws-dev__lineas circle { fill: var(--nws-jic-violeta); }
+.nws-dev__num, .nws-dev__n { display: block; width: 20px; height: 20px; border-radius: var(--naotech-radius-circle); background: var(--nws-jic-violeta); color: #fff; font-size: var(--naotech-sizing-12); line-height: 20px; font-weight: var(--naotech-font-weight-semibold); text-align: center; }
+.nws-dev__num { position: absolute; pointer-events: none; }
+.nws-dev__n { flex: none; }
+
+.nws-dev__nota { position: absolute; box-sizing: border-box; padding: var(--naotech-sizing-12) var(--naotech-sizing-14); border: 1px solid var(--naotech-color-gray-200); border-radius: var(--naotech-radius-xl); background: var(--naotech-app-background); box-shadow: 0 1px 3px rgb(from var(--naotech-color-gray-900) r g b / .08); color: var(--naotech-color-gray-800); font-size: var(--naotech-sizing-12); line-height: 1.5; font-weight: 400; letter-spacing: normal; text-align: left; pointer-events: auto; }
+.nws-dev__t { display: flex; align-items: center; gap: var(--naotech-sizing-8); margin: 0 0 var(--naotech-sizing-8); font-size: var(--naotech-sizing-14); line-height: 20px; font-weight: var(--naotech-font-weight-semibold); letter-spacing: normal; color: var(--naotech-color-gray-900); }
+.nws-dev__b { margin-top: var(--naotech-sizing-8); }
+.nws-dev__b ul { margin: var(--naotech-sizing-4) 0 0; padding-left: var(--naotech-sizing-16); }
+.nws-dev__b li { margin: 2px 0; }
+.nws-dev__pill { display: inline-block; margin: 0; padding: 1px var(--naotech-sizing-8); border-radius: var(--naotech-radius-pill); font-size: var(--naotech-sizing-12); line-height: 16px; font-weight: var(--naotech-font-weight-semibold); letter-spacing: normal; }
+.nws-dev__pill--ui { background: color-mix(in srgb, var(--nws-jic-violeta) 12%, white); color: var(--nws-jic-violeta-700); }
+.nws-dev__pill--logica { background: var(--naotech-color-blue-100); color: var(--naotech-color-blue-800); }
+.nws-dev__pill--flutter { background: var(--naotech-color-green-100); color: var(--naotech-color-green-800); }
+.nws-dev__pill--medidas { background: var(--naotech-color-gray-200); color: var(--naotech-color-gray-800); }
+.nws-dev__tip { margin: var(--naotech-sizing-4) 0 0; }
+.nws-dev__nota code { padding: 0 3px; border-radius: 3px; background: var(--naotech-color-gray-100); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+.nws-dev__nota pre { margin: var(--naotech-sizing-6) 0 0; padding: var(--naotech-sizing-8) var(--naotech-sizing-10); overflow-x: auto; scrollbar-width: thin; border-radius: var(--naotech-radius-lg); background: var(--naotech-color-gray-100); }
+.nws-dev__nota pre code { padding: 0; background: transparent; line-height: 1.5; white-space: pre; }
+
+.nws-dev__mas { margin-top: var(--naotech-sizing-10); padding-top: var(--naotech-sizing-8); border-top: 1px solid var(--naotech-color-gray-200); }
+.nws-dev__mas > summary { display: flex; align-items: center; gap: var(--naotech-sizing-6); cursor: pointer; list-style: none; font-weight: var(--naotech-font-weight-semibold); color: var(--naotech-color-gray-700); }
+.nws-dev__mas > summary::-webkit-details-marker { display: none; }
+.nws-dev__mas > summary::before { content: ''; flex: none; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); }
+.nws-dev__mas[open] > summary::before { transform: rotate(45deg); }
+
+/* Ancho < 1100: la nota baja a la columna, bajo su sección, colapsable. */
+.nws-dev__nota--inline { position: static; display: block; width: auto; margin: var(--naotech-sizing-8) var(--naotech-sizing-16); }
+/* El pie sube 32px sobre lo anterior: el margen inferior de la nota compensa ese solape. */
+.nws-dev__nota--sobre-pie { margin-bottom: var(--naotech-sizing-32); }
+.nws-dev__nota--inline > summary { margin-bottom: 0; cursor: pointer; list-style: none; }
+.nws-dev__nota--inline > summary::-webkit-details-marker { display: none; }
+.nws-dev__nota--inline > summary::after { content: ''; flex: none; width: 7px; height: 7px; margin-left: auto; border-right: 2px solid var(--naotech-color-gray-600); border-bottom: 2px solid var(--naotech-color-gray-600); transform: rotate(-45deg); }
+.nws-dev__nota--inline[open] > summary { margin-bottom: var(--naotech-sizing-8); }
+.nws-dev__nota--inline[open] > summary::after { transform: rotate(45deg); }

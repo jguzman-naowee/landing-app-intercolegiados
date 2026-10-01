@@ -78,7 +78,7 @@
      (closest('[data-…]')); los que emite el SDK como estructura y no como
      gancho se descartan. Si el clic llega acá sin ninguno, la función no
      existe en la exploración → "Disponible próximamente". */
-  var SIN_GANCHO = { 'data-bind': 1, 'data-field': 1, 'data-tabs-indicator': 1, 'data-origen': 1, 'data-step': 1, 'data-pill': 1, 'data-search': 1 };
+  var SIN_GANCHO = { 'data-bind': 1, 'data-field': 1, 'data-tabs-indicator': 1, 'data-origen': 1, 'data-dev': 1, 'data-step': 1, 'data-pill': 1, 'data-search': 1 };
   function enganchado(el) {
     for (var n = el; n && n !== document.body; n = n.parentElement) {
       for (var i = 0; i < n.attributes.length; i++) { var a = n.attributes[i].name; if (a.indexOf('data-') === 0 && !SIN_GANCHO[a]) { return true; } }
