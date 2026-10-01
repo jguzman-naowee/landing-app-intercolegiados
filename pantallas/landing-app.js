@@ -1,9 +1,9 @@
 /**
- * Sin login · app de Juegos Intercolegiados, dentro del marco de teléfono.
+ * App JIN · app de Juegos Intercolegiados, dentro del marco de teléfono.
  * Maqueta «JIN Landing y App», frame 153 v2 (node 13004:13907), a su ancho
  * real (428 px), llevada a patrones de app iOS sobre el SDK de Naowee.
  *
- * Mismo escenario que la app del conductor (toolbar + zoom + teléfono), con
+ * Escenario con toolbar + zoom + teléfono), con
  * el marco a 428 en vez de 390 para que las medidas del Figma entren 1:1.
  * El render es cromo + silueta + splash (igual en las dos pasadas del
  * router, ver `estable`); mount pinta el contenido debajo del splash.
@@ -50,10 +50,13 @@ window.PANTALLAS['landing-app'] = (function () {
         accion(S, 'user', 'Iniciar sesión', 'nws-lpx__accion--perfil')));
   }
 
+  /* El set naotech-icon no trae balón: SVG propio que hereda currentColor. */
+  var BALON = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6c2.6 3.6 2.6 9.2 0 12.8M18.4 5.6c-2.6 3.6-2.6 9.2 0 12.8"/></svg>';
+
   /* Barra de pestañas inferior = NwtTabs a lo ancho, ícono sobre rótulo. */
   function tabbar(S, A) {
     return S.h('nav', { class: 'nws-lpx__tabbar', 'aria-label': 'Navegación principal' },
-      S.tabs({ fullWidth: true, theme: 'primary', value: 'inicio', items: A.tabs.map(function (t) { return { label: t.label, value: t.id, icon: t.icono }; }) }));
+      S.tabs({ fullWidth: true, theme: 'primary', value: 'inicio', items: A.tabs.map(function (t) { return { label: t.label, value: t.id, icon: t.id === 'inicio' ? null : t.icono, iconHtml: t.id === 'inicio' ? BALON : null }; }) }));
   }
   /* Indicador de inicio del sistema (cromo del dispositivo, no de la app). */
   function homeIndicator(S) { return S.h('div', { class: 'nws-lpx__home', 'aria-hidden': 'true' }); }
@@ -61,10 +64,10 @@ window.PANTALLAS['landing-app'] = (function () {
   /* Silueta: mismo ritmo vertical que la vista real. */
   function esqueleto(S) {
     return S.h('div', { 'aria-busy': 'true' },
-      sk(S, '100%', '748px', 'nws-lpv__skel-portada'),
+      sk(S, '100%', '660px', 'nws-lpv__skel-portada'),
       S.h('div', { class: 'nws-lpv__cuerpo' },
         sk(S, '30%', 'var(--naotech-sizing-24)'),
-        S.h('div', { class: 'nws-lpv__menu' }, sk(S, '76px', '68px'), sk(S, '76px', '68px'), sk(S, '76px', '68px'))));
+        S.h('div', { class: 'nws-lpv__menu' }, sk(S, '100%', '72px'), sk(S, '100%', '72px'))));
   }
 
   function tituloSeccion(S, texto) {
@@ -78,60 +81,126 @@ window.PANTALLAS['landing-app'] = (function () {
       S.h('div', { class: 'nws-lpv__carta-foto' }, S.h('img', { src: n.img, alt: '', draggable: 'false' })),
       S.iconButton({ icon: 'share', size: 'small', variant: 'mute', theme: 'neutral', label: 'Compartir', cls: 'nws-lpv__compartir', attrs: { 'data-toast': 'Compartir' } }),
       S.h('div', { class: 'nws-lpv__carta-txt' },
-        S.h('h3', { class: 'nws-lpv__carta-t' }, S.esc(n.titulo)),
+        S.h('h3', { class: 'nws-lpv__carta-t' }, S.esc(n.corto || n.titulo)),
         S.h('div', { class: 'nws-lpv__carta-meta' },
           S.iconLabel({ icon: 'calendar', label: n.fechaCorta, cls: 'nws-lpv__meta' }))));
   }
 
+  /* Escena vectorial de la portada: solo SVG/CSS, sin imágenes (DC-005). */
+  function escenaPortada() {
+    var sv = function (c, vb, d) { return '<div class="nws-lpfx__o ' + c + '"><svg viewBox="' + vb + '" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg></div>'; };
+    return '<div class="nws-lpfx" aria-hidden="true">' +
+      '<i class="nws-lpfx__luz nws-lpfx__luz--a"></i><i class="nws-lpfx__luz nws-lpfx__luz--b"></i><i class="nws-lpfx__luz nws-lpfx__luz--c"></i>' +
+      '<div class="nws-lpfx__capa nws-lpfx__capa--lenta">' +
+        '<i class="nws-lpfx__o nws-lpfx__sol"></i>' +
+        sv('nws-lpfx__arcos', '0 0 360 360', '<path d="M40 200A150 150 0 0 1 190 50" stroke="#f7d500" stroke-width="7"/><path d="M68 262A180 180 0 0 1 250 34" stroke="#f7d500" stroke-width="5" opacity=".7"/>') +
+        sv('nws-lpfx__tri nws-lpfx__tri--a', '0 0 60 54', '<path d="M30 5L56 49H4Z" stroke="#fff" stroke-width="3" opacity=".55"/>') +
+      '</div>' +
+      '<div class="nws-lpfx__capa nws-lpfx__capa--rapida">' +
+        sv('nws-lpfx__balon', '0 0 100 100', '<g stroke="#fff" stroke-width="3.5" opacity=".85"><circle cx="50" cy="50" r="42"/><path d="M50 8V92M8 50H92M20 20C40 38 40 62 20 80M80 20C60 38 60 62 80 80"/></g>') +
+        sv('nws-lpfx__tri nws-lpfx__tri--b', '0 0 60 54', '<path d="M30 5L56 49H4Z" stroke="#f7d500" stroke-width="3.5"/>') +
+        sv('nws-lpfx__aro', '0 0 40 40', '<circle cx="20" cy="20" r="15" stroke="#f07e8c" stroke-width="4"/>') +
+        '<i class="nws-lpfx__punto nws-lpfx__punto--a"></i><i class="nws-lpfx__punto nws-lpfx__punto--b"></i>' +
+        '<i class="nws-lpfx__linea nws-lpfx__linea--a"></i><i class="nws-lpfx__linea nws-lpfx__linea--b"></i><i class="nws-lpfx__linea nws-lpfx__linea--c"></i>' +
+      '</div></div>';
+  }
+
   function contenido(S, L) {
-    var e = S.esc, A = L.app, P = A.portada;
+    var e = S.esc, A = L.app, P = A.portada, V = A.videotutoriales;
     var noticias = [L.novedad].concat(L.noticias);
     /* el mosaico se arma en columnas de 2 teselas (alta+baja / baja+alta) */
     var cols = [];
     for (var c = 0; c < A.mosaico.length; c += 2) { cols.push(A.mosaico.slice(c, c + 2)); }
     return S.h('div', { class: 'nws-lpv' },
-      /* Portada (Figma node 13016:39009): la foto a sangre desde arriba,
-         detrás del estado y del header, con su propio fundido a blanco */
+      /* Portada (Figma 13016:39009): fondo violeta animado en vez de foto
+         (DC-005), a sangre detrás del estado y del header, con fundido a blanco */
       S.h('section', { class: 'nws-lpv__portada', 'data-toast': 'inscribete', role: 'button', tabindex: 0, 'aria-label': P.alt },
-        S.h('img', { src: P.img, alt: '' })),
+        escenaPortada(),
+        /* DC-015: deportista recortada sobre el fondo de marca; el fundido va en la caja y el zoom en la imagen */
+        S.h('div', { class: 'nws-lpv__atleta', 'aria-hidden': 'true' },
+          S.h('img', { src: P.img, alt: '', draggable: 'false' }))),
       S.h('div', { class: 'nws-lpv__cuerpo' },
         /* Titular (texto real, no en la imagen) sobre el fundido */
         S.h('h1', { class: 'nws-lpv__titular' }, e(P.titular[0]) + '<br>' + e(P.titular[1])),
-        /* Menú: accesos en tarjetas blancas, sin título */
-        S.h('section', { class: 'nws-lpv__accesos', 'aria-label': 'Menú' },
+        /* DC-070: título de sección en vez de repetir «competencias» en cada tarjeta */
+        S.h('section', { class: 'nws-lpv__accesos', 'aria-label': A.competencias.titulo },
+          tituloSeccion(S, A.competencias.titulo),
           /* Accesos: NwtAvatarIcon del SDK tal cual (tema primario) */
           S.h('div', { class: 'nws-lpv__menu' }, A.menu.map(function (m) {
-            return S.h('button', { type: 'button', class: 'nws-lpv__app nws-ios-press', 'data-toast': m.label, 'aria-label': m.label },
+            return S.h('button', { type: 'button', class: 'nws-lpv__app nws-ios-press', 'data-vista': m.vista, 'aria-label': m.label },
               S.avatarIcon({ icon: m.icono, theme: 'primary' }),
-              S.h('span', { class: 'nws-lpv__app-l' }, e(m.label)));
+              S.h('span', { class: 'nws-lpv__app-txt' },
+                S.h('span', { class: 'nws-lpv__app-l' },
+                  S.h('span', { class: 'nws-lpv__app-l1' }, e(m.label)))),
+              S.icon('chevron-right', 'nws-lpv__app-c'));
           }))),
-        S.h('section', { class: 'nws-lpv__novedades', 'aria-label': 'Novedades' },
+        S.h('section', { class: 'nws-lpv__novedades', 'aria-label': A.novedades.titulo },
+          tituloSeccion(S, A.novedades.titulo),
           /* Mazo: la de adelante se arrastra con el dedo; al soltarla con
              fuerza (o pasado el umbral) se va y queda al fondo */
           S.h('div', { class: 'nws-lpv__mazo', id: 'lpv-mazo', 'aria-roledescription': 'mazo de noticias', 'aria-live': 'polite' },
             noticias.map(function (n, i) { return tarjeta(S, n, i); }).reverse().join('')),
           S.h('div', { class: 'nws-lpv__mas' },
-            S.button({ label: 'Descubre más noticias', iconEnd: 'arrow-right', size: 'large', theme: 'primary', attrs: { 'data-toast': 'Otras noticias' } }))),
+            S.button({ label: 'Descubre más noticias', size: 'large', theme: 'primary', attrs: { 'data-toast': 'Otras noticias' } }))),
         S.h('section', null,
           tituloSeccion(S, L.galeria.titulo),
           S.h('div', { class: 'nws-lpv__mosaico', role: 'list' }, cols.map(function (col, k) {
             return S.h('div', { class: S.cls('nws-lpv__col', k % 2 && 'nws-lpv__col--inv') }, col.map(function (f, j) {
-              return S.h('button', { type: 'button', class: 'nws-lpv__tesela nws-ios-press', role: 'listitem', 'data-toast': 'galeria', 'aria-label': 'Foto ' + (k * 2 + j + 1) + ' de la galería' },
-                S.h('img', { src: f.img, alt: '', style: 'object-position:' + f.pos, draggable: 'false' }));
+              return S.h('button', { type: 'button', class: 'nws-lpv__tesela nws-ios-press', role: 'listitem', 'data-toast': 'galeria', 'aria-label': 'Foto ' + (k * 2 + j + 1) + ' de la galería' + (f.ciudad ? ' · ' + f.ciudad : '') },
+                S.h('img', { src: f.img, alt: '', style: 'object-position:' + f.pos, draggable: 'false' }),
+                f.ciudad ? S.h('span', { class: 'nws-lpv__ciudad', 'aria-hidden': 'true' }, S.icon('gps-pin-filled') + S.h('span', null, e(f.ciudad))) : '');
             }).join(''));
-          })))));
+          }))),
+        S.h('section', { class: 'nws-lpv__videos', 'aria-label': V.titulo },
+          tituloSeccion(S, V.titulo),
+          S.h('div', { class: 'nws-lpv__vt' },
+            S.h('div', { class: 'nws-lpv__vt-media' },
+              S.h('video', { class: 'nws-lpv__vt-video', src: V.video, poster: V.poster, muted: true, playsinline: true, preload: 'metadata', 'aria-label': V.alt, 'data-vt': '1' }),
+              S.h('span', { class: 'nws-lpv__vt-play', 'aria-hidden': 'true' }, S.icon('play'))),
+            S.h('div', { class: 'nws-lpv__vt-info' },
+              S.h('h3', { class: 'nws-lpv__vt-t' }, e(V.nombre)),
+              S.h('a', { class: 'nws-lpv__vt-a', href: V.url, target: '_blank', rel: 'noopener' }, e(V.enlace)))))),
+      conector(S, A.quote),
+      pie(S, A.footer));
   }
 
-  /* Splash (Figma frame 100, node 9722:14192): la imagen a pantalla completa
-     (trae los logos de Deporte e Intercolegiados 2026) y el ícono refresh
-     del SDK girando como indicador de carga, donde lo pone el Figma. Es la
-     carga de la app: cubre la silueta mientras llega el contenido. */
+  /* DC-080: la frase institucional va como cita sobre el fondo de la app,
+     antes del degradé del pie; la comilla es solo decoración. */
+  function conector(S, Q) {
+    return S.h('blockquote', { class: 'nws-lpv__quote' },
+      S.h('span', { class: 'nws-lpv__quote-filete', 'aria-hidden': 'true' }),
+      S.h('span', { class: 'nws-lpv__quote-marca', 'aria-hidden': 'true' }, '“'),
+      S.h('p', { class: 'nws-lpv__quote-t' }, S.esc(Q.texto)));
+  }
+
+  /* Pie de la app: logos en blanco (filtro solo en los de color único)
+     para que lean sobre el morado; nada navega, todo es maqueta. */
+  function pie(S, F) {
+    var g = window.JIC.logos;
+    function logo(src, cls, alt) { return S.h('img', { class: 'nws-lpv__pie-logo ' + cls, src: src, alt: alt, draggable: 'false' }); }
+    return S.h('footer', { class: 'nws-lpv__pie' },
+      logo(g.mindeporte, 'nws-lpv__pie-logo--blanco nws-lpv__pie-logo--principal', 'Ministerio del Deporte'),
+      S.h('div', { class: 'nws-lpv__pie-logos' },
+        logo(g.intercolegiadosPie, 'nws-lpv__pie-logo--blanco', 'Juegos Intercolegiados'),
+        logo(g.colombia, '', 'Colombia'),
+        logo(g.govco, '', 'gov.co')),
+      S.h('p', { class: 'nws-lpv__pie-legal' },
+        S.h('span', { class: 'nws-lpv__pie-legal-l' }, S.esc(F.legal1)),
+        S.h('span', { class: 'nws-lpv__pie-legal-l' }, S.esc(F.legal2))));
+  }
+
+  /* Splash: imagen con Ken Burns (DC-010, en vez de loader) y el logo de
+     Deporte fijo abajo en una capa aparte, para que no siga el zoom. */
   function splash(S, L) {
     var sp = L.app.splash;
-    return S.h('div', { class: 'nws-lps', id: 'lps', role: 'img', 'aria-label': sp.alt },
-      S.h('img', { class: 'nws-lps__img', src: sp.img, alt: '' }),
+    return S.h('div', { class: 'nws-lps nws-lps--kb', id: 'lps', role: 'img', 'aria-label': sp.alt, style: '--nws-lps-carga:' + sp.ms + 'ms' },
+      S.h('img', { class: 'nws-lps__img', src: sp.img, alt: '', style: '--nws-lps-ms:' + (sp.ms + 600) + 'ms' }),
+      S.h('div', { class: 'nws-lps__tinte' }),
+      S.h('img', { class: 'nws-lps__logo-jic', src: window.JIC.logos.intercolegiados, alt: '' }),
+      S.h('img', { class: 'nws-lps__logo-min', src: window.JIC.logos.mindeporte, alt: '' }),
       S.h('div', { class: 'nws-lps__estado' }, barraEstado(S, L.hora)),
-      S.h('span', { class: 'nws-lps__carga', 'aria-hidden': 'true' }, S.icon('refresh')));
+      S.h('div', { class: 'nws-lps__carga', id: 'lps-carga', role: 'progressbar', 'aria-label': 'Cargando la app', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': '0', style: '--nws-lps-carga:' + sp.ms + 'ms' },
+        S.h('span', { class: 'nws-lps__carga-relleno' })));
   }
 
   /* Pantalla del teléfono: estado + header y pestañas + indicador de inicio
@@ -401,14 +470,14 @@ window.PANTALLAS['landing-app'] = (function () {
   return {
     fullscreen: true,
     estable: true,
-    titulo: 'App Juegos Intercolegiados',
+    titulo: 'App JIN',
 
     render: function (ctx) {
       var S = ctx.S, rol = ctx.rol, L = ctx.D.landing;
       return S.h('div', { class: 'nws-col', style: 'height:100%;background:var(--naotech-app-color-100)' },
         S.toolbar({
-          body: S.h('div', { class: 'nws-row nws-title-light' }, S.h('div', { class: 'nws-title__naowee' }, window.NAOWEE.icono), S.title({ text: 'App · Juegos Intercolegiados', subtitle: rol.rol + ' · vista pública' })),
-          actions: S.button({ label: 'Cambiar de perfil', icon: 'logout', size: 'medium', variant: 'quiet', theme: 'neutral', attrs: { 'data-logout': true } })
+          body: S.h('div', { class: 'nws-row nws-title-light' }, S.h('div', { class: 'nws-title__naowee' }, window.NAOWEE.icono), S.title({ text: 'App JIN', subtitle: 'Juegos Intercolegiados' })),
+          actions: ''
         }),
         S.h('div', { class: 'nws-phone-stage', id: 'stage' },
           S.h('div', { class: 'nws-phone-zoom' },
@@ -446,11 +515,21 @@ window.PANTALLAS['landing-app'] = (function () {
         ctx.cerrarToast();
         detalle(S, L, mob, noticias[+carta.getAttribute('data-i')], carta, alCerrar);
       });
+      var vistas = window.LANDING_VISTAS.montar(S, L, mob, { barraEstado: barraEstado, posicionarIndicadores: ctx.posicionarIndicadores });
       var timers = [];
       var lento = /[?&]lento\b/.test(location.search);
+      /* La barra dura lo mismo que el splash; `ya` descuenta lo transcurrido
+         antes de montar para que llegue a 100 justo cuando el splash se va. */
+      function cargaSplash(ms, ya) {
+        var c = mob.querySelector('#lps-carga'); if (!c) { return; }
+        c.style.setProperty('--nws-lps-carga', ms + 'ms'); c.style.setProperty('--nws-lps-ya', -ya + 'ms');
+        c.parentNode.style.setProperty('--nws-lps-carga', ms + 'ms'); /* el logo hereda la duración del splash */
+        c.setAttribute('aria-valuenow', '0');
+      }
       function ocultarSplash(tras) {
         var sp = mob.querySelector('#lps'); if (!sp) { return; }
         timers.push(setTimeout(function () {
+          var c = mob.querySelector('#lps-carga'); if (c) { c.setAttribute('aria-valuenow', '100'); }
           sp.classList.add('nws-lps--fuera');
           mob.classList.add('nws-lp--entra');
           timers.push(setTimeout(function () { sp.hidden = true; }, 520));
@@ -462,20 +541,50 @@ window.PANTALLAS['landing-app'] = (function () {
         var sp = mob.querySelector('#lps'); if (!sp) { return; }
         timers.forEach(clearTimeout); timers = [];
         ctx.cerrarToast();
-        sp.hidden = false; sp.classList.remove('nws-lps--fuera');
+        sp.hidden = false; sp.classList.remove('nws-lps--fuera', 'nws-lps--kb');
+        cargaSplash(lento ? 4000 : L.app.splash.ms, 0);
+        void sp.offsetWidth; sp.classList.add('nws-lps--kb'); /* reinicia el Ken Burns y la barra */
         sc.scrollTop = 0; onScroll();
         ocultarSplash(lento ? 4000 : L.app.splash.ms);
       }
+      /* `nws-lps--kb` ya viene en el HTML: las animaciones corren desde el primer frame, sin salto. */
       var yaEspero = lento ? 4000 : 520;
+      cargaSplash(lento ? 4000 : L.app.splash.ms, lento ? 4000 : 0);
       ocultarSplash(Math.max(0, (lento ? 4000 : L.app.splash.ms) - yaEspero));
 
       /* Header sobre la portada: transparente con íconos blancos; cuando la
          portada ya pasó por debajo, material blanco con división. */
       var portada = mob.querySelector('.nws-lpv__portada');
+      /* pausa las luces y figuras cuando la portada sale de vista */
+      var vigia = null;
+      if (portada && window.IntersectionObserver) {
+        vigia = new IntersectionObserver(function (en) {
+          portada.classList.toggle('nws-lpfx--pausa', !en[0].isIntersecting);
+        });
+        vigia.observe(portada);
+      }
+      /* Tutorial: arranca y vuelve al 50 % (el loop nativo volvería al 0); solo corre en pantalla. */
+      var vt = mob.querySelector('[data-vt]');
+      if (vt) {
+        var quieto = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var medio = function () { if (vt.duration) { vt.currentTime = vt.duration * 0.5; } };
+        vt.muted = true;
+        vt.addEventListener('loadedmetadata', medio);
+        vt.addEventListener('ended', function () { medio(); if (vt.dataset.vis === '1') { vt.play().catch(function () {}); } });
+        if (vt.readyState > 0) { medio(); }
+        if (!quieto && window.IntersectionObserver) {
+          new IntersectionObserver(function (en) {
+            var dentro = en[0].isIntersecting;
+            vt.dataset.vis = dentro ? '1' : '0';
+            if (dentro) { vt.play().catch(function () {}); } else { vt.pause(); }
+          }, { root: sc, threshold: 0.4 }).observe(vt);
+        }
+      }
       function onScroll() {
         /* la foto se funde a blanco hacia el 66 % de su alto: desde ahí el
            logo blanco ya no se leería, así que el header pasa a material */
-        var limite = portada ? portada.offsetHeight * 0.64 - top.offsetHeight : 0;
+        /* el material suma 8px: se descuentan para medir igual en ambos estados */
+        var limite = portada ? portada.offsetHeight * 0.64 - (top.offsetHeight - (top.classList.contains('nws-lpi__top--sobre') ? 0 : 8)) : 0;
         top.classList.toggle('nws-lpi__top--sobre', sc.scrollTop < limite);
       }
 
@@ -491,9 +600,17 @@ window.PANTALLAS['landing-app'] = (function () {
           aplicarZoom(); return;
         }
         if (ev.target.closest('[data-splash]')) { mostrarSplash(); return; }
-        /* pestañas inferiores: Inicio es donde ya se está; las demás aún no existen */
+        /* Calendario y Resultados (tarjetas): vista inmersiva; el foco vuelve a la tarjeta */
+        var vi = ev.target.closest('[data-vista]');
+        if (vi) { vistas.abrir(vi.getAttribute('data-vista'), vi); return; }
+        /* Medallas/Certificados (pestañas): aviso propio con fecha estimada (datos.js) */
         var tab = ev.target.closest('.nws-lpx__tabbar [data-tab]');
-        if (tab && tab.getAttribute('data-tab') !== 'inicio') { ctx.proximamente(tab.textContent, tab); }
+        if (tab && tab.getAttribute('data-tab') !== 'inicio') {
+          var it = L.app.tabs.filter(function (m) { return m.id === tab.getAttribute('data-tab'); })[0];
+          if (it && it.toast) {
+            ctx.toast({ key: 'aviso:' + it.id, title: it.toast.titulo, message: it.toast.desde, theme: 'neutral', icon: 'info', ms: 6000, origen: tab });
+          }
+        }
       }
       /* Enter/espacio sobre lo que no es <button> */
       function onKey(ev) {
@@ -510,6 +627,8 @@ window.PANTALLAS['landing-app'] = (function () {
       return function () {
         timers.forEach(clearTimeout);
         offMazo();
+        vistas.destruir();
+        if (vigia) { vigia.disconnect(); }
         sc.removeEventListener('scroll', onScroll);
         root.removeEventListener('click', onClick);
         root.removeEventListener('keydown', onKey);

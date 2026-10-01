@@ -8,13 +8,12 @@
  *
  * entidad  = quién firma el prototipo (hoy solo Naowee; al recibir un cliente
  *            se agrega aquí su sigla/logo).
- * roles    = perfiles del selector. Cada rol: id, rol, nombre, iniciales,
+ * roles    = perfil único de la demo (App JIN). Cada rol: id, rol, nombre, iniciales,
  *            organizacion, portal, theme, color, descripcion, inicio (hash).
  * menus    = { [rolId]: [{ section, id, label, icon, route }] } para los roles
  *            que usan el shell con sidebar (los fullscreen no lo necesitan).
  *
- * landing  = contenido de la landing pública de Intercolegiados (perfil Sin
- *            login). Copia del Figma «JIN Landing y App», frame 153
+ * landing  = contenido de la landing pública de Intercolegiados (App JIN). Copia del Figma «JIN Landing y App», frame 153
  *            (node 10185:14357). Las imágenes viven en assets/landing/.
  *            landing.app = lo propio de la app (Figma frame 13004:13907):
  *            portada, menú, pestañas inferiores, mosaico de la galería.
@@ -32,221 +31,19 @@ window.DATOS = {
   },
   "roles": [
     {
-      "id": "conductor",
-      "rol": "Sin login",
-      "nombre": "C. Mendoza",
-      "iniciales": "CM",
-      "organizacion": "Cliente demo · Camión 12",
+      "id": "jin",
+      "rol": "App JIN",
+      "nombre": "Visitante",
+      "iniciales": "JIN",
+      "organizacion": "Juegos Intercolegiados",
       "portal": "App móvil",
       "theme": "primary",
       "color": "orange",
-      "descripcion": "Recorre la ruta y marca cada punto.",
-      "inicio": "#/conductor"
+      "descripcion": "App de Juegos Intercolegiados.",
+      "inicio": "#/"
     }
   ],
   "menus": {},
-  "conductorApp": {
-    "ruta": {
-      "codigo": "R-2406 · Sector B",
-      "camion": "Camión 12",
-      "zona": "Zona Norte"
-    },
-    "cuadrilla": [
-      {
-        "id": "r1",
-        "nombre": "J. Ariza"
-      },
-      {
-        "id": "r2",
-        "nombre": "D. Pérez"
-      }
-    ],
-    "jornada": {
-      "desde": "06:00",
-      "hasta": "14:00"
-    },
-    "programada": {
-      "codigo": "R-2412 · Sector D",
-      "unidades": 28,
-      "zona": "Zona Norte",
-      "cuando": "Hoy 13:30"
-    },
-    "completada": {
-      "codigo": "R-2391 · Bahía",
-      "horario": "05:40 — 08:05",
-      "unidades": 36,
-      "fotos": 36
-    },
-    "paradas": [
-      {
-        "dir": "Cra 45 #72-10",
-        "tipo": "Residencial",
-        "uid": "U-04818",
-        "hora": "08:14",
-        "m": 180,
-        "min": 3,
-        "g": "u",
-        "gt": "Siga derecho por Cra 45",
-        "gm": "la parada queda a la derecha"
-      },
-      {
-        "dir": "Cra 45 #72-24",
-        "tipo": "Comercial",
-        "uid": "U-04819",
-        "hora": "08:17",
-        "m": 140,
-        "min": 2,
-        "g": "u",
-        "gt": "Siga derecho por Cra 45",
-        "gm": "costado oriental, frente al 72-24"
-      },
-      {
-        "dir": "Cra 45 #72-38",
-        "tipo": "Residencial",
-        "uid": "U-04821",
-        "hora": "08:23",
-        "m": 210,
-        "min": 4,
-        "g": "u",
-        "gt": "Siga derecho por Cra 45",
-        "gm": "antes de llegar a Cll 76"
-      },
-      {
-        "dir": "Cra 45 #72-52",
-        "tipo": "Residencial",
-        "uid": "U-04824",
-        "hora": "08:29",
-        "m": 160,
-        "min": 3,
-        "g": "r",
-        "gt": "Gire a la derecha en Cll 76",
-        "gm": "la parada está a 40 m del cruce"
-      },
-      {
-        "dir": "Cll 72 #45-03",
-        "tipo": "Comercial",
-        "uid": "U-04831",
-        "hora": "08:36",
-        "m": 240,
-        "min": 5,
-        "g": "r",
-        "gt": "Gire a la derecha en Cll 72",
-        "gm": "bahía de cargue, costado sur"
-      },
-      {
-        "dir": "Cll 72 #45-19",
-        "tipo": "Residencial",
-        "uid": "U-04833",
-        "hora": "08:41",
-        "m": 130,
-        "min": 2,
-        "g": "u",
-        "gt": "Siga derecho por Cll 72",
-        "gm": "shut del conjunto, sobre andén"
-      },
-      {
-        "dir": "Cra 46 #72-08",
-        "tipo": "Industrial",
-        "uid": "U-04840",
-        "hora": "08:49",
-        "m": 260,
-        "min": 5,
-        "g": "l",
-        "gt": "Gire a la izquierda en Cra 46",
-        "gm": "contenedor industrial · 2 unidades"
-      },
-      {
-        "dir": "Cra 46 #72-22",
-        "tipo": "Comercial",
-        "uid": "U-04842",
-        "hora": "08:55",
-        "m": 150,
-        "min": 3,
-        "g": "f",
-        "gt": "Última parada de la ruta",
-        "gm": "al marcarla podés cerrar la R-2406"
-      }
-    ],
-    "causales": [
-      {
-        "id": "sin",
-        "txt": "Sin basuras",
-        "rec": false,
-        "obs": "Sin residuos dispuestos en el punto al momento del paso."
-      },
-      {
-        "id": "limpio",
-        "txt": "Punto limpio",
-        "rec": false,
-        "obs": "Punto encontrado limpio, no requirió recolección."
-      },
-      {
-        "id": "inacc",
-        "txt": "Inaccesible",
-        "rec": false,
-        "obs": "Punto inaccesible: vía obstruida, el vehículo no pudo acercarse."
-      },
-      {
-        "id": "casas",
-        "txt": "Casas cerradas",
-        "rec": false,
-        "obs": "Predios sin residuos en fachada al momento del paso."
-      },
-      {
-        "id": "mald",
-        "txt": "Mal dispuestos",
-        "rec": true,
-        "obs": "Residuos fuera del contenedor / en horario no autorizado. Se recolecta y se reporta."
-      },
-      {
-        "id": "cont",
-        "txt": "Contenedor dañado",
-        "rec": true,
-        "obs": "Contenedor averiado. Se recolecta y se reporta para reposición."
-      }
-    ],
-    "evidencia": {
-      "hora": "08:42:11",
-      "coordenada": "10.9878, −74.7889"
-    },
-    "historial": [
-      {
-        "codigo": "R-2391 · Bahía",
-        "dia": "hoy",
-        "horario": "05:40 — 08:05",
-        "unidades": 36,
-        "novedades": 0
-      },
-      {
-        "codigo": "R-2388 · Sector B",
-        "dia": "ayer",
-        "horario": "06:10 — 09:02",
-        "unidades": 41,
-        "novedades": 2
-      },
-      {
-        "codigo": "R-2384 · Sector D",
-        "dia": "dom 15",
-        "horario": "05:55 — 08:40",
-        "unidades": 28,
-        "novedades": 1
-      },
-      {
-        "codigo": "R-2379 · Bahía",
-        "dia": "sáb 14",
-        "horario": "05:45 — 08:10",
-        "unidades": 36,
-        "novedades": 0
-      },
-      {
-        "codigo": "R-2371 · Sector B",
-        "dia": "vie 13",
-        "horario": "06:05 — 08:58",
-        "unidades": 41,
-        "novedades": 3
-      }
-    ]
-  },
   "landing": {
     "hora": "9:30",
     "hero": {
@@ -280,13 +77,14 @@ window.DATOS = {
       "autoria": "Autoría: Miguel Guavita, prensa Ministerio del Deporte",
       "fechaCorta": "24 feb 2026",
       "lugar": "Bogotá",
-      "corto": "Más de 1600 colombianos participaron en la consulta ciudadana",
+      "corto": "Más de 1600 colombianos opinaron en la consulta",
       "cuerpo": "Desde los patios escolares de los municipios más apartados hasta los escenarios internacionales, el Deporte Escolar se consolidó en 2025 como uno de los pilares estratégicos del Ministerio del Deporte para la formación integral de niñas, niños y jóvenes en Colombia. A través de dos programas bandera, la Jornada Deportiva Escolar Complementaria y los Juegos Intercolegiados, el país fortaleció no solo la práctica deportiva, sino también los procesos de inclusión, equidad, permanencia escolar y proyección del talento joven en el deporte nacional e internacional."
     },
     "noticias": [
       {
         "img": "assets/landing/noticia-1.jpg",
         "titulo": "Abierta la consulta ciudadana con el proyecto de resolución que define los criterios de selección de deportes",
+        "corto": "Abierta la consulta sobre selección de deportes",
         "fecha": "Bogotá, 24 de febrero de 2026",
         "resumen": "Ya puedes revisar el proyecto de resolución y dejar tus comentarios sobre los criterios de selección de deportes.",
         "fechaCorta": "24 feb 2026",
@@ -296,6 +94,7 @@ window.DATOS = {
       {
         "img": "assets/landing/noticia-2.jpg",
         "titulo": "Este 12 de marzo se abren las inscripciones para los Juegos Intercolegiados Nacionales 2026",
+        "corto": "Inscripciones a los Juegos abren el 12 de marzo",
         "fecha": "Bogotá, 24 de febrero de 2026",
         "resumen": "Colegios de todo el país podrán inscribir a sus deportistas desde el 12 de marzo. Te contamos cómo hacerlo.",
         "fechaCorta": "24 feb 2026",
@@ -303,20 +102,24 @@ window.DATOS = {
         "categoria": "inscripciones"
       }
     ],
+    /* ciudad: TEXTO DE EJEMPLO salvo Florencia (camiseta Caquetá); confirmar con Mindeporte */
     "galeria": {
       "titulo": "Galería multimedia",
       "bajada": "explora las imágenes de la competencia",
       "fotos": [
         {
           "img": "assets/landing/galeria-a.jpg",
+          "ciudad": "Florencia",
           "pos": "38% 50%"
         },
         {
           "img": "assets/landing/galeria-b.jpg",
+          "ciudad": "Bogotá",
           "pos": "55% 50%"
         },
         {
           "img": "assets/landing/galeria-c.jpg",
+          "ciudad": "Cali",
           "pos": "67% 50%"
         }
       ]
@@ -355,23 +158,210 @@ window.DATOS = {
       }
     ],
     "app": {
+      "quote": {
+        "texto": "Juegos Intercolegiados es una iniciativa del Ministerio del Deporte de Colombia."
+      },
+      "footer": {
+        "legal1": "© 2026 Ministerio del Deporte.",
+        "legal2": "Todos los derechos reservados."
+      },
       "tabs": [
         {
           "id": "inicio",
           "icono": "home",
-          "label": "Inicio"
+          "label": "Juegos"
         },
         {
-          "id": "calendario",
-          "icono": "calendar",
-          "label": "Calendario"
-        },
-        {
-          "id": "resultados",
+          "id": "medallas",
           "icono": "mercado-lider",
-          "label": "Resultados"
+          "label": "Medallas",
+          "toast": {
+            "_ejemplo": "TEXTO DE EJEMPLO: fecha tomada del calendario de ejemplo (inicio de la fase nacional)",
+            "titulo": "Aún no hay medallas",
+            "desde": "Disponible desde el 26 de octubre de 2026"
+          }
+        },
+        {
+          "id": "certificados",
+          "icono": "file",
+          "label": "Certificados",
+          "toast": {
+            "_ejemplo": "TEXTO DE EJEMPLO: fecha tomada del calendario de ejemplo (ceremonia de clausura)",
+            "titulo": "Sin certificados aún",
+            "desde": "Disponible desde el 31 de octubre de 2026"
+          }
         }
       ],
+      "calendario": {
+        "_ejemplo": "TEXTO DE EJEMPLO: eventos de demostración, no el calendario oficial",
+        "titulo": "Calendario",
+        "hoy": "2026-09-30",
+        "meses": [
+          "2026-09",
+          "2026-10"
+        ],
+        "diasSemana": [
+          "L",
+          "M",
+          "M",
+          "J",
+          "V",
+          "S",
+          "D"
+        ],
+        "vacio": "No hay eventos este día.",
+        "agregar": "Agregar a mi calendario",
+        "eventos": [
+          {
+            "id": "ev01",
+            "fecha": "2026-09-02",
+            "hora": "8:00 a. m.",
+            "titulo": "Cierre de inscripciones institucionales",
+            "lugar": "Plataforma de inscripciones",
+            "tipo": "Inscripciones",
+            "detalle": "Último día para que las instituciones educativas completen el registro de sus deportistas y delegados."
+          },
+          {
+            "id": "ev02",
+            "fecha": "2026-09-08",
+            "hora": "8:00 a. m.",
+            "titulo": "Fase municipal · Atletismo",
+            "lugar": "Unidad deportiva, Bogotá",
+            "tipo": "Fase municipal",
+            "detalle": "Pruebas de pista y campo de la fase municipal. Llega con tu carné y documento de identidad."
+          },
+          {
+            "id": "ev03",
+            "fecha": "2026-09-12",
+            "hora": "9:00 a. m.",
+            "titulo": "Fase municipal · Baloncesto",
+            "lugar": "Coliseo cubierto, Medellín",
+            "tipo": "Fase municipal",
+            "detalle": "Partidos de la fase municipal en las categorías convocadas."
+          },
+          {
+            "id": "ev04",
+            "fecha": "2026-09-15",
+            "hora": "3:00 p. m.",
+            "titulo": "Sorteo de grupos de la fase departamental",
+            "lugar": "Transmisión en línea",
+            "tipo": "Organización",
+            "detalle": "Se definen los grupos y los cruces de la fase departamental."
+          },
+          {
+            "id": "ev05",
+            "fecha": "2026-09-19",
+            "hora": "8:30 a. m.",
+            "titulo": "Fase municipal · Voleibol",
+            "lugar": "Polideportivo, Cali",
+            "tipo": "Fase municipal",
+            "detalle": "Jornada de voleibol de la fase municipal."
+          },
+          {
+            "id": "ev06",
+            "fecha": "2026-09-24",
+            "hora": "4:00 p. m.",
+            "titulo": "Reunión técnica de delegados",
+            "lugar": "Sala virtual",
+            "tipo": "Organización",
+            "detalle": "Se explican reglamento, horarios y sedes de la fase departamental."
+          },
+          {
+            "id": "ev07",
+            "fecha": "2026-09-30",
+            "hora": "8:00 a. m.",
+            "titulo": "Verificación de carnés deportivos",
+            "lugar": "Sede de la liga, Barranquilla",
+            "tipo": "Inscripciones",
+            "detalle": "Revisión de carnés y documentos antes de la fase departamental."
+          },
+          {
+            "id": "ev08",
+            "fecha": "2026-09-30",
+            "hora": "2:00 p. m.",
+            "titulo": "Fase departamental · Fútbol de salón",
+            "lugar": "Coliseo departamental, Medellín",
+            "tipo": "Fase departamental",
+            "detalle": "Primera jornada de fútbol de salón de la fase departamental."
+          },
+          {
+            "id": "ev09",
+            "fecha": "2026-10-03",
+            "hora": "9:00 a. m.",
+            "titulo": "Fase departamental · Natación",
+            "lugar": "Complejo acuático, Cali",
+            "tipo": "Fase departamental",
+            "detalle": "Competencias de natación de la fase departamental."
+          },
+          {
+            "id": "ev10",
+            "fecha": "2026-10-10",
+            "hora": "10:00 a. m.",
+            "titulo": "Fase departamental · Tenis de mesa",
+            "lugar": "Coliseo de la liga, Barranquilla",
+            "tipo": "Fase departamental",
+            "detalle": "Jornada de tenis de mesa de la fase departamental."
+          },
+          {
+            "id": "ev11",
+            "fecha": "2026-10-14",
+            "hora": "5:00 p. m.",
+            "titulo": "Cierre de la fase departamental",
+            "lugar": "Sedes departamentales",
+            "tipo": "Fase departamental",
+            "detalle": "Se cierra la fase departamental y se consolidan los resultados."
+          },
+          {
+            "id": "ev12",
+            "fecha": "2026-10-17",
+            "hora": "10:00 a. m.",
+            "titulo": "Publicación de clasificados a la fase nacional",
+            "lugar": "Plataforma de resultados",
+            "tipo": "Organización",
+            "detalle": "Se publica el listado de equipos y deportistas clasificados."
+          },
+          {
+            "id": "ev13",
+            "fecha": "2026-10-24",
+            "hora": "6:00 p. m.",
+            "titulo": "Ceremonia de inauguración de la fase nacional",
+            "lugar": "Bogotá",
+            "tipo": "Ceremonia",
+            "detalle": "Acto de apertura de la fase nacional de Juegos Intercolegiados."
+          },
+          {
+            "id": "ev14",
+            "fecha": "2026-10-26",
+            "hora": "8:00 a. m.",
+            "titulo": "Fase nacional · Atletismo",
+            "lugar": "Estadio de atletismo, Bogotá",
+            "tipo": "Fase nacional",
+            "detalle": "Primera jornada de atletismo de la fase nacional."
+          },
+          {
+            "id": "ev15",
+            "fecha": "2026-10-28",
+            "hora": "9:00 a. m.",
+            "titulo": "Fase nacional · Baloncesto",
+            "lugar": "Coliseo cubierto, Bogotá",
+            "tipo": "Fase nacional",
+            "detalle": "Partidos de baloncesto de la fase nacional."
+          },
+          {
+            "id": "ev16",
+            "fecha": "2026-10-31",
+            "hora": "5:00 p. m.",
+            "titulo": "Ceremonia de clausura",
+            "lugar": "Bogotá",
+            "tipo": "Ceremonia",
+            "detalle": "Cierre de la edición 2026 y reconocimiento a las delegaciones."
+          }
+        ]
+      },
+      "resultados": {
+        "titulo": "Resultados",
+        "texto": "Vista de resultados"
+      },
       "cuenta": {
         "nombre": "Juegos Intercolegiados",
         "lugar": "Bogotá"
@@ -391,63 +381,81 @@ window.DATOS = {
         }
       ],
       "splash": {
-        "img": "assets/landing/splash-2026.jpg",
+        "img": "assets/landing/splash-deportistas.jpg",
         "alt": "Juegos Intercolegiados 2026 · Ministerio del Deporte",
         "ms": 2200
       },
       "portada": {
-        "img": "assets/landing/portada-2026.jpg",
         "titular": [
-          "En este 2026",
-          "vamos por más"
+          "¡Es octubre, vamos",
+          "a la nacional!"
         ],
-        "alt": "Juegos Intercolegiados 2026"
+        "alt": "Juegos Intercolegiados 2026",
+        "img": "assets/landing/deportista.png"
       },
       "menu": [
         {
-          "id": "medallas",
+          "id": "calendario",
+          "icono": "calendar",
+          "label": "Calendario",
+          "vista": "calendario"
+        },
+        {
+          "id": "resultados",
           "icono": "mercado-lider",
-          "label": "Medallas"
-        },
-        {
-          "id": "tutoriales",
-          "icono": "play",
-          "label": "Videos tutoriales"
-        },
-        {
-          "id": "certificados",
-          "icono": "file",
-          "label": "Certificados"
+          "label": "Resultados",
+          "vista": "resultados"
         }
       ],
+      "competencias": {
+        "titulo": "Competencias"
+      },
+      "novedades": {
+        "titulo": "Novedades"
+      },
+      "videotutoriales": {
+        "titulo": "Video tutoriales",
+        "video": "assets/landing/video-tutorial-registro.mp4",
+        "poster": "assets/landing/video-tutorial-poster.jpg",
+        "alt": "Vista previa del video tutorial de registro de institución",
+        "nombre": "Conoce cómo usar la plataforma",
+        "enlace": "Ver todos",
+        "url": "https://www.youtube.com/playlist?list=PLIMBtBqZGiXc3uAZTFKREGbpbusHy3ui1"
+      },
       "mosaico": [
         {
           "img": "assets/landing/galeria-a.jpg",
+          "ciudad": "Florencia",
           "pos": "38% 30%",
           "alto": "alto"
         },
         {
           "img": "assets/landing/noticia-1.jpg",
+          "ciudad": "Medellín",
           "pos": "50% 50%",
           "alto": "bajo"
         },
         {
           "img": "assets/landing/novedad-principal.jpg",
+          "ciudad": "Barranquilla",
           "pos": "50% 50%",
           "alto": "bajo"
         },
         {
           "img": "assets/landing/galeria-b.jpg",
+          "ciudad": "Bogotá",
           "pos": "55% 30%",
           "alto": "alto"
         },
         {
           "img": "assets/landing/galeria-c.jpg",
+          "ciudad": "Cali",
           "pos": "67% 50%",
           "alto": "alto"
         },
         {
           "img": "assets/landing/noticia-2.jpg",
+          "ciudad": "Bucaramanga",
           "pos": "50% 40%",
           "alto": "bajo"
         }

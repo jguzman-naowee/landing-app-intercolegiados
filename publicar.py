@@ -53,7 +53,7 @@ out.append(resto)
 # Imágenes de la maqueta (assets/…): los scripts las nombran como texto
 # ('assets/landing/hero.jpg'); acá ese texto se cambia por su data URI para
 # que la página siga siendo UN archivo. Mismo archivo, mismo lugar.
-MIME = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp'}
+MIME = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.mp4': 'video/mp4'}
 def embeber_assets(js):
     def sub(m):
         rel = m.group(2)

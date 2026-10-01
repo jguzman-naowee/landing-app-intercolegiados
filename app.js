@@ -1,5 +1,5 @@
 /**
- * Arranque: sesión ficticia por rol, router por hash y el shell del SDK
+ * Arranque: perfil único App JIN, router por hash y el shell del SDK
  * (NwtSidebar + NwtToolbar + .nwt-app__content) alrededor de cada pantalla.
  */
 (function () {
@@ -10,36 +10,18 @@
   var limpiar = null;
 
   /* ---------- sesión ---------- */
-  var sesion = { rol: null, ultimoRol: null };
-  try { sesion.rol = sessionStorage.getItem('proto.rol'); sesion.ultimoRol = localStorage.getItem('proto.ultimoRol'); } catch (e) { /* almacenamiento bloqueado */ }
+  /* Demo de un solo perfil: no hay selector, la sesión es siempre App JIN. */
+  var sesion = { rol: D.roles[0].id, ultimoRol: D.roles[0].id };
   function rolPorId(id) { return D.roles.filter(function (r) { return r.id === id; })[0] || null; }
-  function guardar() {
-    try {
-      sesion.rol ? sessionStorage.setItem('proto.rol', sesion.rol) : sessionStorage.removeItem('proto.rol');
-      if (sesion.ultimoRol) { localStorage.setItem('proto.ultimoRol', sesion.ultimoRol); }
-    } catch (e) { /* idem */ }
-  }
-  /* Una entrada del selector puede ser un ATAJO y no un rol (p.ej. entra
-     con otro rol y cae directo en una pantalla concreta). `sesion` dice con
-     qué rol se abre la sesión; sin él, el rol es el de la propia entrada. */
-  function entrar(id) { var r = rolPorId(id); if (!r) { return; } var real = r.sesion || r.id; sesion.rol = real; sesion.ultimoRol = real; guardar(); ir(r.inicio); }
-  function salir() { sesion.rol = null; guardar(); ir('#/'); }
+  function salir() { ir('#/'); }
   function ir(hash) { if (location.hash === hash) { navegar(); } else { location.hash = hash; } }
-
-  /* ?rol=conductor abre la sesión directo (para compartir un link a una pantalla
-     concreta). Sin el parámetro, la entrada es siempre el selector. */
-  var qRol = (location.search.match(/[?&]rol=([a-z]+)/) || [])[1];
-  if (qRol && rolPorId(qRol)) { sesion.rol = qRol; sesion.ultimoRol = qRol; guardar(); }
 
   /* ---------- rutas ---------- */
   /* Una línea por pantalla. Para sumar un rol: agregarlo en datos.js
      (roles + menus si usa sidebar), crear pantallas/<rol>-<vista>.js,
      cargarlo en dev.html y registrar aquí su ruta. */
   var RUTAS = {
-    '#/':          { pantalla: 'login' },
-    /* el perfil "Sin login" (id conductor) abre la landing pública; la app del
-       conductor queda en su archivo, sin ruta */
-    '#/conductor': { pantalla: 'landing-app', rol: 'conductor' }
+    '#/': { pantalla: 'landing-app', rol: 'jin' }
   };
 
   /* ---------- toast ----------
@@ -112,7 +94,7 @@
      En React los posiciona useTrackedIndicator midiendo el tab activo.
      Acá se hace lo mismo después de pintar. */
   /* DC-086: getBoundingClientRect() mide en píxeles de PANTALLA (después del
-     transform:scale del escenario del teléfono en conductor-app.js), pero insetInlineStart se aplica en el espacio
+     transform:scale del escenario del teléfono en landing-app.js), pero insetInlineStart se aplica en el espacio
      LOCAL del elemento, antes de ese transform — con escala != 1 quedaba
      desfasado (escalado dos veces). offsetLeft/offsetWidth son medidas de
      layout, ajenas a cualquier transform de un ancestro, e igual de válidas
@@ -147,7 +129,7 @@
      tocar para ajustarlo (0 la apaga y todo vuelve a pintarse de una).
      Para mirar el esqueleto con calma hay un `?lento` en la query (junto a
      `?rol=`, no en el hash: el hash es la ruta y ensuciarlo la rompe) que lo
-     sube a 4s — p.ej. dev.html?rol=conductor&lento#/conductor */
+     sube a 4s — p.ej. dev.html?lento */
   /* Hook opcional para lo que es GEOMETRÍA y no dato: hay que medir el DOM ya
      pintado, pero no puede esperar a que lleguen los datos. Corre en las dos
      pasadas, la del esqueleto y la de los datos.
@@ -228,19 +210,15 @@
     var hash = location.hash || '#/';
     if (hash === '#/salir') { salir(); return; }
     var ruta = RUTAS[hash];
-    var rolRuta = ruta ? ruta.rol : (hash.split('/')[1] || null);
 
     if (limpiar) { limpiar(); limpiar = null; }
     cerrarToast();
 
-    if (!ruta || ruta.pantalla !== 'login') {
-      /* sin sesión → siempre al selector */
-      if (!sesion.rol) { location.hash = '#/'; return; }
-      if (rolRuta && rolRuta !== sesion.rol && rolPorId(rolRuta)) { sesion.rol = rolRuta; sesion.ultimoRol = rolRuta; guardar(); }
+    {
       var rol = rolPorId(sesion.rol);
       var pantalla = ruta ? P[ruta.pantalla] : fueraDeAlcance(rol, hash);
-      var ctx = { S: S, D: D, rol: rol, sesion: sesion, ir: ir, toast: toast, cerrarToast: cerrarToast, proximamente: proximamente, entrar: entrar, salir: salir, posicionarIndicadores: posicionarIndicadores, cargando: false };
-      document.title = pantalla.titulo + ' · ' + rol.rol + ' · ' + D.entidad.sigla;
+      var ctx = { S: S, D: D, rol: rol, sesion: sesion, ir: ir, toast: toast, cerrarToast: cerrarToast, proximamente: proximamente, salir: salir, posicionarIndicadores: posicionarIndicadores, cargando: false };
+      document.title = pantalla.titulo + ' · Juegos Intercolegiados';
       var destino = pantalla.fullscreen ? app : null;
       if (!destino) { app.innerHTML = shell(rol, hash, pantalla, ctx); destino = document.getElementById('view'); }
 
@@ -268,12 +246,6 @@
         ajustar(pantalla, root, ctx);
         posicionarIndicadores(document);
       });
-    } else {
-      if (sesion.rol) { location.hash = rolPorId(sesion.rol).inicio; return; }
-      var ctxL = { S: S, D: D, sesion: sesion, entrar: entrar };
-      document.title = 'Elegir perfil · ' + D.entidad.sigla;
-      app.innerHTML = P.login.render(ctxL);
-      limpiar = P.login.mount(app, ctxL);
     }
     posicionarIndicadores(document);
     requestAnimationFrame(function () { posicionarIndicadores(document); });
@@ -373,6 +345,6 @@
   });
   document.addEventListener('mouseleave', function () { if (scrollConMouse) { scrollConMouse.classList.remove('nws-scroll--hover'); scrollConMouse = null; } });
 
-  document.body.insertAdjacentHTML('beforeend', window.MAPA.DEFS + '<div id="toast-host"></div>');
+  document.body.insertAdjacentHTML('beforeend', '<div id="toast-host"></div>');
   navegar();
 })();

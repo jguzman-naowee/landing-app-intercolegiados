@@ -595,133 +595,6 @@ body {
 .nwt-badge__label { white-space: nowrap; }
 
 /* -------------------------------------------------------------------
-   nws-login — selector de rol, tipo Netflix. NO EXISTE EN EL SDK.
-   Cada perfil es un NwtCard clickable con un NwtAvatar.
-   ------------------------------------------------------------------- */
-/* DC-360: .nws-login__topbar es position:absolute a propósito (no reserva
-   alto, no participa del centrado vertical — ver DC-076/083 más abajo),
-   pero eso significa que nada le avisa a este contenedor que el topbar
-   existe. Con viewport bajo (pantalla chica o zoom subido) el bloque
-   centrado (head/grid/foot) sube hasta pisar el logo. El
-   padding-top de acá es el alto real del topbar (medido: ~94px) — reserva
-   ese espacio siempre, así el centrado nunca puede subir por encima. */
-.nws-login {
-  min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: var(--naotech-sizing-16); padding: var(--naotech-sizing-16); padding-top: 104px;
-  background: var(--naotech-app-color-050);
-  box-sizing: border-box;
-  position: relative; overflow: hidden;
-}
-/* Si aun así no entra (viewport muy bajo o zoom muy alto), que scrollee en
-   vez de superponerse — mejor un scroll que un logo ilegible. */
-@media (max-height: 700px) {
-  .nws-login { overflow-y: auto; justify-content: flex-start; }
-}
-/* Fondo: degradé suave + patrón de puntos encima, detrás del contenido. */
-.nws-login::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(180deg, var(--naotech-app-color-100), var(--naotech-app-background));
-}
-.nws-login::after {
-  content: ''; position: absolute; inset: 0;
-  background-image: radial-gradient(var(--naotech-app-color-300) 1px, transparent 1px);
-  background-size: 18px 18px;
-  opacity: .28;
-}
-.nws-login > * { position: relative; z-index: 1; }
-
-/* Franja superior en grid de 3 — vacío / logo Naowee centrado / vacío —
-   full width pegada al tope (absolute: no toma el max-width ni el centrado
-   vertical de lo demás). Las celdas laterales dejan el logo al centro real
-   y quedan libres para acciones (p.ej. un link a una vitrina). */
-.nws-login__topbar { display: grid; grid-template-columns: 1fr auto 1fr; column-gap: var(--naotech-sizing-40); align-items: center; position: absolute; top: 0; left: 0; right: 0; width: 100%; padding: var(--naotech-sizing-24) var(--naotech-sizing-40); box-sizing: border-box; z-index: 2; }
-.nws-login__naowee { display: flex; justify-content: center; }
-.nws-login__naowee svg { display: block; height: 2rem; width: auto; }
-
-.nws-login__head { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-8); text-align: center; }
-/* Slider horizontal: los perfiles corren en una sola fila con scroll y
-   snap (sirve igual con 1 rol que con 8). El ancho se recorta a 100vw y el padding lateral
-   deja respirar la primera/última card sin que se corten contra el borde.
-   Las cards se aligeraron: avatar, rol y una línea de descripción. */
-.nws-login__grid {
-  display: flex; gap: var(--naotech-sizing-16); margin: var(--naotech-sizing-8) 0;
-  width: 100%; max-width: 100vw; overflow-x: auto; overflow-y: hidden;
-  /* Con pocas cards y pantalla ancha el flex row quedaría pegado a la
-     izquierda. justify-content:center no
-     rompe el caso con scroll: cuando el contenido es más ancho que el
-     contenedor no tiene efecto (no puede "encoger" hacia el centro). */
-  justify-content: center;
-  scroll-snap-type: x mandatory; scroll-padding: var(--naotech-sizing-24);
-  /* overflow-x:auto obliga a overflow-y:hidden (spec) — no hay forma de
-     "ver" ese overflow sin dejar de scrollear en X. Lo que sí se puede es
-     dejar de recortarlo EN LA PRÁCTICA (DC-021): más padding vertical del
-     que antes, ahora que las cards también son más altas (DC-022). */
-  padding: var(--naotech-sizing-56) var(--naotech-sizing-24) var(--naotech-sizing-64);
-  scrollbar-width: thin;
-}
-.nws-login__grid > * { flex: 0 0 216px; scroll-snap-align: center; }
-/* DC-022: las cards del selector de rol quedaban bajas frente al resto de
-   la pantalla (avatar + una línea de descripción no llenan el nwt-card
-   'medium'). Un piso de alto, no un alto fijo — una descripción de dos
-   líneas sigue creciendo la card en vez de cortarse. */
-.nws-login .nwt-card { min-height: 260px; }
-.nws-login__grid::-webkit-scrollbar { height: 6px; }
-.nws-login__grid::-webkit-scrollbar-thumb { background: var(--naotech-app-color-300); border-radius: var(--naotech-radius-pill); }
-.nws-login__grid::-webkit-scrollbar-track { background: transparent; }
-.nws-login .nwt-card {
-  /* relative: el badge de "última visitada" se posiciona contra la card */
-  position: relative;
-  cursor: pointer; border-radius: var(--naotech-radius-xxl);
-  transition: transform var(--naotech-duration-fast) var(--naotech-animation-standard), box-shadow var(--naotech-duration-fast) var(--naotech-animation-standard);
-  /* DC-260: variant quiet del SDK deja el fondo transparente (se ve el
-     degradé/puntos del login a través); acá siempre debe ser blanco, no
-     solo al hacer hover. */
-  --pvt-body-background-color: var(--naotech-app-background);
-}
-/* DC-077: el translateY(-4px) sumado al box-shadow-large necesitaba más
-   despeje del que el padding podía darle sin verse raro (overflow-x:auto
-   sigue obligando a clip en Y, no hay forma de evitarlo del todo). Se saca
-   el lift y se deja solo el cambio de sombra — pide bastante menos aire. */
-.nws-login .nwt-card:hover, .nws-login .nwt-card:focus-visible { box-shadow: var(--naotech-shadow-large); }
-.nws-login .nwt-card__content { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: var(--naotech-sizing-10); padding-top: var(--naotech-sizing-8); }
-.nws-login__foot { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-4); text-align: center; color: var(--naotech-app-color-600); }
-/* Badge "última visitada" sobre la card, fuera del flujo: no empuja el contenido ni obliga a
-   pintar la franja de cabecera (que traía su divider y desalineaba esa card
-   contra las demás). */
-.nws-login__last { position: absolute; top: var(--naotech-sizing-10); right: var(--naotech-sizing-10); z-index: 2; }
-/* La descripción no usa todo el ancho de la card: dos líneas cortas leen
-   mejor que una línea larga pegada a los bordes. */
-/* DC-051: dos líneas parejas en todas las cards — algunas descripciones
-   entran en una sola y el bloque de abajo (avatar/rol) quedaba a distinta
-   altura entre cards. min-height reserva el espacio de 2 líneas siempre. */
-.nws-login__desc { margin: 0; max-width: 21ch; min-height: calc(var(--naotech-smalltext-line-height) * 2); }
-
-/* Título del login: sin equivalente en el SDK, brillo propio con el color
-   del tema neutral (no hay rol elegido todavía en esta pantalla). */
-/* DC-340: título oscuro (app-900) con un brillo naranja que recorre las
-   letras como una máscara en movimiento — no un degradé estático. El
-   naranja es una franja estrecha (8%) que viaja de derecha a izquierda. */
-.nws-login__title {
-  background: linear-gradient(100deg, var(--naotech-app-color-900) 44%, var(--naotech-primary-color-600) 50%, var(--naotech-app-color-900) 56%);
-  background-size: 300% 100%; background-position: 120% 0;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  letter-spacing: -0.01em;
-  /* DC-358: más frecuente pero lento — el barrido ocupa todo el ciclo (sin
-     pausa en los extremos) y es lineal: pasa cada 3.4s y tarda 3.4s en cruzar. */
-  animation: nws-brillo 3.4s linear infinite;
-}
-@keyframes nws-brillo { 0% { background-position: 120% 0; } 100% { background-position: -20% 0; } }
-@media (prefers-reduced-motion: reduce) { .nws-login__title { animation: none; background: none; color: var(--naotech-app-color-900); } }
-/* DC-360: el font-size de 56px es inline (login.js) — a esta altura de
-   viewport es lo que más espacio se come, junto con el padding vertical
-   del slider de perfiles. Se achican los dos para que el scroll de
-   respaldo (arriba) sea la excepción, no la regla. */
-@media (max-height: 700px) {
-  .nws-login__title { font-size: var(--naotech-sizing-32) !important; }
-  .nws-login__grid { padding-top: var(--naotech-sizing-24); padding-bottom: var(--naotech-sizing-32); }
-}
-
-/* -------------------------------------------------------------------
    nws-phone — marco de teléfono para la app del conductor (390×800).
    ------------------------------------------------------------------- */
 .nws-phone-stage { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; padding: var(--naotech-sizing-24); min-height: 0; overflow: hidden; }
@@ -798,9 +671,18 @@ body {
    la vista, por encima del tabbar, y se le suma un fade porque el
    desplazamiento de 100% que trae el SDK dejaría el toast asomando sobre
    las tabs mientras entra y sale. */
-.nws-mob__toast { position: absolute; left: var(--naotech-sizing-12); right: var(--naotech-sizing-12); bottom: calc(var(--naotech-sizing-64) + var(--naotech-sizing-8)); height: 0; z-index: 5; pointer-events: none; }
-.nws-mob__toast .nwt-toast__content { position: absolute; left: 50%; bottom: 0; width: 100%; max-width: 100%; padding: 0; opacity: 0; transition: transform var(--naotech-duration-base) var(--naotech-animation-standard), opacity var(--naotech-duration-base) var(--naotech-animation-standard); }
+.nws-mob__toast { position: absolute; left: var(--naotech-sizing-16); right: var(--naotech-sizing-16); top: var(--naotech-sizing-64); height: 0; z-index: 5; pointer-events: none; }
+.nws-mob__toast .nwt-toast__content { position: absolute; left: 50%; top: 0; bottom: auto; width: 100%; max-width: 100%; padding: 0; opacity: 0; transition: transform var(--naotech-duration-base) var(--naotech-animation-standard), opacity var(--naotech-duration-base) var(--naotech-animation-standard); }
 .nws-mob__toast .nwt-toast--visible .nwt-toast__content { opacity: 1; }
+/* DC-018: el aviso baja desde arriba (bajo el notch), negro y sobrio; sale hacia arriba. */
+.nws-mob__toast .nwt-toast { --pvt-content-transform: translate(-50%, calc(-100% - var(--naotech-sizing-64))); --pvt-content-padding: 0; }
+.nws-mob__toast .nwt-toast--visible { --pvt-content-transform: translate(-50%, 0); }
+.nws-mob__toast .nwt-toast__content { transition-duration: 300ms; }
+.nws-mob__toast .nwt-toast__component { background: var(--naotech-app-color-900); color: var(--naotech-app-background); padding: var(--naotech-sizing-12) var(--naotech-sizing-16); border-radius: var(--naotech-radius-xl); align-items: center; }
+.nws-mob__toast .nwt-toast__component .nwt-avatar-icon { --naotech-icon-color: var(--naotech-app-background); background: rgb(255 255 255 / .16); }
+.nws-mob__toast .nwt-toast__message__value, .nws-mob__toast .nwt-toast__close { color: var(--naotech-app-background); }
+.nws-mob__toast .nwt-toast__body { padding-right: var(--naotech-sizing-24); }
+@media (prefers-reduced-motion: reduce) { .nws-mob__toast .nwt-toast { --pvt-content-transform: translate(-50%, 0); } }
 /* DC-020: el host del toast no se limpia al cerrar (cerrarToast solo saca
    la clase --visible, el HTML se queda) — con pointer-events:auto fijo, el
    fantasma del último toast (opacity:0 pero clickeable) quedaba tapando lo
@@ -1028,12 +910,13 @@ body {
    solo íconos a la derecha. Sin divisor fijo: aparece al scrollear. */
 .nws-lpx__bar {
   flex: none; position: relative; display: flex; align-items: center; justify-content: space-between;
-  height: var(--naotech-sizing-56); padding: 0 var(--naotech-sizing-12) 0 var(--naotech-sizing-16); box-sizing: border-box;
+  height: var(--naotech-sizing-64); padding: 0 var(--naotech-sizing-12) 0 var(--naotech-sizing-16); box-sizing: border-box;
   background: var(--naotech-app-background); border-bottom: 1px solid transparent;
   transition: border-color var(--naotech-duration-base) var(--naotech-animation-standard), box-shadow var(--naotech-duration-base) var(--naotech-animation-standard);
   z-index: 3;
 }
-.nws-lpx__logo { display: block; width: 88px; height: 32px; object-fit: cover; }
+/* Logo a 1,8× (88×32 → 158×58); la barra sube a 64 para que no la roce. */
+.nws-lpx__logo { display: block; width: 158.4px; height: 57.6px; object-fit: cover; }
 .nws-lpx__acciones { display: flex; align-items: center; gap: var(--naotech-sizing-4); }
 .nws-lp .nws-lpx__accion { --pvt-button-dimension: var(--naotech-sizing-40); --naotech-icon-button-sizing: var(--naotech-sizing-24); --pvt-button-font-color: var(--naotech-color-gray-700); }
 /* El perfil como ícono en círculo azul-50: el "Iniciar sesión" de la web
@@ -1060,18 +943,16 @@ body {
    (el indicador de NwtTabs es de pestañas de contenido, arriba); la activa
    se marca con el color primario que el SDK ya le da al label activo. */
 .nws-lpx__tabbar { flex: none; background: var(--naotech-app-background); border-top: 1px solid var(--naotech-color-gray-200); padding: var(--naotech-sizing-4) var(--naotech-sizing-4) 0; }
-.nws-lpx__tabbar .nwt-tabs__list, .nws-lpx__tabbar .nwt-tabs__tab { height: var(--naotech-sizing-56); }
+.nws-lpx__tabbar .nwt-tabs__list, .nws-lpx__tabbar .nwt-tabs__tab { height: var(--naotech-sizing-64); }
 .nws-lpx__tabbar .nwt-tabs__divider, .nws-lpx__tabbar .nwt-tabs__indicator { display: none; }
 .nws-lpx__tabbar .nwt-tabs__tab { border-bottom: 0; border-radius: var(--naotech-radius-xl); padding: 0 var(--naotech-sizing-2); }
 .nws-lpx__tabbar .nwt-tabs__tab:hover { background: transparent; }
-.nws-lpx__tabbar .nwt-tabs__label { flex-direction: column; gap: var(--naotech-sizing-4); font-size: var(--naotech-sizing-12); line-height: var(--naotech-sizing-14); font-weight: var(--naotech-font-weight-medium); color: var(--naotech-color-gray-700); }
+.nws-lpx__tabbar .nwt-tabs__label { flex-direction: column; gap: var(--naotech-sizing-4); font-size: var(--naotech-sizing-16); line-height: var(--naotech-sizing-20); font-weight: var(--naotech-font-weight-medium); color: var(--naotech-color-gray-700); }
 .nws-lpx__tabbar .nwt-tabs__label .nwt-icon { --naotech-icon-dimension: var(--naotech-sizing-24); font-size: var(--naotech-sizing-24); }
 .nws-lpx__tabbar .nwt-tabs__tab--active .nwt-tabs__label { color: var(--naotech-primary-color-normal); font-weight: var(--naotech-font-weight-semibold); }
 /* Indicador de inicio del sistema operativo (cromo del dispositivo). */
 .nws-lpx__home { flex: none; height: var(--naotech-sizing-20); background: var(--naotech-app-background); display: flex; align-items: center; justify-content: center; }
 .nws-lpx__home::before { content: ''; width: 134px; height: 5px; border-radius: var(--naotech-radius-pill); background: var(--naotech-color-gray-900); }
-/* Con tab bar el aviso interno sube por encima de ella. */
-.nws-lp--app .nws-mob__toast { bottom: calc(var(--naotech-sizing-64) + var(--naotech-sizing-28)); }
 
 /* Pie compacto: institucional sin dejar de estar, pero como cierre de feed
    y no como pie de sitio web. */
@@ -1091,7 +972,7 @@ body {
    equivalente del SDK al gris agrupado de iOS). Tipografía Inter del SDK,
    con el tracking negativo que iOS usa en títulos grandes. */
 .nws-lp--ios { background: var(--naotech-app-background); }
-.nws-lp--ios .nws-lp__scroll { padding: 101px 0 92px; scroll-padding-top: 101px; }
+.nws-lp--ios .nws-lp__scroll { padding: 109px 0 100px; scroll-padding-top: 109px; }
 
 /* Cromo superior: barra de estado con isla dinámica + barra de navegación,
    como UNA capa de material. Sin divisor hasta que hay contenido debajo. */
@@ -1123,22 +1004,26 @@ body {
   border-top: .5px solid rgb(from var(--naotech-color-gray-900) r g b / .14);
 }
 .nws-lp--ios .nws-lpx__tabbar, .nws-lp--ios .nws-lpx__home { background: transparent; border-top: 0; }
-.nws-lp--ios .nws-lpx__tabbar .nwt-tabs__list, .nws-lp--ios .nws-lpx__tabbar .nwt-tabs__tab { height: 52px; }
-.nws-lp--ios .nws-lpx__tabbar .nwt-tabs__label { font-size: var(--naotech-sizing-10); line-height: var(--naotech-sizing-12); font-weight: var(--naotech-font-weight-medium); letter-spacing: .01em; }
+.nws-lp--ios .nws-lpx__tabbar .nwt-tabs__list, .nws-lp--ios .nws-lpx__tabbar .nwt-tabs__tab { height: 60px; }
+.nws-lp--ios .nws-lpx__tabbar .nwt-tabs__label { font-size: var(--naotech-sizing-16); line-height: var(--naotech-sizing-20); font-weight: var(--naotech-font-weight-medium); letter-spacing: .01em; }
 .nws-lp--ios .nws-lpx__tabbar .nwt-tabs__label .nwt-icon { --naotech-icon-dimension: 26px; font-size: 26px; }
 .nws-lp--ios .nws-lpx__home { height: 26px; }
-.nws-lp--ios .nws-mob__toast { bottom: 100px; }
 
 /* Splash: capa sobre TODO el teléfono (incluido el cromo), imagen a
-   sangre, barra de estado en blanco e ícono de carga en y 564 del Figma. */
+   sangre y barra de estado en blanco. */
 .nws-lps { position: absolute; inset: 0; z-index: 8; background: var(--nws-jic-violeta); transition: opacity 420ms var(--naotech-animation-standard), transform 420ms var(--naotech-animation-standard); }
 .nws-lps[hidden] { display: none; }
 .nws-lps__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .nws-lps__estado { position: relative; color: var(--naotech-app-background); }
 .nws-lp--ios .nws-lps__estado .nws-mob__status { color: var(--naotech-app-background); }
-.nws-lps__carga { position: absolute; top: 564px; left: 50%; width: var(--naotech-sizing-48); height: var(--naotech-sizing-48); margin-left: calc(var(--naotech-sizing-24) * -1); display: flex; align-items: center; justify-content: center; --naotech-icon-dimension: var(--naotech-sizing-32); --naotech-icon-color: var(--naotech-app-background); color: var(--naotech-app-background); }
-.nws-lps__carga .nwt-icon { font-size: var(--naotech-sizing-32); animation: nws-gira 1s linear infinite; }
-@keyframes nws-gira { to { transform: rotate(360deg); } }
+.nws-lps__carga { position: absolute; left: 20%; right: 20%; bottom: 34px; height: 4px; border-radius: var(--naotech-radius-pill); overflow: hidden; background: rgb(255 255 255 / .28); }
+/* Solo transform (no width); el ease-out frena al final y llega a 100 con el splash. */
+.nws-lps__carga-relleno { display: block; width: 100%; height: 100%; border-radius: inherit; background: var(--naotech-color-yellow-500, #f7d500); transform: scaleX(0); transform-origin: left center; }
+.nws-lps--kb .nws-lps__carga-relleno { animation: nws-lps-carga var(--nws-lps-carga, 2200ms) cubic-bezier(.22, .9, .35, 1) var(--nws-lps-ya, 0ms) both; }
+@keyframes nws-lps-carga { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* Ken Burns: solo transform; dura un poco más que el splash para no frenarse. */
+.nws-lps--kb .nws-lps__img { animation: nws-kb var(--nws-lps-ms, 2800ms) cubic-bezier(.16, 1, .3, 1) both; transform-origin: 50% 50%; }
+@keyframes nws-kb { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
 /* Salida del splash: se desvanece y se agranda apenas (se "abre"). */
 .nws-lps--fuera { opacity: 0; transform: scale(1.04); pointer-events: none; }
 /* Entrada de la home, escalonada (≈1 s, curva de iOS): la foto se asienta
@@ -1159,7 +1044,8 @@ body {
 @keyframes nws-sube-lejos { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes nws-aparece { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .nws-lps__carga .nwt-icon { animation-duration: 2.4s; }
+  .nws-lps--kb .nws-lps__img { animation: none; }
+  .nws-lps--kb .nws-lps__carga-relleno { animation: none; transform: scaleX(1); }
   .nws-lps--fuera { transform: none; }
   .nws-lp--entra * { animation: none !important; }
 }
@@ -1174,7 +1060,7 @@ body {
   --nws-sombra-2: 0 2px 6px rgb(from var(--nws-jic-azul-900) r g b / .08), 0 22px 44px -12px rgb(from var(--nws-jic-azul-900) r g b / .34);
 }
 /* La portada va detrás del estado y del header: sin padding arriba. */
-.nws-lp--inmersiva .nws-lp__scroll { padding-top: 0; scroll-padding-top: 101px; }
+.nws-lp--inmersiva .nws-lp__scroll { padding-top: 0; scroll-padding-top: 117px; }
 
 /* Header sobre la portada: sin material ni división, texto e íconos
    blancos y un velo arriba para que se lean sobre cualquier foto. */
@@ -1188,6 +1074,12 @@ body {
 /* sobre la foto el logo va en blanco (el violeta se pierde en lo oscuro) */
 .nws-lpi__top--sobre .nws-lpx__logo { filter: brightness(0) invert(1) drop-shadow(0 1px 4px rgb(from var(--nws-jic-azul-900) r g b / .5)); }
 .nws-lpx__logo { transition: filter var(--naotech-duration-base) var(--naotech-animation-standard); }
+/* Material al scrollear: +8px bajo el logo, vidrio más notable y grano leve. */
+.nws-lpi__top:not(.nws-lpi__top--sobre) { background: rgb(from var(--naotech-app-background) r g b / .66); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); border-bottom-color: rgb(from var(--nws-jic-violeta-700) r g b / .12); box-shadow: 0 4px 16px -8px rgb(from var(--nws-jic-violeta-700) r g b / .18); }
+.nws-lpi__top:not(.nws-lpi__top--sobre) .nws-lpx__bar { padding-bottom: var(--naotech-sizing-8); height: calc(var(--naotech-sizing-64) + var(--naotech-sizing-8)); }
+.nws-lpi__top::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; mix-blend-mode: soft-light; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); transition: opacity var(--naotech-duration-base) var(--naotech-animation-standard); }
+.nws-lpi__top:not(.nws-lpi__top--sobre)::after { opacity: .1; }
+@media (prefers-reduced-motion: reduce) { .nws-lpi__top, .nws-lpi__top::after { transition: none; } }
 .nws-lpi__top { transition: background-color var(--naotech-duration-base) var(--naotech-animation-standard), border-color var(--naotech-duration-base) var(--naotech-animation-standard), backdrop-filter var(--naotech-duration-base) var(--naotech-animation-standard); }
 
 /* Portada: foto a sangre de 600, esquinas inferiores redondeadas (hoja),
@@ -1201,27 +1093,51 @@ body {
 .nws-lpv__portada + .nws-lpv__cuerpo { position: relative; z-index: 1; margin-top: -237px; padding-top: 0; gap: 0; }
 /* 36/38: más grande y con interlineado apretado (1,05), tracking negativo
    como corresponde a un titular. Titular en y 511, 30 hasta los accesos. */
-.nws-lpv__titular { margin: 0 0 30px 47px; font-size: var(--naotech-sizing-36); line-height: 38px; font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.02em; color: var(--nws-jic-violeta-titular); }
+.nws-lpv__titular { margin: 0 24px 40px; /* DC-077 */ text-align: center; font-size: var(--naotech-sizing-36); line-height: 38px; font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.02em; color: var(--nws-jic-violeta-titular);
+  /* Halo blanco: levanta el contraste sobre el fundido morado sin cambiar el degradé. */
+  text-shadow: 0 0 1px #fff, 0 0 3px #fff, 0 0 6px #fff, 0 0 10px #fff, 0 0 16px #fff, 0 0 26px #fff, 0 0 40px rgb(255 255 255 / .95), 0 0 60px rgb(255 255 255 / .85), 0 2px 4px rgb(105 24 134 / .3);
+  -webkit-text-stroke: 3px rgb(255 255 255 / .85); paint-order: stroke fill; }
 /* Accesos: rótulo violeta-900 14/16 en dos líneas si hace falta. */
-.nws-lpv__accesos .nws-lpv__menu { padding: 0 24px 0 17px; gap: 0; }
-.nws-lpv__accesos .nws-lpv__app { gap: 6px; }
-.nws-lpv__accesos .nws-lpv__app-l { max-width: 81px; font-size: var(--naotech-sizing-14); line-height: 16px; font-weight: var(--naotech-font-weight-semibold); color: var(--nws-jic-violeta-900); }
-/* Íconos de los accesos: NwtAvatarIcon (círculo de 64 del SDK) en blanco,
-   ícono violeta-700 y una sombra sutil. */
-.nws-lpv__accesos .nwt-avatar-icon { background: var(--naotech-app-background); --naotech-icon-color: var(--nws-jic-violeta-700); box-shadow: 0 2px 10px rgb(from var(--nws-jic-azul-900) r g b / .10), 0 1px 2px rgb(from var(--nws-jic-azul-900) r g b / .06); }
-/* Espaciado entre secciones: 40 menú→noticias, 48 entre las demás. */
+/* DC-025: tarjetas a ancho completo, misma familia que video y galería. */
+.nws-lpv__accesos .nws-lpv__menu { align-items: stretch; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--naotech-sizing-12); padding: 0 var(--naotech-sizing-24); }
+.nws-lpv__accesos .nws-lpv__app { position: relative; flex-direction: row; align-items: center; justify-content: flex-start; gap: var(--naotech-sizing-10); min-height: 72px; padding: var(--naotech-sizing-12) var(--naotech-sizing-10) var(--naotech-sizing-12) var(--naotech-sizing-12); box-sizing: border-box; text-align: left; border-radius: var(--naotech-radius-xxl); background: var(--naotech-app-background); box-shadow: var(--nws-sombra-1); }
+.nws-lpv__accesos .nws-lpv__app:focus-visible { outline: 2px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+.nws-lpv__app-txt { display: flex; flex: 1 1 0; flex-direction: column; justify-content: center; min-width: 0; text-align: left; }
+.nws-lpv__accesos .nws-lpv__app-l { max-width: none; white-space: normal; font-size: var(--naotech-sizing-18); line-height: 22px; font-weight: var(--naotech-font-weight-semibold); text-align: left; color: var(--nws-jic-violeta-900); }
+/* DC-026: con imagen a la izquierda el chevron ya no cabe junto al texto. */
+.nws-lpv__accesos .nws-lpv__app-c { display: none; }
+.nws-lpv__app-c { position: absolute; top: var(--naotech-sizing-12); right: var(--naotech-sizing-12); font-size: var(--naotech-sizing-16); color: var(--nws-jic-violeta-700); opacity: .6; }
+/* Ícono en círculo violeta suave (avatar del SDK a 40px). */
+.nws-lpv__accesos .nwt-avatar-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; min-width: 40px; padding: 0; flex: none; border-radius: 50%; background: color-mix(in srgb, var(--nws-jic-violeta-titular) 12%, white); --naotech-icon-color: var(--nws-jic-violeta-700); box-shadow: none; }
+/* DC-081: contenedor 40px con fondo; glifo 28px sin fondo ni padding (el SDK fija tamaño por variable). */
+.nws-lpv__app .nwt-avatar-icon .nwt-icon { --naotech-icon-dimension: 28px; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; margin: 0; background: transparent; font-size: 28px; }
+.nws-lpv__app .nwt-avatar-icon .nwt-icon > i { max-width: 28px; max-height: 28px; padding: 0; margin: 0; background: transparent; font-size: 28px; line-height: 1; }
+/* Mini banner de video tutoriales: la pieza entera (el texto va en la imagen), sin recorte. */
+.nws-lpv__vt { display: flex; align-items: stretch; margin: 0 var(--naotech-sizing-24); border-radius: var(--naotech-radius-xxl); overflow: hidden; background: var(--naotech-app-background); box-shadow: var(--nws-sombra-1); }
+/* El video es apaisado (640x274): cover recorta al centro del formulario para llenar el alto. */
+.nws-lpv__vt-media { position: relative; flex: 0 0 50%; width: 50%; min-width: 0; align-self: center; margin: var(--naotech-sizing-8) 0 var(--naotech-sizing-8) var(--naotech-sizing-8); overflow: hidden; box-sizing: border-box; border: 2px solid color-mix(in srgb, var(--nws-jic-violeta-titular) 20%, transparent); background-clip: padding-box; border-radius: var(--naotech-radius-xl); }
+/* Indicador decorativo: el autoplay mudo sigue igual. */
+.nws-lpv__vt-play { position: absolute; left: 8px; bottom: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--naotech-app-background); color: var(--nws-jic-violeta-700); font-size: var(--naotech-sizing-16); pointer-events: none; }
+.nws-lpv__vt-video { display: block; width: 100%; aspect-ratio: 16 / 9; min-width: 0; object-fit: cover; object-position: 50% 50%; background: var(--naotech-app-color-100); pointer-events: none; }
+.nws-lpv__vt-info { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: var(--naotech-sizing-12) var(--naotech-sizing-16); }
+.nws-lpv__vt-t { margin: 0; font-size: var(--naotech-sizing-16); line-height: 20px; font-weight: 400; color: var(--nws-jic-violeta-900); }
+.nws-lpv__vt-a { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; font-size: var(--naotech-sizing-14); line-height: 20px; font-weight: var(--naotech-font-weight-semibold); color: var(--nws-jic-violeta-titular); text-decoration: underline; }
+.nws-lpv__vt-a:focus-visible { outline: 2px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+/* Espaciado entre secciones: 40 menú→noticias, 48 entre las demás (galería, videos y pie). */
 .nws-lpv__novedades { margin-top: 40px; }
 .nws-lpv__cuerpo > .nws-lpv__novedades ~ section { margin-top: var(--naotech-sizing-48); }
 .nws-lpv__skel-portada { border-radius: 0; }
 
-.nws-lpv__cuerpo { display: flex; flex-direction: column; gap: var(--naotech-sizing-32); padding: var(--naotech-sizing-24) 0 var(--naotech-sizing-24); }
+.nws-lpv__cuerpo { --nws-gap-titulo: 20px; /* DC-071: título → contenido */ display: flex; flex-direction: column; gap: var(--naotech-sizing-32); padding: var(--naotech-sizing-24) 0 var(--naotech-sizing-24); }
 .nws-lpv__cuerpo > section { display: flex; flex-direction: column; }
-.nws-lpv__h2 { margin: 0 var(--naotech-sizing-24) var(--naotech-sizing-16); font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-32); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-color-gray-800); }
+.nws-lpv__h2 { margin: 0 var(--naotech-sizing-24) var(--nws-gap-titulo); font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-32); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-color-gray-800); }
+/* DC-075/076: Competencias y Novedades pegan el título a su contenido; Galería y Video siguen a 20px. */
+.nws-lpv__accesos > .nws-lpv__h2, .nws-lpv__novedades > .nws-lpv__h2 { margin-bottom: 0; }
 
 /* Menú: íconos de app (NwtAvatarIcon 68 en cuadrado redondeado blanco). */
 .nws-lpv__menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--naotech-sizing-16); padding: 0 var(--naotech-sizing-24); }
 .nws-lpv__app { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-10); padding: 0; border: 0; background: transparent; cursor: pointer; }
-.nws-lpv__app-l { max-width: 10ch; font-size: var(--naotech-sizing-14); line-height: 16px; text-align: center; color: var(--naotech-color-gray-800); }
+.nws-lpv__app-l { max-width: 10ch; font-size: var(--naotech-sizing-16); line-height: 20px; text-align: center; color: var(--naotech-color-gray-800); }
 
 /* Mazo de noticias: 3 cartas 303 de ancho, la de adelante 437 de alto; las
    de atrás asoman a la derecha y más bajas (Figma: 382 y 318). */
@@ -1240,14 +1156,16 @@ body {
 .nws-lpv__carta--sale { transition: transform 320ms cubic-bezier(.4, 0, .2, 1), opacity 320ms linear; opacity: 0; }
 .nws-lpv__carta--sin, .nws-lpv__carta--sin img { transition: none !important; }
 .nws-lpv__carta-foto { position: absolute; inset: 0; overflow: hidden; }
+/* borde degradé de 1px (DC-064): más visible arriba-izquierda; sobre foto y velo, bajo texto y compartir */
+.nws-lpv__carta-foto::after { content: ''; position: absolute; inset: 0; z-index: 1; padding: 1px; border-radius: var(--naotech-radius-xxl); background: linear-gradient(135deg, rgb(255 255 255 / .55), rgb(255 255 255 / .08)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 .nws-lpv__carta img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; transform: scale(1.2); transition: transform 460ms cubic-bezier(.34, 1.36, .64, 1); }
-.nws-lpv__carta::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgb(from var(--nws-jic-azul-900) r g b / .55) 58%, rgb(from var(--nws-jic-azul-900) r g b / .92) 100%); pointer-events: none; }
+.nws-lpv__carta::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 20%, rgb(from var(--nws-jic-azul-900) r g b / .7) 48%, rgb(from var(--nws-jic-azul-900) r g b / .95) 100%); pointer-events: none; }
 .nws-lpv__carta-txt { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; flex-direction: column; gap: var(--naotech-sizing-8); padding: var(--naotech-sizing-20); transition: opacity 200ms var(--naotech-animation-standard); }
-/* titular de la carta: grande (24/28) y corto — 2 líneas con puntos suspensivos */
-.nws-lpv__carta-t { margin: 0; font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-28); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.02em; color: var(--naotech-app-background); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* titular: máx. 2 líneas a 21/26 (DC-072); 21px no tiene token, el titular va en `corto` */
+.nws-lpv__carta-t { margin: 0; font-size: 21px; line-height: 26px; font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-app-background); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .nws-lpv__carta-meta { display: flex; gap: var(--naotech-sizing-20); }
 .nws-lpv__meta { --naotech-icon-label-color: rgb(from var(--naotech-app-background) r g b / .78); --naotech-icon-dimension: var(--naotech-sizing-18); }
-.nws-lpv__meta > span { font-size: var(--naotech-sizing-12); line-height: var(--naotech-sizing-16); font-weight: var(--naotech-font-weight-semibold); }
+.nws-lpv__meta > span { font-size: var(--naotech-sizing-14); line-height: var(--naotech-sizing-20); font-weight: var(--naotech-font-weight-semibold); }
 /* Compartir: Thumbnail del Figma = NwtIconButton en círculo blanco. */
 .nws-lp .nws-lpv__compartir { position: absolute; top: var(--naotech-sizing-14); right: var(--naotech-sizing-14); z-index: 2; --pvt-button-dimension: var(--naotech-sizing-36); --naotech-icon-button-sizing: var(--naotech-sizing-18); --pvt-button-font-color: var(--nws-jic-violeta-700); transition: opacity 200ms var(--naotech-animation-standard); }
 .nws-lp .nws-lpv__compartir .nwt-icon-button__content { background: rgb(from var(--naotech-app-background) r g b / .92); border-radius: var(--naotech-radius-circle); box-shadow: var(--nws-sombra-1); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
@@ -1283,14 +1201,38 @@ body {
 .nws-lpd__vuela { position: absolute; top: 0; left: 0; z-index: 9; overflow: hidden; pointer-events: none; transform-origin: 0 0; will-change: transform, clip-path; }
 .nws-lpd__vuela img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .nws-lpv__mas { display: flex; justify-content: center; padding-top: var(--naotech-sizing-24); }
+/* DC-007: violeta de marca con texto blanco (>9:1); hover/active oscurecen dentro de la paleta JIC. */
+.nws-lp .nws-lpv__mas .nwt-button { --pvt-button-background: var(--nws-jic-violeta-titular); --pvt-button-background-hover: var(--nws-jic-violeta-700); --pvt-button-background-active: var(--nws-jic-violeta-900); --pvt-button-font-color: #fff; min-height: 56px; height: 56px; --pvt-button-font-size: 20px; font-size: 20px; font-weight: var(--naotech-font-weight-semibold); }
+.nws-lp .nws-lpv__mas .nwt-button__content { font-size: 20px; font-weight: var(--naotech-font-weight-semibold); }
+.nws-lp .nws-lpv__mas .nwt-button:focus-visible { outline: 2px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
 
 /* Galería: mosaico horizontal en columnas de 2 (alta+baja / baja+alta). */
 .nws-lpv__mosaico { display: flex; gap: var(--naotech-sizing-16); overflow-x: auto; padding: 0 var(--naotech-sizing-24) var(--naotech-sizing-12); scroll-snap-type: x mandatory; scroll-padding-inline: var(--naotech-sizing-24); scrollbar-width: none; }
 .nws-lpv__mosaico::-webkit-scrollbar { display: none; }
+
+/* Pie de la app: sube de transparente a violeta; el padding inferior cubre el tabbar flotante (100px). */
+/* margin-top negativo = el gap del cuerpo: el degradé arranca justo bajo la tarjeta de video (DC-023). */
+.nws-lpv__pie { margin-top: calc(var(--naotech-sizing-32) * -1); margin-bottom: -100px; padding: 96px var(--naotech-sizing-24) calc(100px + var(--naotech-sizing-16)); display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-16); text-align: center; background: linear-gradient(to bottom, rgb(from var(--nws-jic-violeta-700) r g b / 0) 0, var(--nws-jic-violeta-700) 45%, var(--nws-jic-violeta-900) 100%); color: var(--naotech-color-white, #fff); }
+.nws-lpv__pie-logos { display: flex; align-items: center; justify-content: center; gap: var(--naotech-sizing-20, 20px); flex-wrap: wrap; }
+.nws-lpv__pie-logo { height: var(--naotech-sizing-32); width: auto; max-width: 96px; object-fit: contain; }
+.nws-lpv__pie-logo--blanco { filter: brightness(0) invert(1); }
+/* DC-022: MinDeporte es el logo principal, al doble (32 a 64). */
+.nws-lpv__pie-logo--principal { height: var(--naotech-sizing-64); max-width: 192px; margin-bottom: var(--naotech-sizing-8); }
+.nws-lpv__pie-legal { margin: 0; font-size: var(--naotech-sizing-14); line-height: 20px; opacity: .85; }
+.nws-lpv__pie-legal-l { display: block; }
+/* El pie conserva su margin-top negativo: cancela el gap y el degradé arranca bajo la cita. */
+.nws-lpv__quote { margin: 0; padding: var(--naotech-sizing-8) var(--naotech-sizing-24) var(--naotech-sizing-40, 40px); display: flex; flex-direction: column; align-items: center; text-align: center; background: var(--naotech-app-background); }
+.nws-lpv__quote-filete { width: var(--naotech-sizing-40, 40px); height: 3px; border-radius: 2px; background: var(--nws-jic-violeta-700); }
+.nws-lpv__quote-marca { margin-top: var(--naotech-sizing-8); font-size: 64px; line-height: 48px; height: 32px; font-weight: 700; color: rgb(from var(--nws-jic-violeta-700) r g b / .2); }
+.nws-lpv__quote-t { margin: 0; font-size: 19px; line-height: 28px; font-weight: 500; color: var(--nws-jic-violeta-700); text-wrap: balance; }
 .nws-lpv__col { flex: 0 0 166px; display: grid; grid-template-rows: 205px 150px; gap: var(--naotech-sizing-14); scroll-snap-align: start; }
 .nws-lpv__col--inv { grid-template-rows: 150px 205px; }
-.nws-lpv__tesela { padding: 0; border: 0; border-radius: var(--naotech-radius-xxl); overflow: hidden; cursor: pointer; background: var(--naotech-app-color-100); box-shadow: var(--nws-sombra-1); }
+.nws-lpv__tesela { position: relative; padding: 0; border: 0; border-radius: var(--naotech-radius-xxl); overflow: hidden; cursor: pointer; background: var(--naotech-app-color-100); box-shadow: var(--nws-sombra-1); }
 .nws-lpv__tesela img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Badge de ciudad sobre la foto: violeta de marca con texto blanco para leer sobre cualquier imagen. */
+.nws-lpv__ciudad { position: absolute; left: 8px; bottom: 8px; max-width: calc(100% - 16px); display: inline-flex; align-items: center; gap: var(--naotech-sizing-4); width: fit-content; min-width: 0; flex-grow: 0; padding: var(--naotech-sizing-4) var(--naotech-sizing-8); border-radius: var(--naotech-radius-pill); background: rgb(from var(--nws-jic-violeta-700) r g b / .88); color: var(--naotech-color-white, #fff); font-size: 13px; /* badges a 13px (DC-042); no hay token */ line-height: 16px; font-weight: 600; pointer-events: none; }
+.nws-lpv__ciudad .nwt-icon { --naotech-icon-color: currentColor; --naotech-icon-dimension: var(--naotech-sizing-14); flex: none; margin: 0; font-size: var(--naotech-sizing-14); }
+.nws-lpv__ciudad span:not(.nwt-icon) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Respuesta al tocar: al presionar (no al soltar), rápida. */
 .nws-ios-press { transition: transform 100ms var(--naotech-animation-standard), filter 100ms var(--naotech-animation-standard); -webkit-tap-highlight-color: transparent; }
@@ -1386,3 +1328,124 @@ body {
   15% { box-shadow: 0 0 0 3px var(--naotech-informative-color-300, var(--naotech-informative-color-600)); }
 }
 
+
+/* --- Portada animada (DC-005): fondo violeta vectorial, sin foto --- */
+.nws-lpv__portada { height: 660px; padding-top: 0; background: var(--naotech-app-background); }
+/* 4px menos abajo: a escala fraccionaria el borde de la máscara dejaba una línea violeta.
+   Fundido a blanco antes del titular: violeta sobre violeta daba <5:1 (DC-056). */
+.nws-lpfx { position: absolute; inset: 0 0 4px 0; overflow: hidden; pointer-events: none; background: var(--nws-jic-violeta-portada);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 46%, transparent 73%); mask-image: linear-gradient(180deg, #000 0, #000 46%, transparent 73%); }
+.nws-lpfx__capa { position: absolute; inset: 0; will-change: transform; }
+.nws-lpfx__capa--lenta { animation: nws-lpfx-deriva 18s ease-in-out infinite alternate; }
+.nws-lpfx__capa--rapida { animation: nws-lpfx-deriva 11s ease-in-out -4s infinite alternate-reverse; --dx: 14px; --dy: -10px; }
+.nws-lpfx__luz { position: absolute; border-radius: 50%; will-change: transform, opacity; animation: nws-lpfx-respira 12s ease-in-out infinite; }
+.nws-lpfx__luz--a { width: 420px; height: 420px; left: -150px; top: 150px; background: radial-gradient(closest-side, rgb(240 126 140 / .55), transparent); }
+.nws-lpfx__luz--b { width: 460px; height: 460px; right: -190px; top: -90px; background: radial-gradient(closest-side, rgb(176 92 204 / .6), transparent); animation-duration: 16s; animation-delay: -5s; }
+.nws-lpfx__luz--c { width: 320px; height: 320px; left: 60px; top: 330px; background: radial-gradient(closest-side, rgb(247 213 0 / .28), transparent); animation-duration: 9s; animation-delay: -2s; }
+.nws-lpfx__o { position: absolute; display: block; will-change: transform; }
+.nws-lpfx__o svg { display: block; width: 100%; height: 100%; }
+.nws-lpfx__sol { width: 300px; height: 300px; right: -70px; top: 140px; border-radius: 50%; background: #f7d500; animation: nws-lpfx-flota 14s ease-in-out infinite; }
+.nws-lpfx__arcos { width: 360px; height: 360px; right: -100px; top: 110px; animation: nws-lpfx-gira 20s linear infinite; }
+.nws-lpfx__balon { width: 92px; height: 92px; left: 34px; top: 250px; animation: nws-lpfx-flota 9s ease-in-out -3s infinite, nws-lpfx-gira 16s linear infinite; }
+.nws-lpfx__tri { width: 44px; height: 40px; }
+.nws-lpfx__tri--a { left: 150px; top: 126px; animation: nws-lpfx-gira 18s linear infinite reverse; }
+.nws-lpfx__tri--b { right: 54px; top: 92px; width: 30px; height: 27px; animation: nws-lpfx-flota 10s ease-in-out -6s infinite, nws-lpfx-gira 12s linear infinite; }
+.nws-lpfx__aro { width: 26px; height: 26px; left: 120px; top: 222px; animation: nws-lpfx-flota 8s ease-in-out -1s infinite; }
+.nws-lpfx__punto { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: nws-lpfx-parpadea 6s ease-in-out infinite; }
+.nws-lpfx__punto--a { left: 70px; top: 180px; }
+.nws-lpfx__punto--b { right: 120px; top: 380px; animation-delay: -3s; background: #f7d500; }
+.nws-lpfx__linea { position: absolute; left: 24px; height: 3px; border-radius: 2px; background: rgb(255 255 255 / .6); animation: nws-lpfx-corre 7s ease-in-out infinite; }
+.nws-lpfx__linea--a { top: 330px; width: 64px; }
+.nws-lpfx__linea--b { top: 346px; width: 40px; left: 44px; animation-delay: -2s; }
+.nws-lpfx__linea--c { top: 362px; width: 54px; left: 14px; animation-delay: -4s; }
+.nws-lpv__portada.nws-lpfx--pausa .nws-lpfx * { animation-play-state: paused; }
+.nws-lpv__atleta { position: absolute; left: 40px; bottom: 132px; width: 328px; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 54%, transparent 78%); mask-image: linear-gradient(180deg, #000 0, #000 54%, transparent 78%); }
+.nws-lpv__atleta img { display: block; width: 100%; height: auto; aspect-ratio: 820 / 984; object-fit: contain; object-position: center bottom; transform-origin: 50% 100%; animation: nws-lpfx-zoom 10s ease-in-out infinite; }
+.nws-lpv__portada.nws-lpfx--pausa .nws-lpv__atleta img { animation-play-state: paused; }
+@keyframes nws-lpfx-zoom { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+.nws-lpv__portada.nws-lpfx--pausa .nws-lpfx, .nws-lpv__portada.nws-lpfx--pausa .nws-lpfx__capa { animation-play-state: paused; }
+@keyframes nws-lpfx-deriva { to { transform: translate3d(var(--dx, -10px), var(--dy, 8px), 0); } }
+@keyframes nws-lpfx-respira { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: .55; } 50% { transform: translate3d(30px, -20px, 0) scale(1.18); opacity: 1; } }
+@keyframes nws-lpfx-flota { 0%, 100% { translate: 0 0; } 50% { translate: 0 -14px; } }
+@keyframes nws-lpfx-gira { to { rotate: 360deg; } }
+@keyframes nws-lpfx-parpadea { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.3); } }
+@keyframes nws-lpfx-corre { 0%, 100% { transform: translate3d(-8px, 0, 0); opacity: .2; } 50% { transform: translate3d(22px, 0, 0); opacity: .8; } }
+@media (prefers-reduced-motion: reduce) {
+  .nws-lpfx, .nws-lpfx * { animation: none !important; }
+  .nws-lpv__atleta img { animation: none !important; }
+}
+
+/* ==========================================================================
+   nws-lpvw — vistas inmersivas de la App JIN (Calendario · Resultados).
+   Cubren tabbar y contenido; entran en push. JS: pantallas/landing-vistas.js
+   ========================================================================== */
+.nws-lpvw { position: absolute; inset: 0; z-index: 4; background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); transform: translateX(100%); transition: transform 300ms cubic-bezier(.32, .72, 0, 1); box-shadow: -12px 0 32px -12px rgb(from var(--nws-jic-azul-900) r g b / .28); }
+.nws-lpvw[hidden] { display: none; }
+.nws-lpvw--abierta { transform: none; }
+.nws-lpvw__bloque { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.nws-lpvw__top { position: relative; flex: none; display: flex; align-items: center; height: 56px; padding: 0 var(--naotech-sizing-12); }
+.nws-lpvw__titulo { position: absolute; left: 0; right: 0; margin: 0; text-align: center; font-size: 18px; line-height: 22px; font-weight: var(--naotech-font-weight-bold); color: var(--nws-jic-violeta-900); pointer-events: none; }
+.nws-lp .nws-lpvw__volver { position: relative; z-index: 1; --pvt-button-dimension: 44px; --naotech-icon-button-sizing: 24px; --pvt-button-font-color: var(--nws-jic-violeta-700); }
+.nws-lp .nws-lpvw--calendario .nws-lpvw__volver .nwt-icon-button__content { background: var(--nws-jic-azul-050); border-radius: var(--naotech-radius-circle); }
+.nws-lpvw--resultados .nws-lpvw__centro { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 var(--naotech-sizing-32) 88px; text-align: center; }
+.nws-lpvw--resultados .nws-lpvw__centro p { margin: 0; font-size: 20px; line-height: 26px; font-weight: var(--naotech-font-weight-medium); color: var(--nws-jic-violeta-900); }
+
+.nws-lpvw__scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.nws-lpvw__scroll::-webkit-scrollbar { display: none; }
+.nws-lpvw__cuerpo { padding: var(--naotech-sizing-4) var(--naotech-sizing-16) 56px; }
+.nws-lpvw__mes { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--naotech-sizing-8); }
+.nws-lpvw__mes-t { margin: 0; font-size: 18px; line-height: 22px; font-weight: var(--naotech-font-weight-bold); text-transform: capitalize; }
+.nws-lp .nws-lpvw__nav { --pvt-button-dimension: 44px; --naotech-icon-button-sizing: 24px; --pvt-button-font-color: var(--nws-jic-violeta-700); }
+.nws-lpvw__semana, .nws-lpvw__grilla { display: grid; grid-template-columns: repeat(7, 1fr); }
+.nws-lpvw__semana span { padding: var(--naotech-sizing-8) 0; text-align: center; font-size: 14px; line-height: 18px; font-weight: var(--naotech-font-weight-semibold); color: var(--naotech-color-gray-700); }
+.nws-lpvw__dia { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 52px; padding: 0; border: 1.5px solid transparent; border-radius: var(--naotech-radius-xl); background: transparent; color: var(--nws-jic-violeta-900); font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color 150ms var(--naotech-animation-standard), color 150ms var(--naotech-animation-standard); }
+.nws-lpvw__num { font-size: 16px; line-height: 20px; font-weight: var(--naotech-font-weight-semibold); }
+.nws-lpvw__puntos { display: flex; gap: 3px; height: 5px; }
+.nws-lpvw__puntos i { width: 5px; height: 5px; border-radius: 50%; background: var(--nws-jic-violeta); }
+.nws-lpvw__dia--hoy { border-color: var(--nws-jic-violeta); }
+.nws-lpvw__dia:not(.nws-lpvw__dia--sel):hover { background: var(--nws-jic-azul-050); }
+.nws-lpvw__dia--sel { background: var(--nws-jic-violeta); color: var(--naotech-app-background); }
+.nws-lpvw__dia--sel .nws-lpvw__puntos i { background: var(--naotech-app-background); }
+
+.nws-lpvw__agenda { margin-top: var(--naotech-sizing-20); padding-top: var(--naotech-sizing-16); border-top: 1px solid var(--naotech-color-gray-200); }
+.nws-lpvw__agenda-t { margin: 0 0 var(--naotech-sizing-12); font-size: 16px; line-height: 20px; font-weight: var(--naotech-font-weight-bold); }
+.nws-lpvw__agenda-t::first-letter { text-transform: uppercase; }
+.nws-lpvw__vacio { margin: 0; padding: var(--naotech-sizing-16) 0; font-size: 14px; line-height: 18px; color: var(--naotech-color-gray-700); }
+.nws-lpvw__lista { display: flex; flex-direction: column; gap: var(--naotech-sizing-12); margin: 0; padding: 0; list-style: none; }
+.nws-lpvw__ev { display: flex; align-items: center; gap: var(--naotech-sizing-12); width: 100%; min-height: 72px; padding: var(--naotech-sizing-12) var(--naotech-sizing-12) var(--naotech-sizing-12) var(--naotech-sizing-16); border: 1px solid var(--naotech-color-gray-200); border-radius: var(--naotech-radius-xxl); background: var(--naotech-app-background); box-shadow: var(--nws-sombra-1); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.nws-lpvw__ev-f { flex: none; display: flex; flex-direction: column; gap: 2px; width: 84px; padding-right: var(--naotech-sizing-12); border-right: 1px solid var(--naotech-color-gray-200); font-size: 14px; line-height: 18px; color: var(--naotech-color-gray-700); }
+.nws-lpvw__ev-f strong { font-size: 14px; line-height: 18px; font-weight: var(--naotech-font-weight-bold); color: var(--nws-jic-violeta-900); }
+.nws-lpvw__ev-c { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.nws-lpvw__ev-tipo { font-size: 13px; /* pastilla de categoría: 13px (DC-042) */ line-height: 16px; font-weight: var(--naotech-font-weight-semibold); color: var(--nws-jic-violeta-700); }
+.nws-lpvw__ev-t { font-size: 16px; line-height: 20px; font-weight: var(--naotech-font-weight-semibold); color: var(--nws-jic-violeta-900); }
+.nws-lpvw .nwt-icon-label { gap: var(--naotech-sizing-6, 6px); font-size: 14px; line-height: 18px; color: var(--naotech-color-gray-700); }
+.nws-lpvw .nwt-icon-label > span { font-size: 14px; line-height: 18px; }
+.nws-lpvw__ev-ir { flex: none; color: var(--naotech-color-gray-700); }
+
+.nws-lpvw__hoja { position: absolute; inset: 0; z-index: 2; }
+.nws-lpvw__velo { position: absolute; inset: 0; background: rgb(from var(--nws-jic-azul-900) r g b / .5); opacity: 0; transition: opacity 260ms var(--naotech-animation-standard); }
+.nws-lpvw__panel { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; gap: var(--naotech-sizing-8); padding: var(--naotech-sizing-24) var(--naotech-sizing-20) 38px; border-radius: 28px 28px 0 0; background: var(--naotech-app-background); box-shadow: var(--nws-sombra-2); transform: translateY(100%); transition: transform 260ms cubic-bezier(.32, .72, 0, 1); }
+.nws-lpvw__hoja--abierta .nws-lpvw__velo { opacity: 1; }
+.nws-lpvw__hoja--abierta .nws-lpvw__panel { transform: none; }
+.nws-lpvw__asa { position: absolute; top: 8px; left: 50%; width: 36px; height: 5px; margin-left: -18px; border-radius: 3px; background: var(--naotech-color-gray-300); }
+.nws-lp .nws-lpvw__x { position: absolute; top: 12px; right: 12px; --pvt-button-dimension: 44px; --naotech-icon-button-sizing: 22px; --pvt-button-font-color: var(--nws-jic-violeta-700); }
+.nws-lpvw__hoja-t { margin: 0; padding-right: var(--naotech-sizing-44, 44px); font-size: 20px; line-height: 25px; font-weight: var(--naotech-font-weight-bold); }
+.nws-lpvw__datos { display: flex; flex-direction: column; gap: var(--naotech-sizing-8); margin: var(--naotech-sizing-4) 0; }
+.nws-lpvw__datos .nwt-icon-label { font-size: 14px; line-height: 18px; color: var(--nws-jic-violeta-900); }
+.nws-lpvw__hoja-d { margin: 0 0 var(--naotech-sizing-12); font-size: 14px; line-height: 20px; color: var(--naotech-color-gray-700); }
+.nws-lpvw__agregar { width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nws-lpvw, .nws-lpvw__velo, .nws-lpvw__panel, .nws-lpvw__dia { transition: none; }
+}
+
+/* nws-lps2 · splash DC-035/DC-040: tinte violeta, logo JIC con zoom y MinDeporte fijo. */
+.nws-lps__tinte { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgb(68 30 99 / .6), rgb(68 30 99 / .7)); }
+.nws-lps__logo-jic, .nws-lps__logo-min { position: absolute; left: 0; right: 0; margin: 0 auto; pointer-events: none; filter: brightness(0) invert(1); }
+/* DC-041: centro al 74 % del alto (bajo la cara del atleta de abajo) y zoom final de 220px. */
+.nws-lps__logo-jic { top: calc(74% - 65px); height: 130px; width: auto; transform-origin: 50% 50%; transform: scale(1); }
+.nws-lps__logo-min { bottom: 54px; width: 80px; height: auto; }
+.nws-lps--kb .nws-lps__logo-jic { animation: nws-lps2-zoom var(--nws-lps-carga, 2200ms) cubic-bezier(.16, 1, .3, 1) 0ms both; }
+@keyframes nws-lps2-zoom { from { transform: scale(1); } to { transform: scale(1.69); } }
+@media (prefers-reduced-motion: reduce) { .nws-lps--kb .nws-lps__logo-jic { animation: none; transform: scale(1.69); } }

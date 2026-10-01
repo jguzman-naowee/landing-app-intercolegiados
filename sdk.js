@@ -337,7 +337,7 @@ window.SDK = (function () {
               role: 'tab', type: 'button', 'aria-selected': active ? 'true' : 'false', 'data-tab': t.value
             },
             h('span', { class: 'nwt-tabs__label' },
-              t.icon && icon(t.icon),
+              t.iconHtml ? h('div', { class: 'nwt-icon' }, t.iconHtml) : t.icon && icon(t.icon),
               h('span', { class: 'nwt-tabs__label-text' }, esc(t.label)),
               t.count !== undefined && h('span', null, ' (' + t.count + ')'),
               t.dot && h('span', { class: 'nwt-tabs__dot nwt-tabs__dot--' + t.dot })));

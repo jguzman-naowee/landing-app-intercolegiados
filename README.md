@@ -1,9 +1,8 @@
 # Plantilla de prototipo Naowee — alta fidelidad sobre el SDK
 
 Paquete de front plano (HTML/CSS/JS, sin npm ni build) para montar prototipos
-de alta fidelidad con el SDK real de Naowee. Viene con **un solo rol de
-ejemplo, Conductor** (app móvil dentro de un marco de teléfono), marca Naowee
-y datos de demostración. Está listo para recibir el prototipo de un cliente
+de alta fidelidad con el SDK real de Naowee. Viene con **un solo perfil, App JIN** (app móvil dentro de un marco de
+teléfono) y datos de demostración. Está listo para recibir el prototipo de un cliente
 nuevo.
 
 ## Abrirlo
@@ -11,16 +10,12 @@ nuevo.
 Doble clic en `index.html`: una sola página con todo embebido, funciona sin
 servidor. Es el mismo archivo que se publica.
 
-Entrada: selector de perfil. `#/salir` o "Cambiar de perfil" vuelven ahí.
-Link directo a una pantalla: `index.html?rol=conductor#/conductor`.
+Entrada: directo al splash de la App JIN, sin selector de perfil.
 `?lento` alarga las cargas simuladas a 4 s para revisar las siluetas.
 
-| Rol | Pantallas |
+| Perfil | Pantallas |
 |---|---|
-| Sin login | `#/conductor` landing pública de Juegos Intercolegiados en marco de teléfono de 428 px (Figma «JIN Landing y App», frame 153) |
-
-La app del conductor (`pantallas/conductor-app.js` + `mapa.js`) sigue en la
-carpeta como referencia, sin ruta.
+| App JIN | `#/` app de Juegos Intercolegiados en marco de teléfono de 428 px (Figma «JIN Landing y App», frame 153) |
 
 ## Cómo sumar un cliente / un rol
 
@@ -59,13 +54,12 @@ dev.html        mesa de trabajo con archivos separados — de acá sale index.ht
 publicar.py     genera index.html desde dev.html (concatena y embebe)
 app.css         lo que el SDK no tiene (prefijo nws-), todo en tokens
 sdk.js          anatomía de los Nwt*, leída del compilado
-mapa.js         motor de mapa (retícula de calles, rutas, camión animado)
 marca.js        logo e isotipo de Naowee (SVG inline) + favicon
 marca-jic.js    marca del cliente: logos JIC/MinDeporte/gov.co + íconos de redes
 assets/landing/ imágenes de la landing (publicar.py las embebe como data URI)
 datos.js        los datos, en JSON
 app.js          sesión por rol, router por hash, shell (sidebar + toolbar)
-pantallas/      login.js (selector) + una por pantalla de rol
+pantallas/      landing-app.js (la App JIN)
 vendor/         copia literal del dist de foundations. NO SE EDITA
 ```
 
