@@ -390,8 +390,8 @@ window.DATOS = {
       },
       "portada": {
         "titular": [
-          "¡Ya jugamos la",
-          "fase regional!"
+          "¡Estamos jugando",
+          "la fase regional!"
         ],
         "alt": "Juegos Intercolegiados 2026",
         "img": "assets/landing/deportista.png"
