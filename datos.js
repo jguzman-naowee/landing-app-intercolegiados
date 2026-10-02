@@ -160,7 +160,7 @@ window.DATOS = {
     "app": {
       "salidas": false,
       "quote": {
-        "texto": "Juegos Intercolegiados es una iniciativa del Ministerio del Deporte de Colombia."
+        "texto": "“Juegos Intercolegiados es una iniciativa del Ministerio del Deporte de Colombia.”"
       },
       "footer": {
         "legal1": "© 2026 Ministerio del Deporte.",
@@ -365,6 +365,31 @@ window.DATOS = {
         "titulo": "Resultados",
         "texto": "Vista de resultados"
       },
+      /* TEXTO DE EJEMPLO: las seis regionales de la captura de referencia (faltan las demás) y la final.
+         Fotos: no hay atletismo ni salto largo en assets/, van las más cercanas (`pos` = encuadre). */
+      "regionales": {
+        "titulo": "Regional de conjuntos",
+        "subtitulo": "Sigue el minuto a minuto de los eventos de esta fase",
+        "cambiar": "Cambiar",
+        /* Opciones y orden de «Regional de individuales» son de EJEMPLO (Jorge debe confirmar los reales).
+           `tarjetas` = índices de `items` en el orden de cada opción; `actual` es la inicial. */
+        "actual": "conjuntos",
+        "opciones": [
+          { "id": "conjuntos", "nombre": "Regional de conjuntos", "tarjetas": [0, 1, 2, 3, 4, 5] },
+          { "id": "individuales", "nombre": "Regional de individuales", "tarjetas": [5, 4, 3, 2, 1, 0] },
+          { "id": "final", "nombre": "Final nacional", "tarjetas": [6] }
+        ],
+        "items": [
+          { "ciudad": "Pasto", "nombre": "Regional Pacífico", "img": "assets/landing/galeria-c.jpg", "pos": "50% 50%" },
+          { "ciudad": "Aguazul", "nombre": "Regional Orinoquia", "img": "assets/landing/novedad-principal.jpg", "pos": "50% 40%" },
+          { "ciudad": "Manizales", "nombre": "Regional Eje Cafetero", "img": "assets/landing/galeria-a.jpg", "pos": "50% 22%" },
+          { "ciudad": "Espinal", "nombre": "Regional Centro Sur", "img": "assets/landing/noticia-2.jpg", "pos": "46% 40%" },
+          { "ciudad": "Floridablanca", "nombre": "Regional Centro Oriente", "img": "assets/landing/noticia-1.jpg", "pos": "40% 40%" },
+          { "ciudad": "Puerto Colombia", "nombre": "Regional Caribe 1", "img": "assets/landing/galeria-b.jpg", "pos": "50% 50%" },
+          /* Noticia de la web oficial (10-jun-2026): Bogotá será la sede de la final nacional. Foto del mosaico. */
+          { "ciudad": "Bogotá", "nombre": "Final Nacional", "img": "assets/landing/galeria-b.jpg", "pos": "55% 30%" }
+        ]
+      },
       "cuenta": {
         "nombre": "Juegos Intercolegiados",
         "lugar": "Bogotá"
@@ -390,8 +415,8 @@ window.DATOS = {
       },
       "portada": {
         "titular": [
-          "¡Estamos jugando la",
-          "fase regional!"
+          "¡Juntos llegamos",
+          "más lejos!"
         ],
         "alt": "Juegos Intercolegiados 2026",
         "img": "assets/landing/deportista.png"
@@ -400,18 +425,13 @@ window.DATOS = {
         {
           "id": "calendario",
           "icono": "calendar",
-          "label": "Calendario",
-          "vista": "calendario"
-        },
-        {
-          "id": "resultados",
-          "icono": "mercado-lider",
-          "label": "Resultados",
-          "vista": "resultados"
+          "label": "Calendario y Resultados",
+          "vista": "regionales",
+          "activa": true
         }
       ],
       "competencias": {
-        "titulo": "Competencias"
+        "titulo": "Fase regional"
       },
       "novedades": {
         "titulo": "Novedades"

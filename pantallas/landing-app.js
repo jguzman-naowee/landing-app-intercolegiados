@@ -111,11 +111,15 @@ window.PANTALLAS['landing-app'] = (function () {
     { id: 'una', icono: 'view-galery', label: 'Ver una foto a la vez' },
     { id: 'grid', icono: 'view-grid', label: 'Ver en cuadrícula' }
   ];
+  /* Badge de ciudad: lo comparten las dos vistas de la galería y el visor de foto. */
+  function insigniaCiudad(S, f) {
+    return f.ciudad ? S.h('span', { class: 'nws-lpv__ciudad', 'aria-hidden': 'true' }, S.icon('gps-pin-filled') + S.h('span', null, S.esc(f.ciudad))) : '';
+  }
   function seccionGaleria(S, L, fotos) {
     var e = S.esc, total = fotos.length, cols = [];
     for (var c = 0; c < total; c += 2) { cols.push(fotos.slice(c, c + 2)); } /* columnas de 2 teselas (alta+baja / baja+alta) */
     function foto(f) { return S.h('img', { src: f.img, alt: '', style: 'object-position:' + f.pos, draggable: 'false' }); }
-    function ciudad(f) { return f.ciudad ? S.h('span', { class: 'nws-lpv__ciudad', 'aria-hidden': 'true' }, S.icon('gps-pin-filled') + S.h('span', null, e(f.ciudad))) : ''; }
+    function ciudad(f) { return insigniaCiudad(S, f); }
     return S.h('section', { class: 'nws-lpv__galeria', id: 'lpv-galeria', 'data-dev': 'galeria' },
       S.h('div', { class: 'nws-lpv__h2-fila' },
         S.h('h2', { class: 'nws-lpv__h2' }, e(L.galeria.titulo)),
@@ -124,7 +128,7 @@ window.PANTALLAS['landing-app'] = (function () {
         }))),
       S.h('div', { class: 'nws-lpv__vista', id: 'lpv-gal-una' },
         S.h('div', { class: 'nws-lpv__pista', role: 'region', 'aria-roledescription': 'carrusel', 'aria-label': 'Galería multimedia', tabindex: 0 }, fotos.map(function (f, i) {
-          return S.h('div', { class: 'nws-lpv__slide', 'data-i': i, role: 'group', 'aria-roledescription': 'diapositiva', 'aria-label': (i + 1) + ' de ' + total + (f.ciudad ? ' · ' + f.ciudad : '') }, foto(f), ciudad(f));
+          return S.h('div', { class: 'nws-lpv__slide', 'data-i': i, tabindex: -1, role: 'group', 'aria-roledescription': 'diapositiva', 'aria-label': (i + 1) + ' de ' + total + (f.ciudad ? ' · ' + f.ciudad : '') }, foto(f), ciudad(f));
         })),
         S.h('div', { class: 'nws-lpv__dots' }, fotos.map(function (f, i) {
           return S.h('button', { type: 'button', class: S.cls('nws-lpv__dot', i === 0 && 'nws-lpv__dot--activo'), 'data-i': i, 'aria-label': 'Ir a la foto ' + (i + 1) + ' de ' + total, 'aria-current': i === 0 ? 'true' : null });
@@ -155,10 +159,11 @@ window.PANTALLAS['landing-app'] = (function () {
         /* DC-070: título de sección en vez de repetir «competencias» en cada tarjeta */
         S.h('section', { class: 'nws-lpv__accesos', 'data-dev': 'competencias', 'aria-label': A.competencias.titulo },
           tituloSeccion(S, A.competencias.titulo),
-          /* Accesos: NwtAvatarIcon del SDK tal cual (tema primario). Sin salidas,
-             `data-inerte` cuenta como gancho en app.js: el toque no hace nada. */
-          S.h('div', { class: 'nws-lpv__menu' }, A.menu.map(function (m) {
-            return S.h('button', Object.assign({ type: 'button', class: 'nws-lpv__app nws-ios-press', 'aria-label': m.label }, A.salidas ? { 'data-vista': m.vista } : { 'data-inerte': '1' }),
+          /* Accesos: NwtAvatarIcon del SDK tal cual (tema primario). Navega si hay
+             salidas o si el ítem es `activa`; si no, `data-inerte` es el gancho
+             de app.js y el toque no hace nada. */
+          S.h('div', { class: S.cls('nws-lpv__menu', A.menu.length === 1 && 'nws-lpv__menu--uno') }, A.menu.map(function (m) {
+            return S.h('button', Object.assign({ type: 'button', class: 'nws-lpv__app nws-ios-press', 'aria-label': m.label }, (A.salidas || m.activa) ? { 'data-vista': m.vista } : { 'data-inerte': '1' }),
               S.avatarIcon({ icon: m.icono, theme: 'primary' }),
               S.h('span', { class: 'nws-lpv__app-txt' },
                 S.h('span', { class: 'nws-lpv__app-l' },
@@ -489,10 +494,216 @@ window.PANTALLAS['landing-app'] = (function () {
     document.addEventListener('keydown', esc);
   }
 
+  /* ---------- visor de foto (DC-097): pantalla completa con zoom ----------
+     Una sola capa translate+scale sobre la <img> (origen 0 0). Los límites del
+     desplazamiento salen del tamaño real de la foto dentro de su caja (contain). */
+  var Z_MAX = 5, Z_DOBLE = 2.5, Z_PASO = 1.5, CIERRA_DY = 90, VISOR_MS = 200;
+  function visorFoto(o) {
+    var S = o.S, mob = o.mob, i = o.i, f = o.fotos[i], total = o.fotos.length, origen = o.origen;
+    var reducido = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var capas = [mob.querySelector('#lp-scroll'), mob.querySelector('#lpi-top'), mob.querySelector('.nws-lpi__bottom')];
+    function boton(accion, icono, label, extra) {
+      return S.iconButton({ icon: icono, size: 'medium', variant: 'mute', theme: 'neutral', label: label, cls: S.cls('nws-lpz__btn', extra), attrs: { 'data-lpz': accion } });
+    }
+    var d = document.createElement('div');
+    d.className = 'nws-lpz';
+    d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
+    d.setAttribute('aria-label', 'Foto ' + (i + 1) + ' de ' + total + (f.ciudad ? ' · ' + f.ciudad : ''));
+    d.setAttribute('data-visor', '1'); /* gancho: sin un data-* el control cae en «Disponible próximamente» (app.js) */
+    d.innerHTML =
+      S.h('div', { class: 'nws-lpz__lienzo' }, S.h('img', { class: 'nws-lpz__img', src: f.img, alt: '', draggable: 'false' })) +
+      S.h('div', { class: 'nws-lpz__estado' }, barraEstado(S, o.hora)) +
+      boton('cerrar', 'close', 'Cerrar foto', 'nws-lpz__cerrar') +
+      S.h('div', { class: 'nws-lpz__barra' },
+        S.h('div', { class: 'nws-lpz__info' }, insigniaCiudad(S, f), S.h('span', { class: 'nws-lpz__cuenta', 'aria-hidden': 'true' }, (i + 1) + '/' + total)),
+        S.h('div', { class: 'nws-lpz__zoom', role: 'group', 'aria-label': 'Zoom de la foto' },
+          boton('menos', 'zoom-out', 'Alejar foto'), boton('ajustar', 'refresh', 'Ajustar foto a la pantalla'), boton('mas', 'zoom-in', 'Acercar foto'))) +
+      S.h('div', { class: 'nws-lpz__home', 'aria-hidden': 'true' }) +
+      S.h('span', { class: 'nws-lpz__sr', 'aria-live': 'polite' });
+    mob.appendChild(d);
+    var lienzo = d.querySelector('.nws-lpz__lienzo'), img = d.querySelector('.nws-lpz__img'), sr = d.querySelector('.nws-lpz__sr');
+    var bt = { menos: d.querySelector('[data-lpz="menos"] button'), ajustar: d.querySelector('[data-lpz="ajustar"] button'), mas: d.querySelector('[data-lpz="mas"] button') };
+    var cerrarBtn = d.querySelector('[data-lpz="cerrar"] button');
+
+    /* Medidas en px de layout, no de pantalla: el teléfono va escalado. W×H es el lienzo; ox/oy/rw/rh, la foto dentro. */
+    var W = 0, H = 0, ox = 0, oy = 0, rw = 0, rh = 0, x = 0, y = 0, k = 1;
+    var toques = [], gesto = null, ultimo = null, tDoble = 0, tSr = 0, tAnima = 0, kSr = 1, cerrando = false, cierraPend = false, desde = performance.now();
+
+    function medir() {
+      W = lienzo.clientWidth; H = lienzo.clientHeight;
+      var nw = img.naturalWidth, nh = img.naturalHeight, s = nw && nh ? Math.min(W / nw, H / nh) : 0;
+      rw = s ? nw * s : W; rh = s ? nh * s : H; ox = (W - rw) / 2; oy = (H - rh) / 2;
+    }
+    /* Eje: si la foto ampliada cabe en la caja se centra; si no, no deja ver vacío en los bordes. */
+    function tope(p, caja, margen, lado, nk) {
+      var ancho = nk * lado;
+      return ancho <= caja ? (caja - ancho) / 2 - nk * margen : Math.min(-nk * margen, Math.max(caja - nk * (margen + lado), p));
+    }
+    function marcar(b, off) { if (off) { b.setAttribute('aria-disabled', 'true'); } else { b.removeAttribute('aria-disabled'); } }
+    function poner(nx, ny, nk, anima) {
+      nk = Math.min(Z_MAX, Math.max(1, nk)); if (nk < 1.001) { nk = 1; }
+      x = tope(nx, W, ox, rw, nk); y = tope(ny, H, oy, rh, nk); k = nk;
+      img.classList.toggle('nws-lpz__img--anima', !!anima && !reducido);
+      img.style.transform = 'translate(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px) scale(' + k.toFixed(4) + ')';
+      clearTimeout(tAnima); if (anima) { tAnima = setTimeout(function () { img.classList.remove('nws-lpz__img--anima'); }, 260); }
+      d.classList.toggle('nws-lpz--ampliada', k > 1);
+      marcar(bt.menos, k <= 1); marcar(bt.ajustar, k <= 1); marcar(bt.mas, k >= Z_MAX - 0.001);
+      clearTimeout(tSr); tSr = setTimeout(function () { if (k !== kSr) { kSr = k; sr.textContent = 'Zoom ' + Math.round(k * 100) + ' %'; } }, 350);
+    }
+    /* El teléfono va escalado (zoom del escenario): se pasa de píxeles de pantalla a los del lienzo. */
+    function local(cx, cy) {
+      var r = lienzo.getBoundingClientRect(), e = r.width / (W || 1) || 1;
+      return { x: (cx - r.left) / e, y: (cy - r.top) / e, e: e };
+    }
+    function zoomEn(nk, px, py, anima) {
+      nk = Math.min(Z_MAX, Math.max(1, nk));
+      var r = nk / k;
+      poner(px - (px - x) * r, py - (py - y) * r, nk, anima);
+    }
+    function sobreFoto(l) { return l.x >= x + k * ox && l.x <= x + k * (ox + rw) && l.y >= y + k * oy && l.y <= y + k * (oy + rh); }
+    function alternar(l) { tDoble = performance.now(); zoomEn(k > 1 ? 1 : Z_DOBLE, l.x, l.y, true); }
+
+    /* Gestos: la referencia (`gesto.b`) se rehace al sumar o quitar un dedo, así no hay saltos. */
+    function punto(id) { for (var n = 0; n < toques.length; n++) { if (toques[n].id === id) { return toques[n]; } } return null; }
+    function referencia() {
+      var a = toques[0], c = toques[1];
+      var cx = c ? (a.x + c.x) / 2 : a.x, cy = c ? (a.y + c.y) / 2 : a.y;
+      gesto.b = { x: x, y: y, k: k, cx: cx, cy: cy, d: c ? Math.hypot(a.x - c.x, a.y - c.y) : 0, l: local(cx, cy) };
+    }
+    function abajo(ev) {
+      if (cerrando || toques.length >= 2 || ev.target.closest('.nws-lpz__btn')) { return; }
+      if (ev.pointerType === 'mouse' && ev.button !== 0) { return; }
+      cierraPend = false;
+      try { d.setPointerCapture(ev.pointerId); } catch (e) { /* evento sintético */ }
+      toques.push({ id: ev.pointerId, x: ev.clientX, y: ev.clientY });
+      if (toques.length === 1) { gesto = { movio: false, multi: false, cierra: false, dy: 0 }; }
+      else { gesto.multi = true; gesto.cierra = false; lienzo.style.transform = ''; d.style.removeProperty('--nws-lpz-op'); }
+      referencia();
+    }
+    function mover(ev) {
+      var t = punto(ev.pointerId); if (!t || !gesto) { return; }
+      t.x = ev.clientX; t.y = ev.clientY;
+      var b = gesto.b, a = toques[0], c = toques[1];
+      if (c) { /* pellizco: el punto bajo el centro inicial sigue bajo el centro actual */
+        var nk = Math.min(Z_MAX, Math.max(1, b.k * Math.hypot(a.x - c.x, a.y - c.y) / Math.max(b.d, 1)));
+        var l = local((a.x + c.x) / 2, (a.y + c.y) / 2), q = nk / b.k;
+        gesto.movio = true;
+        poner(l.x - (b.l.x - b.x) * q, l.y - (b.l.y - b.y) * q, nk, false);
+        return;
+      }
+      if (Math.hypot(a.x - b.cx, a.y - b.cy) < 6 && !gesto.movio) { return; }
+      gesto.movio = true;
+      var dx = (a.x - b.cx) / b.l.e, dy = (a.y - b.cy) / b.l.e;
+      if (k > 1) { d.classList.add('nws-lpz--arrastra'); poner(b.x + dx, b.y + dy, k, false); return; }
+      if (!gesto.cierra && !gesto.multi && dy > 12 && dy > Math.abs(dx)) { gesto.cierra = true; d.classList.add('nws-lpz--arrastra'); }
+      if (gesto.cierra) {
+        gesto.dy = Math.max(0, dy);
+        lienzo.style.transform = 'translateY(' + gesto.dy.toFixed(1) + 'px)';
+        d.style.setProperty('--nws-lpz-op', Math.max(0.35, 1 - gesto.dy / 360).toFixed(3));
+      }
+    }
+    function toque(ev) {
+      var l = local(ev.clientX, ev.clientY), ahora = performance.now();
+      if (ultimo && ahora - ultimo.t < 320 && Math.hypot(l.x - ultimo.x, l.y - ultimo.y) < 30) { ultimo = null; alternar(l); return; }
+      ultimo = { t: ahora, x: l.x, y: l.y };
+      /* El fondo cierra solo sin zoom, y no en los primeros 450 ms (2.º clic de un doble clic al abrir).
+         Se cierra en el `click`: si el visor se va antes, el toque táctil cae en lo de abajo. */
+      if (k === 1 && ahora - desde > 450 && !sobreFoto(l)) {
+        cierraPend = true;
+        setTimeout(function () { if (cierraPend) { cierraPend = false; cerrar(); } }, 350);
+      }
+    }
+    function arriba(ev) {
+      var t = punto(ev.pointerId); if (!t || !gesto) { return; }
+      toques.splice(toques.indexOf(t), 1);
+      try { d.releasePointerCapture(ev.pointerId); } catch (e) { /* sin captura */ }
+      if (toques.length) { gesto.movio = true; referencia(); return; }
+      var g = gesto; gesto = null;
+      d.classList.remove('nws-lpz--arrastra');
+      if (g.cierra) {
+        if (g.dy >= CIERRA_DY) { cerrar(); } else { lienzo.style.transform = ''; d.style.removeProperty('--nws-lpz-op'); }
+        return;
+      }
+      if (ev.type === 'pointerup' && !g.movio && !g.multi) { toque(ev); }
+    }
+    function dblclick(ev) {
+      if (cerrando || ev.target.closest('.nws-lpz__btn') || performance.now() - tDoble < 250) { return; }
+      var l = local(ev.clientX, ev.clientY); alternar(l);
+    }
+    function rueda(ev) {
+      ev.preventDefault(); /* si no, ctrl+rueda amplía el navegador y la vista plana se desplaza detrás */
+      var l = local(ev.clientX, ev.clientY), dy = ev.deltaY * (ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? 400 : 1);
+      zoomEn(k * Math.exp(-dy * (ev.ctrlKey ? 0.01 : 0.002)), l.x, l.y, false);
+    }
+    function clic(ev) {
+      var b = ev.target.closest('[data-lpz]');
+      if (!b) { if (cierraPend) { cierraPend = false; cerrar(); } return; }
+      var a = b.getAttribute('data-lpz'), c = b.querySelector('button');
+      if (c && c.getAttribute('aria-disabled') === 'true') { return; }
+      if (a === 'cerrar') { cerrar(); }
+      else if (a === 'mas') { zoomEn(k * Z_PASO, W / 2, H / 2, true); }
+      else if (a === 'menos') { zoomEn(k / Z_PASO, W / 2, H / 2, true); }
+      else { zoomEn(1, W / 2, H / 2, true); }
+    }
+    function tecla(ev) {
+      if (ev.ctrlKey || ev.metaKey || ev.altKey) { return; }
+      var kk = ev.key, paso = 60;
+      if (kk === 'Escape') { ev.preventDefault(); cerrar(); }
+      else if (kk === '+' || kk === '=') { ev.preventDefault(); zoomEn(k * Z_PASO, W / 2, H / 2, true); }
+      else if (kk === '-' || kk === '_') { ev.preventDefault(); zoomEn(k / Z_PASO, W / 2, H / 2, true); }
+      else if (kk === '0') { ev.preventDefault(); zoomEn(1, W / 2, H / 2, true); }
+      else if (kk.indexOf('Arrow') === 0 || kk === 'PageUp' || kk === 'PageDown' || kk === 'Home' || kk === 'End') {
+        ev.preventDefault(); /* a 1× tampoco deben desplazar la vista plana de atrás */
+        if (k > 1 && kk.indexOf('Arrow') === 0) {
+          poner(x + (kk === 'ArrowLeft' ? paso : kk === 'ArrowRight' ? -paso : 0), y + (kk === 'ArrowUp' ? paso : kk === 'ArrowDown' ? -paso : 0), k, true);
+        }
+      } else if (kk === ' ' && ev.target.tagName !== 'BUTTON') { ev.preventDefault(); }
+      else if (kk === 'Tab') { /* el foco no sale del visor: ciclo entre sus cuatro botones */
+        var bs = [cerrarBtn, bt.menos, bt.ajustar, bt.mas], j = bs.indexOf(document.activeElement);
+        ev.preventDefault();
+        bs[j < 0 ? (ev.shiftKey ? bs.length - 1 : 0) : (j + (ev.shiftKey ? bs.length - 1 : 1)) % bs.length].focus({ preventScroll: true });
+      }
+    }
+    function alRedim() { medir(); poner(x, y, k, false); }
+
+    function cerrar(ya) {
+      if (cerrando) { return; } cerrando = true;
+      document.removeEventListener('keydown', tecla); window.removeEventListener('resize', alRedim);
+      clearTimeout(tSr); clearTimeout(tAnima);
+      capas.forEach(function (c) { if (c) { c.inert = false; } });
+      if (!ya && origen && origen.isConnected) { origen.focus({ preventScroll: true }); }
+      var hecho = false;
+      function fin() { if (hecho) { return; } hecho = true; d.remove(); o.alCerrar(); }
+      if (ya || reducido || !d.animate) { fin(); return; }
+      d.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: 'ease-in', fill: 'forwards' }).onfinish = fin;
+      setTimeout(fin, 260);
+    }
+
+    d.addEventListener('pointerdown', abajo);
+    d.addEventListener('pointermove', mover);
+    d.addEventListener('pointerup', arriba);
+    d.addEventListener('pointercancel', arriba);
+    d.addEventListener('dblclick', dblclick);
+    d.addEventListener('wheel', rueda, { passive: false });
+    d.addEventListener('click', clic);
+    document.addEventListener('keydown', tecla);
+    window.addEventListener('resize', alRedim);
+    img.addEventListener('load', alRedim);
+
+    capas.forEach(function (c) { if (c) { c.inert = true; } });
+    medir(); poner(0, 0, 1, false);
+    if (!reducido && d.animate) {
+      d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: VISOR_MS, easing: 'ease-out' });
+      lienzo.animate([{ transform: 'scale(.96)' }, { transform: 'none' }], { duration: VISOR_MS, easing: CURVA });
+    }
+    cerrarBtn.focus({ preventScroll: true });
+    return { cerrar: cerrar };
+  }
+
   /* ---------- galería: carrusel con scroll-snap + cuadrícula ----------
-     Solo en memoria. Tocar la foto avanza (la última vuelve a la primera);
-     tocar una tesela abre el carrusel en esa foto. */
-  function galeria(sec) {
+     Solo en memoria. Tocar la foto la abre en el visor (avanzar es por swipe,
+     dots o ←/→); tocar una tesela abre el carrusel en esa foto. */
+  function galeria(sec, abrirVisor) {
     var pista = sec.querySelector('.nws-lpv__pista');
     var slides = Array.prototype.slice.call(sec.querySelectorAll('.nws-lpv__slide'));
     var dots = Array.prototype.slice.call(sec.querySelectorAll('.nws-lpv__dot'));
@@ -542,12 +753,13 @@ window.PANTALLAS['landing-app'] = (function () {
       var t = ev.target, el;
       if ((el = t.closest('[data-gal-vista]'))) { cambiar(el.getAttribute('data-gal-vista')); }
       else if ((el = t.closest('.nws-lpv__dot'))) { ir(+el.getAttribute('data-i'), true); }
-      else if (t.closest('.nws-lpv__slide')) { ir(idx + 1 < n ? idx + 1 : 0, true); }
+      else if ((el = t.closest('.nws-lpv__slide'))) { if (abrirVisor) { abrirVisor(el, +el.getAttribute('data-i')); } }
       else if ((el = t.closest('.nws-lpv__tesela'))) { marcar(+el.getAttribute('data-i')); cambiar('una'); }
     }
     function alTeclear(ev) {
       var d = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
       if (d) { ev.preventDefault(); ir(idx + d, true); }
+      else if ((ev.key === 'Enter' || ev.key === ' ') && abrirVisor) { ev.preventDefault(); abrirVisor(slides[idx], idx); } /* el teclado no «toca» la foto */
     }
     function alScroll() { if (!raf) { raf = requestAnimationFrame(leer); } }
     function alTocar() { rumbo = -1; } /* el dedo o la rueda toman el mando */
@@ -825,7 +1037,13 @@ window.PANTALLAS['landing-app'] = (function () {
          el splash no suman dos esperas) y la home entra escalonada. */
       mob.querySelector('#lp-view').innerHTML = contenido(S, L);
       ctx.posicionarIndicadores(mob);
-      var offGaleria = galeria(mob.querySelector('#lpv-galeria'));
+      /* Visor de foto: una capa del teléfono, no una salida (no depende de landing.app.salidas). */
+      var visor = null;
+      var offGaleria = galeria(mob.querySelector('#lpv-galeria'), function (slide, i) {
+        if (visor) { return; }
+        ctx.cerrarToast(); /* un aviso vigente taparía el ✕ */
+        visor = visorFoto({ S: S, mob: mob, hora: L.hora, fotos: L.app.mosaico, i: i, origen: slide, alCerrar: function () { visor = null; } });
+      });
       var noticias = [L.novedad].concat(L.noticias);
       var offMazo = mazo(mob.querySelector('#lpv-mazo'), null, sc, function (carta, alCerrar) {
         ctx.cerrarToast();
@@ -833,7 +1051,7 @@ window.PANTALLAS['landing-app'] = (function () {
         if (!L.app.salidas) { ctx.proximamente('Detalle de noticia', carta); alCerrar(); return; }
         detalle(S, L, mob, noticias[+carta.getAttribute('data-i')], carta, alCerrar);
       });
-      var vistas = window.LANDING_VISTAS.montar(S, L, mob, { barraEstado: barraEstado, posicionarIndicadores: ctx.posicionarIndicadores });
+      var vistas = window.LANDING_VISTAS.montar(S, L, mob, { barraEstado: barraEstado, posicionarIndicadores: ctx.posicionarIndicadores, proximamente: ctx.proximamente });
       var timers = [];
       var lento = /[?&]lento\b/.test(location.search);
       /* La barra dura lo mismo que el splash; `ya` descuenta lo transcurrido
@@ -981,7 +1199,7 @@ window.PANTALLAS['landing-app'] = (function () {
           aplicarZoom(); return;
         }
         if (ev.target.closest('[data-splash]')) { mostrarSplash(); return; }
-        /* Calendario y Resultados (tarjetas): vista inmersiva; el foco vuelve a la tarjeta */
+        /* Tarjeta de acceso (hoy abre «Regional de conjuntos»): vista inmersiva; el foco vuelve a la tarjeta */
         var vi = ev.target.closest('[data-vista]');
         if (vi) { vistas.abrir(vi.getAttribute('data-vista'), vi); return; }
         /* Medallas/Certificados (pestañas): aviso propio con fecha estimada (datos.js) */
@@ -1014,6 +1232,7 @@ window.PANTALLAS['landing-app'] = (function () {
         notasDev.destruir();
         timers.forEach(clearTimeout);
         offMazo();
+        if (visor) { visor.cerrar(true); }
         offGaleria();
         vistas.destruir();
         if (vigia) { vigia.disconnect(); }

@@ -45,9 +45,9 @@ una web.
    haga o sepa; después lo que explora; al final lo institucional.
 4. **Texto real, no texto en imagen.** Titulares, rótulos y botones son texto de la
    interfaz: se leen, escalan y se pueden traducir. Las imágenes solo ilustran.
-5. **Lo secundario se abre como vista, no como página.** Calendario y Resultados se
-   abren inmersivos, a pantalla completa, con transición de entrada y botón de volver.
-   Se nota el cambio de lugar.
+5. **Lo secundario se abre como vista, no como página.** «Regional de conjuntos» (desde
+   la tarjeta de la fase regional) se abre inmersiva, a pantalla completa, con
+   transición de entrada y botón de volver. Se nota el cambio de lugar.
 6. **Todo responde al toque.** Presión visible en tarjetas y botones, toasts dentro
    del teléfono, nada «muerto». Lo que aún no existe contesta «Disponible
    próximamente» en vez de quedarse mudo.
@@ -62,11 +62,11 @@ De arriba abajo, de lo más importante a lo más institucional:
 
 | Nivel | Qué | Cómo se resuelve |
 |---|---|---|
-| 1. Mensaje | Titular contextual («¡Estamos jugando la fase regional!») | h1 de 36 px sobre el hero, con halo para leerse sobre el degradé |
+| 1. Mensaje | Titular de campaña («¡Juntos llegamos más lejos!») | h1 de 36 px sobre el hero, con halo para leerse sobre el degradé |
 | 2. Marca y emoción | Hero con la deportista sobre morado animado | Imagen a sangre bajo el estado y el header; fundido a blanco |
-| 3. Acción | **Competencias**: Calendario y Resultados | Dos tarjetas a ancho completo, ícono + rótulo, abren vistas inmersivas |
+| 3. Acción | **Fase regional**: Calendario y Resultados | Una tarjeta a ancho completo, ícono + rótulo; abre «Regional de conjuntos» (regionales con ciudad y foto). Es la única salida activa de la home |
 | 4. Actualidad | **Novedades**: mazo de noticias | Tarjetas deslizables, título a 2 líneas, detalle expandible |
-| 5. Exploración | **Galería multimedia** | Mosaico con badge de ciudad |
+| 5. Exploración | **Galería multimedia** | Carrusel de una foto a la vez (o cuadrícula) con badge de ciudad; tocar la foto la abre a pantalla completa con zoom |
 | 6. Ayuda | **Video tutoriales** | Tarjeta con video (arranca al 50 %) y «Ver todos» |
 | 7. Confianza | Cita institucional y footer | Frase de respaldo + logos sobre degradé morado |
 
@@ -77,8 +77,15 @@ un protagonista (el mensaje y el hero) y un único bloque de acciones.
 
 - **Pestañas:** Juegos (inicio, con balón), Medallas, Certificados. Las dos últimas
   aún no tienen contenido: muestran un toast corto con la fecha estimada.
-- **Vistas inmersivas:** Calendario (mes, cuadrícula, agenda del día, detalle) y
-  Resultados (por ahora, solo el texto «Vista de resultados»).
+- **Vistas inmersivas:** «Regional de conjuntos» (activa): cabecera en tres filas (volver; título y
+  «Cambiar» alineados por arriba; subtítulo) y una cuadrícula de 2 columnas con una tarjeta por
+  regional (foto, ciudad, nombre y flecha). «Cambiar» despliega, bajo el título, la lista
+  (Regional de conjuntos, Regional de individuales y Final nacional, de ejemplo, por confirmar)
+  con la actual seleccionada; al elegir otra cambia el título y se reordena el contenido de abajo.
+  Con una sola tarjeta (Final nacional, Bogotá) ocupa todo el espacio disponible. Tocar una
+  tarjeta sigue avisando «Disponible próximamente»; no navega. Calendario (mes, cuadrícula, agenda
+  del día, detalle) y Resultados (solo el texto «Vista de resultados») siguen en el
+  código, sin camino de entrada.
 - **Sin enlaces que saquen de la app**, salvo el de la lista de videos de YouTube.
 
 ## 5. Reglas del sistema
@@ -101,7 +108,7 @@ nunca por debajo de 16.
 
 - Margen lateral de la pantalla: **24 px**.
 - Entre un título y su contenido: variable `--nws-gap-titulo` (20 px). Hoy tiene
-  excepciones pedidas a mano: «Competencias» y «Novedades» a 0, titular a 40 px.
+  excepciones pedidas a mano: «Fase regional» y «Novedades» a 0, titular a 40 px.
 - Tarjetas: radio grande (`--naotech-radius-xxl`), sombra suave, fondo blanco.
 - Toque mínimo: 44 px.
 

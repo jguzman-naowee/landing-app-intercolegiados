@@ -1,14 +1,12 @@
-/**
- * Vistas inmersivas de la App JIN (Calendario y Resultados). Cada una se
- * monta una sola vez sobre el teléfono y entra en push; la home no se toca
- * (queda inerte debajo), así conserva scroll y estado al volver.
- * Estilos: bloque nws-lpvw al final de app.css.
- */
+/* Vistas inmersivas de la App JIN: entran en push y la home queda inerte debajo.
+   Hoy solo `regionales` tiene acceso; calendario y resultados esperan sus salidas.
+   Estilos: bloque nws-lpvw de app.css. */
 window.LANDING_VISTAS = (function () {
 
   var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   var DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
   var DUR = 300;
+  var elegida = null;   /* regional elegida: en memoria, sobrevive a un nuevo montar(); sin localStorage */
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function iso(a, m, d) { return a + '-' + pad(m) + '-' + pad(d); }
@@ -18,10 +16,10 @@ window.LANDING_VISTAS = (function () {
   function corta(f) { var p = partes(f); return p.d + ' ' + MESES[p.m - 1].slice(0, 3); }
 
   function montar(S, L, mob, o) {
-    var C = L.app.calendario, R = L.app.resultados, e = S.esc;
+    var C = L.app.calendario, R = L.app.resultados, G = L.app.regionales, e = S.esc;
     var reducido = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var capas = [mob.querySelector('#lp-scroll'), mob.querySelector('#lpi-top'), mob.querySelector('.nws-lpi__bottom')];
-    var vistas = {}, actual = null, timer = null, hoja = null, origenHoja = null, foco = null;
+    var vistas = {}, actual = null, timer = null, hoja = null, origenHoja = null, foco = null, tReg = null, tEntra = null;
     var est = { mes: C.hoy.slice(0, 7), dia: C.hoy };
 
     function eventosDe(f) { return C.eventos.filter(function (x) { return x.fecha === f; }); }
@@ -75,6 +73,95 @@ window.LANDING_VISTAS = (function () {
         S.h('div', { class: 'nws-lpvw__agenda' }));
     }
 
+    /* ---------- Regional de conjuntos: cuadrícula de 2 columnas (una sola tarjeta: a pantalla llena) ---------- */
+    function opcionDe(id) { return G.opciones.filter(function (x) { return x.id === id; })[0]; }
+    function regActual() { return opcionDe(elegida) || opcionDe(G.actual) || G.opciones[0]; }
+    function regionalesHtml(entra) {
+      var op = regActual();
+      return S.h('ul', { class: S.cls('nws-lpvw__reg-lista', op.tarjetas.length === 1 && 'nws-lpvw__reg-lista--una', entra && 'nws-lpvw__reg-lista--entra'), role: 'list' }, op.tarjetas.map(function (k, i) {
+        var x = G.items[k];
+        return S.h('li', { style: '--nws-i:' + i },
+          S.h('button', { type: 'button', class: 'nws-lpvw__reg nws-ios-press', 'aria-label': x.nombre + ', ' + x.ciudad, 'data-toast': x.nombre },
+            S.h('span', { class: 'nws-lpvw__reg-foto' }, S.h('img', { src: x.img, alt: '', draggable: 'false', style: x.pos ? 'object-position:' + x.pos : null })),
+            S.h('span', { class: 'nws-lpvw__reg-ciudad' }, e(x.ciudad)),
+            S.h('span', { class: 'nws-lpvw__reg-fila' },
+              S.h('span', { class: 'nws-lpvw__reg-nombre' }, e(x.nombre)),
+              S.icon('arrow-right', 'nws-lpvw__reg-ir'))));
+      }));
+    }
+    /* Panel de «Cambiar»: cerrado va `inert` (sin foco ni lectura) y sin alto; ver .nws-lpvw__reg-cambio. */
+    function cambioHtml() {
+      return S.h('div', { class: 'nws-lpvw__reg-cambio', id: 'nws-reg-cambio', inert: true },
+        S.h('div', { class: 'nws-lpvw__reg-cambio-v' },
+          S.h('div', { class: 'nws-lpvw__reg-ops', role: 'listbox', 'aria-label': 'Regionales disponibles' }, G.opciones.map(function (x) {
+            var sel = x.id === regActual().id;
+            return S.h('button', { type: 'button', class: 'nws-lpvw__reg-op', role: 'option', 'aria-selected': sel ? 'true' : 'false', tabindex: sel ? '0' : '-1', 'data-reg-op': x.id },
+              S.h('span', { class: 'nws-lpvw__reg-op-t' }, e(x.nombre)),
+              sel ? S.icon('positive', 'nws-lpvw__reg-op-ok') : '');
+          }))));
+    }
+    /* Cuatro filas: volver; título y «Cambiar»; panel de regionales (colapsado); subtítulo. */
+    function cabeceraRegionales(volver) {
+      return S.h('header', { class: 'nws-lpvw__top nws-lpvw__top--reg' },
+        S.h('div', { class: 'nws-lpvw__cab-nav' }, volver),
+        S.h('div', { class: 'nws-lpvw__cab-tit' },
+          S.h('h1', { class: 'nws-lpvw__reg-t' }, e(regActual().nombre)),
+          S.button({ label: G.cambiar, size: 'medium', theme: 'neutral', cls: 'nws-lpvw__cambiar', attrs: { 'data-reg-cambiar': true, 'aria-label': 'Cambiar regional', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': 'nws-reg-cambio' } })),
+        cambioHtml(),
+        S.h('p', { class: 'nws-lpvw__reg-sub' }, e(G.subtitulo)));
+    }
+
+    /* ---------- «Cambiar»: abre/cierra el panel de regionales ---------- */
+    function cambioEls() {
+      var v = vistas.regionales; if (!v) { return null; }
+      return { p: v.el.querySelector('.nws-lpvw__reg-cambio'), b: v.el.querySelector('.nws-lpvw__cambiar') };
+    }
+    function cambioAbierto() { var c = cambioEls(); return !!c && c.p.classList.contains('nws-lpvw__reg-cambio--abierto'); }
+    function ponerCambio(abierto, devolverFoco) {
+      var c = cambioEls(); if (!c || cambioAbierto() === abierto) { return; }
+      if (!abierto && devolverFoco) { c.b.focus({ preventScroll: true }); }  /* antes del inert: si no, el foco cae al body */
+      c.p.classList.toggle('nws-lpvw__reg-cambio--abierto', abierto);
+      c.p.inert = !abierto;
+      c.b.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+      var s = c.p.querySelector('[aria-selected="true"]');
+      c.p.querySelectorAll('[data-reg-op]').forEach(function (x) { x.tabIndex = x === s ? 0 : -1; });
+      if (abierto && s) { s.focus({ preventScroll: true }); }
+    }
+    function moverOpcion(ev) {
+      var op = ev.target.closest('[data-reg-op]'), k = ev.key;
+      if (!op || (k !== 'ArrowDown' && k !== 'ArrowUp' && k !== 'Home' && k !== 'End')) { return; }
+      var ops = [].slice.call(op.parentNode.querySelectorAll('[data-reg-op]')), i = ops.indexOf(op);
+      var n = k === 'Home' ? 0 : k === 'End' ? ops.length - 1 : (i + (k === 'ArrowDown' ? 1 : -1) + ops.length) % ops.length;
+      ev.preventDefault();
+      ops.forEach(function (x, j) { x.tabIndex = j === n ? 0 : -1; });
+      ops[n].focus({ preventScroll: true });
+    }
+
+    /* El toque responde al instante (título, check); cierre y repintado esperan 150 ms para que se vea la selección. */
+    function elegirRegional(id) {
+      var v = vistas.regionales, op = opcionDe(id); if (!v || !op) { return; }
+      elegida = id;
+      v.el.setAttribute('aria-label', op.nombre);
+      v.el.querySelector('.nws-lpvw__reg-t').textContent = op.nombre;
+      v.el.querySelectorAll('[data-reg-op]').forEach(function (b) {
+        var s = b.getAttribute('data-reg-op') === id, ok = b.querySelector('.nws-lpvw__reg-op-ok');
+        b.setAttribute('aria-selected', s ? 'true' : 'false');
+        if (ok && !s) { ok.remove(); }
+        if (s && !ok) { b.insertAdjacentHTML('beforeend', S.icon('positive', 'nws-lpvw__reg-op-ok')); }
+      });
+      clearTimeout(tReg);
+      tReg = setTimeout(function () { pintarRegionales(v.el, op); }, 150);
+    }
+    function pintarRegionales(el, op) {
+      ponerCambio(false, true);
+      var sc = el.querySelector('.nws-lpvw__scroll');
+      sc.innerHTML = regionalesHtml(!reducido);
+      sc.scrollTop = 0;
+      el.querySelector('[data-reg-aviso]').textContent = 'Mostrando ' + op.nombre;
+      clearTimeout(tEntra);   /* la animación se retira: al reabrir la vista (display:none) se repetiría */
+      if (!reducido) { tEntra = setTimeout(function () { var u = sc.firstElementChild; if (u) { u.classList.remove('nws-lpvw__reg-lista--entra'); } }, 460); }
+    }
+
     /* ---------- detalle del evento: bottom sheet dentro del teléfono ---------- */
     function abrirHoja(id, origen) {
       var x = C.eventos.filter(function (k) { return k.id === id; })[0]; if (!x || hoja) { return; }
@@ -114,17 +201,42 @@ window.LANDING_VISTAS = (function () {
       el.className = 'nws-lpvw nws-lpvw--' + id;
       el.hidden = true;
       el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
-      el.setAttribute('aria-label', id === 'calendario' ? C.titulo : R.titulo);
-      var volver = S.iconButton({ icon: 'chevron-left', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Volver a Inicio', cls: 'nws-lpvw__volver', attrs: { 'data-vw-cerrar': true } });
-      el.innerHTML = S.h('div', { class: 'nws-lpvw__bloque' },
-        S.h('div', { class: 'nws-lpvw__estado' }, o.barraEstado(S, L.hora)),
-        S.h('header', { class: 'nws-lpvw__top' }, volver, id === 'calendario' ? S.h('h1', { class: 'nws-lpvw__titulo' }, e(C.titulo)) : ''),
-        id === 'calendario'
+      el.setAttribute('aria-label', id === 'regionales' ? regActual().nombre : id === 'calendario' ? C.titulo : R.titulo);
+      var volver = S.iconButton({ icon: 'chevron-left', size: 'medium', variant: 'mute', theme: 'neutral', label: id === 'regionales' ? 'Volver' : 'Volver a Inicio', cls: 'nws-lpvw__volver', attrs: { 'data-vw-cerrar': true } });
+      var cabecera, cuerpo;
+      if (id === 'regionales') {
+        cabecera = cabeceraRegionales(volver);
+        cuerpo = S.h('div', { class: 'nws-lpvw__scroll' }, regionalesHtml());
+      } else {
+        cabecera = S.h('header', { class: 'nws-lpvw__top' }, volver, id === 'calendario' ? S.h('h1', { class: 'nws-lpvw__titulo' }, e(C.titulo)) : '');
+        cuerpo = id === 'calendario'
           ? S.h('div', { class: 'nws-lpvw__scroll' }, calendario())
-          : S.h('div', { class: 'nws-lpvw__centro' }, S.h('p', null, e(R.texto))));
+          : S.h('div', { class: 'nws-lpvw__centro' }, S.h('p', null, e(R.texto)));
+      }
+      el.innerHTML = S.h('div', { class: 'nws-lpvw__bloque' },
+        S.h('div', { class: 'nws-lpvw__estado' }, o.barraEstado(S, L.hora)), cabecera, cuerpo,
+        id === 'regionales' ? S.h('p', { class: 'nws-lpvw__sr', 'aria-live': 'polite', 'data-reg-aviso': true }) : '');
       mob.appendChild(el);
+      if (id === 'regionales' && o.proximamente) {
+        /* El rótulo del aviso es el data-toast tal cual: el global de app.js prefiere el aria-label. */
+        el.addEventListener('click', function (ev) {
+          var t = ev.target.closest('[data-toast]'); if (!t) { return; }
+          ev.stopPropagation();
+          o.proximamente(t.getAttribute('data-toast'), t);
+        });
+      }
+      el.addEventListener('keydown', moverOpcion);
       el.addEventListener('click', function (ev) {
         var t = ev.target;
+        var cb = t.closest('[data-reg-cambiar]');
+        if (cb) { ev.stopPropagation(); ponerCambio(!cambioAbierto(), true); return; }
+        var op = t.closest('[data-reg-op]');
+        if (op) {
+          ev.stopPropagation();
+          if (op.getAttribute('data-reg-op') === regActual().id) { ponerCambio(false, true); } else { elegirRegional(op.getAttribute('data-reg-op')); }
+          return;
+        }
+        if (cambioAbierto() && !t.closest('.nws-lpvw__reg-cambio')) { ponerCambio(false, false); }
         if (t.closest('[data-hoja-cerrar]')) { cerrarHoja(); return; }
         if (t.closest('[data-vw-cerrar]')) { cerrar(); return; }
         var m = t.closest('[data-mes]');
@@ -149,7 +261,7 @@ window.LANDING_VISTAS = (function () {
     function inerte(v) { capas.forEach(function (c) { if (c) { c.inert = v; } }); }
 
     function abrir(id, origen) {
-      if (actual === id || !(id === 'calendario' || id === 'resultados')) { return; }
+      if (actual === id || !(id === 'regionales' || id === 'calendario' || id === 'resultados')) { return; }
       if (actual) { return; }
       var v = vistas[id] || (vistas[id] = { el: crear(id) });
       clearTimeout(timer);
@@ -165,6 +277,7 @@ window.LANDING_VISTAS = (function () {
     function cerrar() {
       if (!actual) { return; }
       cerrarHoja();
+      ponerCambio(false, false);   /* la vista queda en caché: al reabrir, el panel arranca cerrado */
       var v = vistas[actual]; actual = null;
       v.el.classList.remove('nws-lpvw--abierta');
       inerte(false);
@@ -177,13 +290,13 @@ window.LANDING_VISTAS = (function () {
     function onEsc(ev) {
       if (ev.key !== 'Escape') { return; }
       ev.preventDefault();
-      if (hoja) { cerrarHoja(); } else { cerrar(); }
+      if (hoja) { cerrarHoja(); } else if (cambioAbierto()) { ponerCambio(false, true); } else { cerrar(); }
     }
 
     return {
       abrir: abrir, cerrar: cerrar,
       destruir: function () {
-        clearTimeout(timer); document.removeEventListener('keydown', onEsc);
+        clearTimeout(timer); clearTimeout(tReg); clearTimeout(tEntra); document.removeEventListener('keydown', onEsc);
         Object.keys(vistas).forEach(function (k) { vistas[k].el.remove(); });
         inerte(false);
       }
