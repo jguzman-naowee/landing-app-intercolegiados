@@ -88,6 +88,18 @@ window.LANDING_FLUJOS = function (S, L) {
         b += buscar(st, String(k).indexOf('individuales:') === 0 ? 'Buscar por nombre de la prueba' : 'Buscar por nombre del deporte') + select('Deporte', 'deporte', deportesRegional(k), st) + select('Categoría', 'categoria', categoriasRegional(k), st);
         b += h('div', { 'data-fl-calendario': true }, calendarioRegional(st, k));
       }
+    } else if (id === 'noticias') {
+      t = 'Noticias';
+      b = h('h1', { class: 'nws-fl__h1 nws-fl__h1--noticias' }, 'Noticias') + [L.novedad].concat(L.noticias).map(function (n, i) {
+        return enlace('noticia', i, h('img', { class: 'nws-fl__noti-img', src: n.img, alt: '' })
+          + h('span', { class: 'nws-fl__fila-cuerpo' }, h('span', { class: 'nws-fl__noti-t' }, e(n.titulo)), h('span', { class: 'nws-fl__noti-f' }, e(n.fecha))), 'nws-fl__fila--noticia');
+      }).join('');
+    } else if (id === 'noticia') {
+      x = [L.novedad].concat(L.noticias)[+k || 0]; t = 'Noticia';
+      b = h('img', { class: 'nws-fl__noticia-foto', src: x.img, alt: '' }) + h('p', { class: 'nws-fl__noticia-fecha' }, e(x.fecha))
+        + h('h1', { class: 'nws-fl__noticia-t' }, e(x.titulo)) + (x.autoria ? h('p', { class: 'nws-fl__noticia-aut' }, e(x.autoria)) : '')
+        + h('p', { class: 'nws-fl__noticia-txt' }, e(x.cuerpo || x.resumen))
+        + h('button', { type: 'button', class: 'nws-fl__noticia-btn', 'data-toast': 'Leer noticia completa' }, 'Leer noticia completa');
     } else if (id === 'sedes') {
       x = competencia(k); t = 'Sedes';
       b = (x.sedes || [x.sede]).map(function (n) {
@@ -232,7 +244,7 @@ window.LANDING_FLUJOS = function (S, L) {
         return tarjeta('nws-fl__resultado', h('details', { name: 'jin-resultados' }, h('summary', null, e(r.nombre)), texto(r.categoria + ' · ' + r.ronda + ' · ' + r.fase) + tabla(['Competencia', 'Estado', 'Resultados'], [[r.prueba, r.estado, r.resultado]])));
       }).join('') + texto('Página 1 de 1');
     } else { return null; }
-    return { titulo: t, sub: sub, violeta: violeta, foto: foto, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
+    return { titulo: t, sub: sub, violeta: violeta, foto: foto, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
   }
   /* Tabla genérica: cada celda es texto o { html } ya armado. */
   function celda(c) { return c && typeof c === 'object' ? c.html : e(String(c)); }

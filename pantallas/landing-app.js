@@ -177,7 +177,7 @@ window.PANTALLAS['landing-app'] = (function () {
           S.h('div', { class: 'nws-lpv__mazo', id: 'lpv-mazo', 'aria-roledescription': 'mazo de noticias', 'aria-live': 'polite' },
             noticias.map(function (n, i) { return tarjeta(S, n, i); }).reverse().join('')),
           S.h('div', { class: 'nws-lpv__mas' },
-            S.button({ label: 'Descubre más noticias', size: 'large', theme: 'primary', attrs: { 'data-toast': 'Otras noticias' } }))),
+            S.button({ label: 'Descubre más noticias', size: 'large', theme: 'primary', attrs: { 'data-vista': 'noticias' } }))),
         seccionGaleria(S, L, A.mosaico),
         S.h('section', { class: 'nws-lpv__videos', 'data-dev': 'video', 'aria-label': V.titulo },
           tituloSeccion(S, V.titulo),
@@ -1052,8 +1052,7 @@ window.PANTALLAS['landing-app'] = (function () {
       var offMazo = mazo(mob.querySelector('#lpv-mazo'), null, sc, function (carta, alCerrar) {
         ctx.cerrarToast();
         /* landing.app.salidas = false: la home no navega, solo avisa (se reactiva en datos.js). */
-        if (!L.app.salidas) { ctx.proximamente('Detalle de noticia', carta); alCerrar(); return; }
-        detalle(S, L, mob, noticias[+carta.getAttribute('data-i')], carta, alCerrar);
+        vistas.abrir('noticia', carta, carta.getAttribute('data-i'), alCerrar);
       });
 
       var vistas = window.LANDING_VISTAS.montar(S, L, mob, { barraEstado: barraEstado, posicionarIndicadores: ctx.posicionarIndicadores, proximamente: ctx.proximamente });
