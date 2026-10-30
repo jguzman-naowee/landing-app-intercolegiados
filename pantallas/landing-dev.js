@@ -111,7 +111,7 @@ window.LANDING_DEV = {
     ],
     logica: [
       'La tarjeta (`activa: true` en `landing.app.menu`) abre «Regional de conjuntos» con push de ≈ 300 ms; es la única salida activa, lo demás de la home sigue avisando.',
-      'En la vista, «Cambiar» abre un panel lila con tres opciones de ejemplo (Regional de conjuntos, Regional de individuales y Final nacional) y la actual seleccionada. Elegir otra cambia el título y reordena la lista de tarjetas; con una sola tarjeta (Final nacional, Bogotá) ésta ocupa todo el espacio disponible. Tocar una tarjeta responde «Disponible próximamente»: no navega.',
+      'En la vista, «Cambiar» abre un panel lila con tres opciones de ejemplo (Regional de conjuntos, Regional de individuales y Final nacional) y la actual seleccionada. Elegir otra cambia el título y reordena la lista de tarjetas; con una sola tarjeta (Final nacional, Bogotá) ésta ocupa todo el espacio disponible. Las tarjetas de conjuntos e individuales abren el detalle regional; Final nacional responde «Disponible próximamente».',
       'Panel: se despliega en el flujo bajo el título (≈ 220 ms) y empuja subtítulo y cuadrícula. Se cierra al tocar la actual, fuera del panel o con Esc (primero el panel, luego la vista); ↑/↓ mueven el foco. Opciones y orden en `landing.app.regionales.opciones[].tarjetas` (índices de `items`), de ejemplo y por confirmar.',
       'Al elegir: check y título cambian al instante; a los 150 ms se cierra el panel, el foco vuelve a «Cambiar», el scroll sube y las tarjetas reentran con fundido y desplazamiento escalonado de 40 ms (≤ 400 ms; sin animación con `prefers-reduced-motion`). Una región `aria-live` anuncia «Mostrando …». La elección vive en memoria mientras la página siga abierta.',
       'Presión inmediata: escala .97 y brillo en 100 ms.'
@@ -157,7 +157,7 @@ window.LANDING_DEV = {
       widgets: [
         '`Stack` de `Positioned` (una por carta) con `GestureDetector(onHorizontalDragUpdate/End)`; el arrastre va en `Transform.translate`.',
         'Resorte al soltar: `AnimationController.animateWith(SpringSimulation(...))`, o `AnimatedPositioned` con `Curves.easeOutBack`.',
-        'Detalle con foto compartida: `Hero` + `Navigator.push(PageRouteBuilder)`; alternativa `OpenContainer` (paquete `animations`).',
+        'Detalle con `Navigator.push(PageRouteBuilder)` y la misma pila que las demás vistas.',
         'Sin hacerlo a mano: `PageView.builder` con `viewportFraction`, o un swiper de cartas (`flutter_card_swiper`, `appinio_swiper`: verificar).',
         'Autopaso: `Timer.periodic` cancelado en `dispose`, con `VisibilityDetector` y `MediaQuery.of(context).disableAnimations`.',
         'Botón: `FilledButton` con `styleFrom(minimumSize: Size(224, 56))`.'
@@ -328,7 +328,7 @@ window.LANDING_DEV = {
     ],
     logica: [
       'Vidrio: blanco al 78 % con desenfoque; el contenido pasa por debajo.',
-      'Medallas y Certificados muestran un toast con fecha estimada (6 s); «Juegos» es la activa.'
+      'Medallas responde con proximamente(), porque su ruta está comentada en Flutter. Certificados conserva su aviso; «Juegos» es la activa.'
     ],
     flutter: {
       widgets: [
@@ -361,13 +361,13 @@ window.LANDING_DEV = {
     ui: [
       'Splash: foto con zoom lento, tinte violeta y barra de carga; sale con un fundido de 420 ms.',
       'Toasts: avisos oscuros de una o dos líneas que entran desde arriba, dentro del teléfono.',
-      'Vistas inmersivas («Regional de conjuntos»): pantalla completa que entra de lado. Calendario y Resultados siguen en el código, sin acceso.'
+      'Vistas inmersivas («Regional de conjuntos»): pantalla completa que entra de lado. Calendario y Resultados se conservan sin acceso desde Inicio: Flutter no tiene esa entrada activa.'
     ],
     logica: [
       'Splash de 2,2 s con Ken Burns y logo a 1,69×; luego la home entra escalonada.',
       'Toasts de 4,2 s (6 s en pestañas), deduplicados por `key`; lo sin destino avisa «Disponible próximamente».',
       'Vistas: push de ≈ 300 ms, home `inert`; Esc o «Volver» cierran y devuelven el foco (en «Regional de conjuntos», Esc cierra antes el panel «Cambiar» si está abierto).',
-      'Detalle de noticia (foto compartida, 560 ms) y hoja de evento: hoy apagados por `salidas`.'
+      'Noticias usa la misma pila que regionales, independientemente de `salidas`; la hoja del calendario se conserva.'
     ],
     flutter: {
       widgets: [
@@ -393,7 +393,322 @@ window.LANDING_DEV = {
       'Splash: logo de 130 px (zoom a 1,69×), MinDeporte de 80 px a 54 px del fondo; barra de carga de 4 px, al 20 % de los bordes y a 34 px.',
       'Toast: a 64 px del borde superior, 16 px de margen lateral, fondo app-color-900, radio 12, padding 12/16, entrada de 300 ms.',
       'Vistas: `inset: 0`, `z-index: 4`, sombra lateral; hoja de evento con radio de 28 arriba.',
-      'Detalle de noticia: foto de 470 px y curva `cubic-bezier(.32, .72, 0, 1)`.'
+      'Noticias: imagen ilustrativa 16:10 y texto HTML; transición de la pila de 300 ms.'
     ]
   }
 };
+
+/* Flujos de la app real; solo documentación del prototipo. */
+Object.assign(window.LANDING_DEV, {
+  "fl-regionales": {
+    "titulo": "Selección de regional",
+    "ui": [
+      "Opciones de fase y tarjetas de regional."
+    ],
+    "logica": [
+      "Conjuntos e individuales abren su detalle. Final nacional conserva proximamente().",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`Scaffold`",
+        "`GridView`",
+        "`Navigator`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const RegionalDetailScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-regional": {
+    "titulo": "Detalle regional",
+    "ui": [
+      "Calendario, Sedes e Info. logística, en el orden actual de Flutter."
+    ],
+    "logica": [
+      "Filtros locales por deporte, categoría y búsqueda; Todas las fechas conserva los filtros al abrir competencias.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`NestedScrollView`",
+        "`TabBar`",
+        "`TabBarView`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const RegionalDetailScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-sede": {
+    "titulo": "Detalle de sede",
+    "ui": [
+      "Imagen ilustrativa, nombre, dirección de ejemplo y zonas del escenario."
+    ],
+    "logica": [
+      "La sede viene de la selección. Ubicación responde proximamente(): no hay mapas reales.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`SingleChildScrollView`",
+        "`Card`",
+        "`Wrap`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const VenueDetailScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-competencias": {
+    "titulo": "Competencias de la regional",
+    "ui": [
+      "Pestañas Competencias y En vivo, días, filtro de deporte y tarjetas."
+    ],
+    "logica": [
+      "Datos congelados por tipo de regional; En vivo muestra el estado vacío porque no hay eventos en curso.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`TabBar`",
+        "`ListView`",
+        "`ChoiceChip`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const EventCompetitionsScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-competencia": {
+    "titulo": "Detalle de competencia",
+    "ui": [
+      "Rondas, fechas, llaves, posiciones y sedes."
+    ],
+    "logica": [
+      "Posiciones y Sedes abren pantallas; una ronda de equipo abre partido y una individual abre lista de salida.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`TabBar`",
+        "`ListView`",
+        "`Navigator`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const CompetitionDetailScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-posiciones": {
+    "titulo": "Posiciones por grupos",
+    "ui": [
+      "Grupos desplegables, estadísticas y convenciones."
+    ],
+    "logica": [
+      "Los grupos están congelados; no se recalculan resultados ni se consulta una API.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`ExpansionTile`",
+        "`DataTable`",
+        "`SingleChildScrollView`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const GroupStandingsScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-salida": {
+    "titulo": "Lista de salida",
+    "ui": [
+      "Subpruebas de combinada, deportistas, marcas y puntaje total."
+    ],
+    "logica": [
+      "Cambiar de pestaña actualiza la subprueba. Cada perfil se abre como diálogo sobre la misma pila.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`TabBar`",
+        "`ListView`",
+        "`Dialog`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const StartListScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-deportista": {
+    "titulo": "Perfil del deportista",
+    "ui": [
+      "Inicial como placeholder, institución, departamento, municipio, categoría y participación."
+    ],
+    "logica": [
+      "Ficha ficticia en diálogo con fondo inerte y foco contenido; volver o Escape devuelven el foco al control de origen.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`Dialog`",
+        "`CircleAvatar`",
+        "`Column`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "showDialog<void>(context: context, builder: (_) => const AthleteProfileDialog());"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-partido": {
+    "titulo": "Detalle de partido",
+    "ui": [
+      "Ronda, categoría, fecha, marcador y pestañas Cuartos / Equipos."
+    ],
+    "logica": [
+      "Parciales congelados y nóminas con perfil de deportista. No hay enlace real al perfil antiguo de partido ni a confrontaciones.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`SingleChildScrollView`",
+        "`TabBar`",
+        "`DataTable`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const MatchDetailScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-podio": {
+    "titulo": "Posiciones individuales",
+    "ui": [
+      "Lista numérica con deportista, marca y puntos."
+    ],
+    "logica": [
+      "Replica TopMedalsPodiumScreen(soloPosiciones: true). Top medallas está oculto en regionales; no se dibujan medallas ni pedestales.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`DataTable`",
+        "`SingleChildScrollView`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const TopMedalsPodiumScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-resultados": {
+    "titulo": "Resultados de enfrentamientos",
+    "ui": [
+      "Filtro de deporte y tarjetas expandibles con competencia, estado y resultado."
+    ],
+    "logica": [
+      "Reemplaza el texto anterior. Se conserva sin entrada desde Inicio: RouteToResultsAction no tiene llamadas activas.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`ExpansionTile`",
+        "`ListView`",
+        "`DropdownButton`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const ResultScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-noticias": {
+    "titulo": "Lista completa de noticias",
+    "ui": [
+      "Todas las noticias del mazo con imagen, titular y fecha."
+    ],
+    "logica": [
+      "Descubre más noticias abre la lista; Leer noticia abre el mismo detalle que el mazo.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`ListView`",
+        "`Card`",
+        "`Navigator`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const NewsListScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  },
+  "fl-noticia": {
+    "titulo": "Detalle de noticia",
+    "ui": [
+      "Imagen, fecha, título, autoría cuando existe y texto."
+    ],
+    "logica": [
+      "Usa el contenido existente de datos.js. Leer noticia completa responde proximamente() porque el prototipo no abre artículos externos.",
+      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+    ],
+    "flutter": {
+      "widgets": [
+        "`SingleChildScrollView`",
+        "`Image`",
+        "`Text`"
+      ],
+      "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
+      "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const NewsDetailsScreen()));"
+    },
+    "medidas": [
+      "Margen lateral de 24 px; controles de al menos 44 px (48 px en formularios y acciones).",
+      "Títulos de sección 24 px; tarjetas 18 px; texto 14 px mínimo; pestañas 16 px.",
+      "Push de 300 ms; sin transición con prefers-reduced-motion."
+    ]
+  }
+});

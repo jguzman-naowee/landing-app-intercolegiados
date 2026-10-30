@@ -1789,3 +1789,493 @@ body.nws-modo-dev [data-dev].nws-dev--foco { outline: 2.5px solid var(--nws-jic-
 .nws-dev__nota--inline > summary::after { content: ''; flex: none; width: 7px; height: 7px; margin-left: auto; border-right: 2px solid var(--naotech-color-gray-600); border-bottom: 2px solid var(--naotech-color-gray-600); transform: rotate(-45deg); }
 .nws-dev__nota--inline[open] > summary { margin-bottom: var(--naotech-sizing-8); }
 .nws-dev__nota--inline[open] > summary::after { transform: rotate(45deg); }
+
+/* Flujos JIN: diseño de la app real (design_system, competition_card, day_chip, group_standings,
+   start_list, match_detail y MonthRangeCalendar). Colores y medidas tomados del código de la app. */
+.nws-fl__contenido { padding: 0 16px 40px; }
+.nws-fl--violeta .nws-fl__contenido { padding-top: 24px; }
+.nws-fl__contenido p, .nws-fl__contenido li { margin: 0 0 8px; font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__contenido h2 { margin: 16px 0 8px; font-size: 16px; line-height: 20px; font-weight: 700; color: #282834; }
+.nws-fl__aviso { margin: 16px 0 0; font-size: 12px; line-height: 16px; color: #646587; text-align: center; }
+/* Cabecera de la regional: degradado violetJIC700 → violetJIC500, título 18/700 y sede 14 en blanco. */
+.nws-fl__top-fila { display: flex; align-items: center; height: 44px; }
+.nws-lp .nws-fl__top--violeta .nws-lpvw__volver { --pvt-button-font-color: #fff; }
+.nws-fl__top--violeta .nwt-icon-button__content { background: rgb(255 255 255 / .2); border-radius: 50%; }
+/* Pestañas a todo el ancho: 14/700, activa naranja con indicador, inactivas en tinta. */
+.nws-fl__tabs { margin-top: 0; }
+.nws-fl__tabs .nwt-tabs__list { overflow-x: auto; scrollbar-width: none; }
+.nws-fl__tabs .nwt-tabs__tab { flex-shrink: 0; min-height: 44px; font-size: 14px; line-height: 18px; font-weight: 700; }
+/* Campos (NaoweeSelect y NaoweeSearchField): 48 px, radio 12, borde gris, marcador en gris. */
+.nws-fl__filtro { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 0; }
+.nws-fl__filtro-t { font-size: 14px; line-height: 18px; color: #282834; }
+.nws-fl__filtro select { box-sizing: border-box; width: 100%; height: 48px; padding: 0 44px 0 16px; border: 1px solid #8788ab; border-radius: 12px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath d='M2 2l6 6 6-6' fill='none' stroke='%23441e63' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 16px center / 16px 10px; -webkit-appearance: none; appearance: none; color: #282834; font: inherit; font-size: 14px; }
+.nws-fl__select--vacio { color: #646587; }
+.nws-fl__buscar-caja { margin: 16px 0 0; }
+.nws-fl__buscar-caja .nws-fl__filtro { margin: 0; }
+.nws-fl__buscar { box-sizing: border-box; width: 100%; height: 48px; padding: 0 16px 0 44px; border: 1px solid #8788ab; border-radius: 12px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23646587' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 14px center / 18px 18px; color: #282834; font: inherit; font-size: 14px; }
+.nws-fl__buscar::placeholder { color: #646587; }
+/* Chips de día en caja (day_chip.dart): 56 px de ancho, radio 12, número, mes y día de la semana. */
+.nws-fl__dias { display: flex; gap: 8px; margin: 16px 0 0; overflow-x: auto; scrollbar-width: none; }
+.nws-fl__dias::-webkit-scrollbar { display: none; }
+.nws-fl__dia { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 56px; padding: 8px 0; border: 1px solid #e7e9f3; border-radius: 12px; background: #fff; color: #282834; font: inherit; cursor: pointer; }
+.nws-fl__dia-sem { font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__dia-num { font-size: 18px; line-height: 22px; color: #282834; }
+.nws-fl__dia-mes { font-size: 10px; line-height: 14px; color: #646587; }
+.nws-fl__dia--sel { border: 1px solid #d74009; background: #ffedc7; }
+.nws-fl__dia--sel .nws-fl__dia-sem, .nws-fl__dia--sel .nws-fl__dia-mes, .nws-fl__dia--sel .nws-fl__dia-num { color: #d74009; font-weight: 700; }
+/* Tarjetas (competition_card): blancas, radio 20, borde gris, sombra de tinta al 10 %. */
+.nws-fl__tarjeta { margin: 12px 0; padding: 16px; border: 1px solid #e7e9f3; border-radius: 20px; background: #fff; box-shadow: 0 6px 18px -6px rgb(40 40 52 / .10); }
+.nws-fl__tarjeta > p { margin: 0 0 4px; }
+.nws-fl__cabecera { margin-top: 12px; }
+.nws-fl__h1 { margin: 12px 0 8px; font-size: 18px; line-height: 22px; font-weight: 700; color: #282834; }
+.nws-fl__h1--grande { margin: 12px 0 0; font-size: 30px; line-height: 34px; }
+.nws-fl__disciplina { margin: 4px 0 0; font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__chip-cat { display: inline-flex; align-items: center; min-height: 34px; margin: 8px 0 12px; padding: 8px 12px; border-radius: 18px; background: #ffedc7; color: #d74009; font-size: 13px; font-weight: 500; }
+.nws-fl__subtitulo { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: #282834; }
+.nws-fl__convenciones { border: 0; border-radius: 24px; background: #eef0f5; box-shadow: none; padding: 20px; }
+.nws-fl__convenciones p { color: #282834; font-size: 12px; }
+/* Filas de lista (competition_card titleOnly y lista de salida): toda la tarjeta es el botón. */
+.nws-fl__filas { display: flex; flex-direction: column; }
+.nws-fl__fila { display: flex; align-items: center; gap: 12px; width: 100%; margin: 12px 0 0; padding: 12px; border: 1px solid #e7e9f3; border-radius: 20px; background: #fff; box-shadow: 0 6px 18px -6px rgb(40 40 52 / .10); color: #282834; font: inherit; text-align: left; cursor: pointer; }
+.nws-fl__cuadro { flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 12px; background: #ffedc7; color: #d74009; font-size: 20px; font-weight: 700; }
+.nws-fl__num { flex: none; width: 16px; font-size: 12px; color: #282834; }
+.nws-fl__fila-cuerpo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.nws-fl__fila-t { font-size: 16px; line-height: 20px; font-weight: 700; color: #282834; }
+.nws-fl__fila-m { font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__ir { flex: none; color: #d74009; }
+/* Píldoras de estado (en curso, finalizado, programado). */
+.nws-fl__pill { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 16px; }
+.nws-fl__pill--ok { background: #deface; color: #17641a; }
+.nws-fl__pill--vivo { background: #c4031d; color: #fff; }
+.nws-fl__pill--vivo::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.nws-fl__pill--info { background: #cef4ff; color: #002b5b; }
+.nws-fl__pill--pausa { background: #ffedc7; color: #b83100; }
+.nws-fl__pill--error { background: #ffe5e9; color: #c4031d; }
+.nws-fl__pill--neutro { background: #e7e9f3; color: #646587; }
+.nws-fl__ronda { display: flex; flex-direction: column; gap: 2px; margin: 0 0 12px; padding: 12px 16px; border-radius: 12px; background: #f4f5f9; }
+.nws-fl__ronda strong { font-size: 18px; line-height: 22px; font-weight: 700; color: #282834; }
+.nws-fl__ronda span { font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__estado-fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.nws-fl__fecha { font-size: 12px; line-height: 16px; color: #646587; }
+/* Partido (match_detail): escudos de color sin logo, marcador de 38 px. */
+.nws-fl__marcador-fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0 12px; }
+.nws-fl__equipo { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.nws-fl__equipo-n { font-size: 14px; line-height: 18px; color: #282834; }
+.nws-fl__escudo { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: #fff; font-size: 18px; font-weight: 700; }
+.nws-fl__marcador { display: flex; align-items: center; gap: 8px; color: #282834; }
+.nws-fl__marcador strong { font-size: 38px; line-height: 38px; font-weight: 600; }
+.nws-fl__vs { font-size: 12px; color: #646587; }
+/* Tipografía y cabecera de la app (regional_detail_screen.dart): Inter, título 18/700, sede 14 en blanco. */
+.nws-lpvw.nws-fl { color: #282834; font-family: Inter, system-ui, sans-serif; }
+.nws-fl__top--violeta { flex: none; display: flex; flex-direction: column; gap: 0; padding: 12px 12px 20px 16px; background: linear-gradient(90deg, #441e63, #602a8c); color: #fff; }
+.nws-fl__top-t { margin: 8px 0 0; font-size: 18px; line-height: 22px; font-weight: 700; color: #fff; }
+.nws-fl__top-sub { margin: 4px 0 0; font-size: 14px; line-height: 18px; color: #fff; }
+/* Sedes (regional_venues_tab.dart y venue_card.dart): cuadrícula de 2, tarjeta blanca radio 20, foto cuadrada. */
+.nws-fl__sedes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.nws-fl__sede { display: flex; flex-direction: column; gap: 8px; aspect-ratio: 1 / 1; min-width: 0; padding: 12px; border: 1px solid #e7e9f3; border-radius: 20px; background: #fff; box-shadow: 0 6px 18px -6px rgb(40 40 52 / .10); color: #282834; font: inherit; text-align: left; cursor: pointer; }
+.nws-fl__sede-cab { display: flex; align-items: flex-start; gap: 8px; }
+.nws-fl__sede-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.nws-fl__sede-t { font-size: 14px; line-height: 18px; font-weight: 600; color: #282834; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.nws-fl__sede-d { font-size: 12px; line-height: 16px; color: #282834; }
+.nws-fl__sede-ubic { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #d74009; color: #fff; }
+.nws-fl__sede-ubic svg { width: 16px; height: 16px; }
+.nws-fl__sede-img { flex: 1; min-height: 0; width: 100%; object-fit: cover; border-radius: 12px; }
+/* Info. logística (regional_logistics_tab.dart): intro azul marino, divisor, botón violeta y filas de documento. */
+.nws-fl__contenido .nws-fl__intro { margin: 16px 0; font-size: 14px; line-height: 18px; color: #181e47; }
+.nws-fl__divisor { margin: 16px 0; border: 0; border-top: 1px solid #e7e9f3; }
+.nws-fl__poliza { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; padding: 12px 16px; box-sizing: border-box; border-radius: 16px; background: #441e63; color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 4px 12px -4px rgb(40 40 52 / .10); }
+.nws-fl__poliza .nws-fl__ico { width: 20px; height: 20px; }
+.nws-fl__doc { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; margin: 12px 0 0; padding: 16px; box-sizing: border-box; border: 1px solid #e7e9f3; border-radius: 16px; background: #fff; color: #282834; font: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
+.nws-fl__doc .nws-fl__ico { flex: none; width: 20px; height: 20px; color: #441e63; }
+.nws-fl__doc-t { flex: 1; min-width: 0; }
+.nws-fl__doc-chev { flex: none; width: 16px; height: 16px; color: #d74009; }
+/* Calendario de la regional (MonthRangeCalendar): cabecera violetJIC700 con puntos, mes y flechas;
+   semana en violeta; celdas de 44 px con línea gris; barra beige continua sobre los días con competencias. */
+.nws-fl__calendario { margin: 20px 0 0; padding: 0; overflow: hidden; border-radius: 16px; }
+.nws-fl__mes-cab { padding: 12px 16px; background: #441e63; color: #fdfdfd; }
+.nws-fl__puntos { display: flex; justify-content: center; margin-bottom: 8px; }
+.nws-fl__puntos span { width: 10px; height: 9.41px; margin: 0 3px; border-radius: 50%; background: #fff; }
+.nws-fl__mes-fila { display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+.nws-fl__mes-nav { display: grid; place-items: center; width: 27px; height: 27px; padding: 0; border: 0; border-radius: 10px; background: rgb(255 255 255 / .2); color: #fdfdfd; cursor: pointer; }
+.nws-fl__mes-t { display: inline-flex; align-items: center; gap: 4px; min-height: 48px; padding: 0 8px; border: 0; background: none; color: #fdfdfd; font: inherit; font-size: 24px; line-height: 30px; font-weight: 700; text-transform: capitalize; cursor: pointer; }
+.nws-fl__mes-ico { width: 18px; height: 18px; flex: none; }
+.nws-fl__mes-chev { width: 18px; height: 18px; }
+.nws-fl__semana { display: grid; grid-template-columns: repeat(7, 1fr); padding: 8px 0; background: #fff; }
+.nws-fl__semana span { text-align: center; font-size: 12px; line-height: 16px; font-weight: 700; color: #441e63; }
+.nws-fl__grilla { border-top: 1px solid #e7e9f3; border-left: 1px solid #e7e9f3; background: #fff; }
+.nws-fl__fila-cal { position: relative; display: grid; grid-template-columns: repeat(7, 1fr); }
+.nws-fl__cel { display: flex; align-items: center; justify-content: center; height: 44px; border-right: 1px solid #e7e9f3; border-bottom: 1px solid #e7e9f3; background: #fff; color: #282834; font-size: 12px; line-height: 16px; }
+.nws-fl__cel--fuera { background: #f4f5f9; }
+.nws-fl__cel--con .nws-fl__cel-num { visibility: hidden; }
+.nws-fl__barras { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(7, 1fr); align-items: center; pointer-events: none; }
+.nws-fl__barra { pointer-events: auto; display: flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; min-width: 0; overflow: hidden; border: 0; background: #ffedc7; color: #d74009; font: inherit; font-size: 12px; line-height: 16px; font-weight: 600; cursor: pointer; }
+.nws-fl__barra-ico { flex: none; width: 12px; height: 12px; }
+.nws-fl__barra span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Acciones: texto naranja y fondo beige, como el evento de la app. */
+.nws-fl .nwt-button.nws-fl__accion { min-height: 44px; margin: 12px 0 0; background: #ffedc7; color: #d74009; }
+.nws-fl .nwt-button.nws-fl__accion .nwt-button__content { color: #d74009; }
+.nws-fl__imagen { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; margin: 8px 0 12px; border-radius: 16px; }
+.nws-fl__lista { margin: 0; padding-left: 20px; }
+/* Tablas: tabla de posiciones con encabezado gris, líder en verde y puntos en caja (group_standings). */
+.nws-fl__tabla { overflow-x: auto; margin: 12px 0; }
+.nws-fl__tabla table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.nws-fl__tabla th, .nws-fl__tabla td { padding: 10px 6px; text-align: center; border-bottom: 1px solid #e2e5f2; color: #282834; }
+.nws-fl__tabla th { font-size: 12px; font-weight: 600; }
+.nws-fl__tabla td:nth-child(2), .nws-fl__tabla th:nth-child(2) { text-align: left; }
+.nws-fl__tabla--pos thead tr { background: #eef0f5; }
+.nws-fl__tabla--pos th:first-child { border-radius: 14px 0 0 14px; }
+.nws-fl__tabla--pos th:last-child { border-radius: 0 14px 14px 0; }
+.nws-fl__tabla--pos tr.nws-fl__tr--lider td { background: #eaf8ec; }
+.nws-fl__pos { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: #d74009; color: #fff; font-size: 12px; font-weight: 700; }
+.nws-fl__pos--lider { background: #5cc16a; }
+.nws-fl__pts { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; background: #eef0f5; font-size: 14px; font-weight: 700; }
+.nws-fl__tr--lider .nws-fl__pts { background: #d3f1d8; }
+.nws-fl__grupo { margin: 12px 0; padding: 12px; border-radius: 24px; background: #f4f5fa; box-shadow: 0 6px 24px rgb(47 42 114 / .06); }
+.nws-fl__grupo > summary { display: flex; align-items: center; min-height: 44px; padding: 0 4px; font-size: 18px; font-weight: 700; color: #282834; cursor: pointer; list-style: none; }
+.nws-fl__resultado { margin: 8px 0; padding: 16px; border-radius: 8px; background: #fafbff; }
+.nws-fl__perfil { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 12px; text-align: center; }
+.nws-fl__dato { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid #e7e9f3; }
+.nws-fl__dato-l { font-size: 12px; color: #646587; }
+.nws-fl__dato-v { font-size: 14px; color: #282834; }
+.nws-fl--dialogo { background: rgb(24 30 71 / .5); }
+.nws-fl--dialogo .nws-lpvw__bloque { inset: 40px 16px; border-radius: 20px; background: #fff; overflow: hidden; }
+.nws-fl--dialogo .nws-lpvw__estado { display: none; }
+/* Títulos de los flujos: la base del SDK les pone min-height y su fuente; aquí se quitan (la app usa Inter sin altura mínima). */
+.nws-lpvw.nws-fl h1, .nws-lpvw.nws-fl h2, .nws-lpvw.nws-fl h3 { min-height: 0; font-family: Inter, system-ui, sans-serif; letter-spacing: 0; }
+/* Pestañas de los flujos: indicador del ancho del texto (variables medidas en landing-vistas.js). */
+.nws-fl__tabs .nwt-tabs__indicator { width: var(--fl-ind-w, 0px) !important; inset-inline-start: var(--fl-ind-x, 0px) !important; }
+/* Municipio bloqueado hasta elegir departamento (NaoweeSelect deshabilitado). */
+.nws-fl__filtro--off .nws-fl__filtro-t { color: #a8acbf; }
+.nws-fl__filtro select:disabled { color: #8788ab; background-color: #f4f5f9; border-color: #d0d4e6; }
+/* Estado vacío centrado: ilustración de la app (sincontenido), título 18/700 y mensaje gris. */
+.nws-fl__vacio { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 40px 0 0; text-align: center; }
+.nws-fl__vacio-img { display: block; width: 200px; max-width: 80%; height: auto; margin-bottom: 8px; }
+.nws-fl__vacio strong { font-size: 18px; line-height: 22px; font-weight: 700; color: #282834; }
+.nws-fl__vacio p { max-width: 280px; margin: 0; font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__vacio-t { margin: 16px 0 0; font-size: 14px; line-height: 18px; color: #646587; }
+/* Partido: parciales a 14 px con filas de 16×12 y nómina en una sola tarjeta (match_detail_screen.dart). */
+.nws-fl__parciales table { font-size: 14px; }
+.nws-fl__parciales th, .nws-fl__parciales td { padding: 12px 16px; }
+.nws-fl__parciales th { font-size: 12px; color: #646587; }
+.nws-fl__nomina { border-color: #d0d4e6; }
+.nws-fl__equipo-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.nws-fl__equipo-nom { font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__chip-ciudad { flex: none; padding: 6px 8px; border-radius: 12px; background: #e7e9f3; font-size: 10px; line-height: 14px; font-weight: 600; color: #282834; }
+.nws-fl__fila.nws-fl__fila--plana { margin: 0; padding: 12px 0; border: 0; border-top: 1px solid #e7e9f3; border-radius: 0; box-shadow: none; }
+.nws-fl__fila-t.nws-fl__fila-t--sm { font-size: 14px; line-height: 18px; font-weight: 600; }
+/* Competencias (competition list de la app): cabecera-tarjeta con la regional, días dentro, «Explora» y botón volver en círculo. */
+.nws-fl__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.nws-fl .nws-lpvw__volver .nwt-icon-button__content { background: #e7e9f3; border-radius: 50%; }
+.nws-fl__cabecera-reg { margin: 8px 0 0; padding: 16px; }
+.nws-fl__reg-fila { display: flex; align-items: center; gap: 12px; }
+.nws-fl__reg-ico { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: #ffedc7; }
+.nws-fl__reg-img { width: 24px; height: 24px; }
+.nws-fl__reg-tx { min-width: 0; }
+.nws-fl__contenido .nws-fl__reg-t { margin: 0; font-size: 20px; line-height: 24px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__reg-sub { margin: 4px 0 0; font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__cabecera-reg .nws-fl__dias { margin: 16px 0 0; }
+.nws-fl__dia { width: 50px; }
+.nws-fl__contenido .nws-fl__explora { margin: 24px 0 0; font-size: 20px; line-height: 24px; font-weight: 700; color: #282834; }
+.nws-fl__filtro--sin-rotulo { margin-top: 12px; }
+.nws-fl__cuadro-img { width: 28px; height: 28px; }
+/* Competencia (match rows de la app): caja naranja con la hora, título de la ronda y equipos con «↳ VS». */
+.nws-fl__filas { display: flex; flex-direction: column; }
+.nws-fl__hora { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 56px; height: 56px; border-radius: 12px; background: #ffedc7; color: #d74009; }
+.nws-fl__hora-ico { width: 20px; height: 20px; }
+.nws-fl__hora-t { font-size: 12px; line-height: 14px; font-weight: 700; text-align: center; }
+.nws-fl__vs-b { font-weight: 700; color: #282834; }
+/* Sede (pantalla de sede de la app): foto a ancho completo y tarjeta que la cubre con nombre, dirección, botón de ubicación y zonas. */
+.nws-fl__sede-foto { margin: 0 -16px; height: 230px; overflow: hidden; }
+.nws-fl__sede-foto-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.nws-fl__sede-card { position: relative; margin: -28px 0 0; padding: 16px 16px 20px; }
+.nws-fl__sede-cab { display: flex; align-items: flex-start; gap: 12px; }
+.nws-fl__sede-tx { flex: 1; min-width: 0; }
+.nws-fl__contenido .nws-fl__sede-t { margin: 0; font-size: 18px; line-height: 22px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__sede-dir { margin: 4px 0 0; font-size: 12px; line-height: 16px; color: #8788ab; }
+.nws-fl__sede-pin { flex: none; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 12px; background: #d74009; color: #fff; cursor: pointer; }
+.nws-fl__sede-pin svg { width: 20px; height: 20px; }
+.nws-fl__sede-card .nws-fl__divisor { margin: 16px 0; }
+/* Sede: la foto es la cabecera (el botón volver va encima) y la tarjeta blanca la cubre (pantalla de sede de la app). */
+.nws-lpvw__top.nws-fl__top--foto { height: 236px; margin-bottom: -28px; padding-top: 12px; align-items: flex-start; background-color: #e7e9f3; background-size: cover; background-position: center; }
+.nws-fl__sede-card { margin: 0; }
+/* Partido centrado (match_detail_screen.dart): estado arriba, tarjeta de ronda centrada, escudos de 56 px. */
+.nws-fl__pill-centro { display: flex; justify-content: center; margin: 16px 0 0; }
+.nws-fl__marcador-card { margin-top: 12px; }
+.nws-fl__ronda--centro { align-items: center; text-align: center; }
+.nws-fl__ronda--centro strong { font-size: 16px; line-height: 20px; }
+.nws-fl__marcador-fila .nws-fl__escudo { width: 56px; height: 56px; }
+.nws-fl__equipo-ciudad { font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__eq-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 16px 0 8px; }
+.nws-fl__cuarto { margin: 12px 0; padding: 16px; border: 1px solid #e7e9f3; border-radius: 20px; background: #fff; box-shadow: 0 6px 18px -6px rgb(40 40 52 / .10); }
+.nws-fl__contenido .nws-fl__cuarto-t { margin: 0 0 8px; font-size: 14px; line-height: 18px; font-weight: 700; color: #282834; }
+.nws-fl__cuarto-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; font-size: 14px; color: #282834; border-top: 1px solid #e7e9f3; }
+.nws-fl__cuarto-f strong { font-weight: 700; }
+.nws-fl .nws-fl__persona { flex: none; width: 20px; height: 20px; color: #d74009; }
+.nws-fl__fila.nws-fl__fila--plana .nws-fl__fila-t--sm { flex: 1; }
+/* Perfil del deportista: modal centrado sobre la pantalla anterior, con título y X (como la hoja de la app). */
+.nws-fl--dialogo .nws-lpvw__bloque { top: 50%; bottom: auto; left: 16px; right: 16px; transform: translateY(-50%); max-height: calc(100% - 96px); border-radius: 20px; background: #fff; overflow: hidden; }
+.nws-fl--dialogo .nws-fl__contenido { padding: 8px 16px 16px; }
+.nws-fl__modal-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 8px 4px 16px; }
+.nws-fl__modal-t { margin: 0; font-size: 16px; line-height: 20px; font-weight: 700; color: #282834; }
+.nws-fl__modal-x { --pvt-button-dimension: 36px; }
+.nws-fl__perfil-fila { display: flex; align-items: center; gap: 12px; margin: 8px 0 16px; }
+.nws-fl__foto-ini { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 16px; background: #ffedc7; color: #d74009; font-size: 24px; font-weight: 700; }
+.nws-fl__perfil-tx { min-width: 0; }
+.nws-fl__contenido .nws-fl__perfil-n { margin: 0; font-size: 16px; line-height: 20px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__perfil-i { margin: 2px 0 0; font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__datos { margin: 0 0 16px; padding: 16px; }
+.nws-fl__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+.nws-fl__celda { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.nws-fl__celda-l { font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__celda-v { font-size: 14px; line-height: 18px; color: #282834; }
+.nws-fl__chip-dep { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; max-width: 100%; padding: 4px 8px; border: 1.5px solid #d74009; border-radius: 8px; font-size: 14px; font-weight: 600; color: #282834; }
+.nws-fl__chip-dep img { flex: none; width: 16px; height: 16px; }
+.nws-fl__comp-card { display: flex; align-items: center; gap: 12px; padding: 12px; }
+.nws-fl__comp-t { font-size: 14px; line-height: 18px; font-weight: 700; color: #282834; text-transform: uppercase; }
+
+
+.nws-fl__nomina .nws-fl__fila.nws-fl__fila--plana:first-child { border-top: 0; }
+
+/* Ronda centrada del partido: título 18/700 y subtítulo 14 gris, con el relleno de la tarjeta de la app. */
+.nws-fl__contenido .nws-fl__ronda--centro strong { font-size: 18px; line-height: 22px; font-weight: 700; }
+.nws-fl__contenido .nws-fl__ronda--centro span { font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__ronda--centro { padding: 16px 20px; }
+/* Posiciones finalizadas (Resultados finales de la app): encabezado centrado, tarjeta gris con #, Equipo y Pts. */
+.nws-fl__centro { text-align: center; }
+.nws-fl__chip-cat.nws-fl__chip-cat--centro { display: flex; width: fit-content; margin: 8px auto 16px; }
+.nws-fl__resultados { padding: 12px; border: 0; background: #f4f5fa; box-shadow: 0 6px 24px rgb(47 42 114 / .06); }
+.nws-fl__contenido .nws-fl__res-h { margin: 4px 4px 8px; font-size: 18px; line-height: 22px; font-weight: 700; color: #282834; }
+.nws-fl__res-cab { display: flex; align-items: center; gap: 12px; min-height: 36px; padding: 0 12px; border-radius: 14px; background: #eef0f5; font-size: 12px; font-weight: 600; color: #282834; }
+.nws-fl__res-fila { display: flex; align-items: center; gap: 12px; min-height: 64px; margin-top: 8px; padding: 12px; border: 1px solid #e2e5f2; border-radius: 14px; background: #fff; }
+.nws-fl__res-fila--lider { background: #eaf8ec; }
+.nws-fl__res-n { flex: none; width: 26px; }
+.nws-fl__res-eq { flex: 1; min-width: 0; font-size: 14px; line-height: 18px; color: #282834; }
+.nws-fl__res-pts { flex: none; width: 30px; text-align: center; }
+.nws-fl__res-fila--lider .nws-fl__pts { background: #d3f1d8; }
+/* Tabla por grupos (group_standings_screen.dart): filas de 88 px mínimo, encabezado de 44, grupo de 52. */
+.nws-fl__tabla--pos thead th { height: 44px; }
+.nws-fl__tabla--pos tbody tr { height: 88px; }
+.nws-fl__tabla--pos td { vertical-align: middle; }
+.nws-fl__grupo > summary { min-height: 52px; }
+/* Distintivo «● En curso» de la ronda (en_curso_badge.dart): pastilla roja con punto blanco. */
+.nws-fl__en-curso { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 4px 8px; border-radius: 999px; background: #c4031d; color: #fff; font-size: 12px; font-weight: 600; line-height: 16px; }
+.nws-fl__en-curso-pt { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+/* Resultados finales: filas planas pegadas con separador, nombres de 12 px (StandingsGroupCard pointsOnly). */
+.nws-fl__res-fila { margin-top: 0; min-height: 72px; border: 0; border-bottom: 1px solid #e7e9f3; border-radius: 0; }
+.nws-fl__res-cab { margin-bottom: 8px; }
+.nws-fl__res-eq { font-size: 12px; }
+.nws-fl__res-cab .nws-fl__res-eq { font-weight: 600; }
+.nws-fl__resultados { padding: 12px 12px 4px; }
+.nws-fl__centro.nws-fl__disciplina { color: #7c82a8; }
+.nws-fl__chip-cat--centro { gap: 6px; align-items: center; }
+.nws-fl__chip-cat--centro .nws-fl__persona { width: 14px; height: 14px; color: #d74009; }
+
+/* Resultados finales: filas con margen dentro de la tarjeta y aire bajo el encabezado. */
+.nws-fl__res-cab { margin-bottom: 12px; }
+.nws-fl__res-fila { margin: 0 8px; border-radius: 12px; }
+.nws-fl__res-fila--lider { border-bottom-color: transparent; }
+.nws-fl__resultados { padding-bottom: 12px; }
+
+/* Posiciones en curso (group_standings_screen.dart): filas planas blancas, flecha del grupo, leyenda en dos columnas. */
+.nws-fl__tabla--pos { overflow: visible; }
+.nws-fl__tabla--pos tbody tr { height: 72px; }
+.nws-fl__tabla--pos td { background: #fff; padding: 0 3px; font-size: 12px; }
+.nws-fl__tabla--pos tr.nws-fl__tr--lider td { background: #eaf8ec; }
+.nws-fl__tabla--pos td:nth-child(2) { font-size: 12px; line-height: 16px; }
+.nws-fl__tabla--pos th, .nws-fl__tabla--pos td { padding-left: 3px; padding-right: 3px; }
+.nws-fl__grupo > summary { justify-content: space-between; }
+.nws-fl__grupo-flecha { width: 24px; height: 24px; color: #d74009; transition: transform .2s; }
+.nws-fl__grupo:not([open]) .nws-fl__grupo-flecha { transform: rotate(-90deg); }
+.nws-fl__grupo > summary::-webkit-details-marker { display: none; }
+.nws-fl__contenido .nws-fl__convenciones h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; }
+.nws-fl__leyenda-ico { width: 18px; height: 18px; color: #d74009; }
+.nws-fl__leyenda { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.nws-fl__leyenda > div:first-child { padding-right: 8px; border-right: 1px solid #d0d4e6; }
+.nws-fl__contenido .nws-fl__leyenda p { display: flex; gap: 8px; margin: 0 0 6px; font-size: 12px; color: #282834; }
+.nws-fl__leyenda strong { min-width: 22px; font-weight: 700; }
+
+/* Sedes de la competencia (modal con 2 o más sedes): tarjeta ancha por sede con nombre, dirección y foto. */
+.nws-fl__sede-modal { margin: 0 0 12px; padding: 12px; border-color: #d0d4e6; box-shadow: none; }
+.nws-fl__contenido .nws-fl__sm-t { margin: 0; font-size: 14px; line-height: 18px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__sm-d { margin: 2px 0 12px; font-size: 12px; line-height: 16px; color: #a8acbf; }
+.nws-fl__sm-img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; }
+
+/* Fila de partido (competition_card de la app): badge a la derecha del título, chip de sede, sin chevron. */
+.nws-fl__fila--partido { align-items: flex-start; }
+.nws-fl__fila--partido > .nws-fl__ir { display: none; }
+.nws-fl__ronda-fila { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.nws-fl__flecha-vs { color: #d74009; font-weight: 700; }
+.nws-fl__chip-sede { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; margin-top: 6px; padding: 3px 8px; border-radius: 999px; background: #e7e9f3; font-size: 10px; font-weight: 600; line-height: 14px; color: #282834; }
+.nws-fl__chip-pin { width: 12px; height: 12px; }
+.nws-fl__tabs--vivo [data-tab="1"] .nwt-tabs__label-text::after { content: ''; display: inline-block; width: 6px; height: 6px; margin-left: 4px; vertical-align: super; border-radius: 50%; background: #ed314a; }
+
+.nws-fl__fila--tarjeta .nws-fl__fila-cuerpo > .nws-fl__fila-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* Fila de partido: tamaños de la app (hora 14, equipos 13 en tinta, flecha grande, chip en negrita). */
+.nws-fl__fila--partido .nws-fl__hora { align-self: center; width: 60px; height: 64px; }
+.nws-fl__fila--partido .nws-fl__hora-ico { width: 22px; height: 22px; }
+.nws-fl__fila--partido .nws-fl__hora-t { font-size: 14px; line-height: 16px; }
+.nws-fl__fila--partido .nws-fl__fila-m { font-size: 13px; line-height: 17px; color: #282834; }
+.nws-fl__fila--partido .nws-fl__flecha-vs { font-size: 16px; line-height: 14px; }
+.nws-fl__fila--partido .nws-fl__chip-sede { margin-top: 8px; padding: 4px 8px; font-size: 11px; font-weight: 700; background: #e7e9f3; color: #3c3f66; }
+.nws-fl__fila--partido .nws-fl__chip-pin { width: 13px; height: 13px; }
+.nws-fl__fila--partido .nws-fl__en-curso { padding: 3px 8px; font-size: 12px; }
+.nws-fl .nws-fl__top--violeta .nws-lpvw__volver .nwt-icon-button__content { background: rgb(255 255 255 / .2); border-radius: 50%; }
+/* Resultados finales: filas a todo el ancho del encabezado y pegadas una debajo de otra. */
+.nws-fl__resultados .nws-fl__res-fila { margin: 0; border-radius: 0; border: 0; border-bottom: 1px solid #e7e9f3; }
+.nws-fl__resultados .nws-fl__res-fila:last-child { border-bottom: 0; border-radius: 0 0 12px 12px; }
+.nws-fl__resultados .nws-fl__res-cab { margin-bottom: 0; }
+.nws-fl__resultados .nws-fl__res-fila--lider { border-bottom-color: #d3f1d8; }
+/* Resultados finales como la app: filas de borde a borde de la tarjeta; solo título y encabezado llevan margen. */
+.nws-fl__resultados { padding: 12px 0 0; overflow: hidden; }
+.nws-fl__resultados .nws-fl__res-h { margin: 4px 16px 8px; }
+.nws-fl__resultados .nws-fl__res-cab { margin: 0 12px; }
+.nws-fl__resultados .nws-fl__res-fila { padding: 12px 16px; min-height: 72px; }
+.nws-fl__resultados .nws-fl__res-fila:last-child { border-radius: 0 0 24px 24px; }
+.nws-fl__resultados .nws-fl__res-eq { font-size: 13px; line-height: 17px; }
+.nws-fl__resultados .nws-fl__res-cab .nws-fl__res-n { margin-left: 4px; }
+/* Encabezado del mismo ancho que las filas, con las columnas alineadas. */
+.nws-fl__resultados .nws-fl__res-cab { margin: 0; padding: 0 16px; border-radius: 0; }
+.nws-fl__resultados .nws-fl__res-cab .nws-fl__res-n { margin-left: 0; width: 26px; text-align: center; }
+.nws-fl__resultados .nws-fl__res-cab .nws-fl__res-pts { width: 30px; }
+
+/* Noticias (lista y detalle de la app): filas con miniatura, y detalle con foto, fecha, título, autoría y botón violeta. */
+.nws-fl__contenido .nws-fl__h1--noticias { margin: 8px 0 12px; font-size: 20px; line-height: 24px; }
+.nws-fl__fila.nws-fl__fila--noticia { margin: 0 0 16px; padding: 0; border: 0; border-radius: 0; box-shadow: none; background: none; align-items: center; }
+.nws-fl__noti-img { flex: none; width: 80px; height: 58px; object-fit: cover; border-radius: 12px; }
+.nws-fl__noti-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; line-height: 20px; font-weight: 700; color: #282834; }
+.nws-fl__noti-f { font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__noticia-foto { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; margin: 8px 0 16px; border-radius: 16px; }
+.nws-fl__contenido .nws-fl__noticia-fecha { margin: 0 0 12px; font-size: 12px; color: #646587; }
+.nws-fl__contenido .nws-fl__noticia-t { margin: 0 0 8px; font-size: 16px; line-height: 22px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__noticia-aut { margin: 0 0 12px; font-size: 12px; font-style: italic; color: #646587; }
+.nws-fl__contenido .nws-fl__noticia-txt { margin: 0 0 24px; font-size: 13px; line-height: 20px; color: #181e47; text-align: justify; }
+.nws-fl__noticia-btn { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #561b78; color: #fff; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+
+/* Inicio de sesión (pantalla de login de la app): cabecera naranja con X, formulario y enlaces. */
+.nws-fl--naranja .nws-lpvw__estado { background: #b83100; }
+.nws-fl--naranja .nws-mob__status { color: #fff; }
+.nws-fl__top-naranja { flex: none; position: relative; display: flex; align-items: center; justify-content: center; height: 48px; background: #b83100; color: #fff; }
+.nws-fl__login-x { position: absolute; left: 8px; --pvt-button-font-color: #fff; --pvt-button-dimension: 40px; }
+.nws-fl .nws-fl__login-x .nwt-icon-button__content { background: transparent; }
+.nws-fl__top-naranja-t { margin: 0; font-size: 16px; line-height: 20px; font-weight: 500; color: #fff; }
+.nws-fl__login-logo { display: block; height: 48px; margin: 8px 0 12px; }
+.nws-fl__contenido .nws-fl__login-t { margin: 8px 0 12px; font-size: 28px; line-height: 34px; font-weight: 400; text-align: center; color: #282834; }
+.nws-fl__login-t strong { font-weight: 700; }
+.nws-fl__contenido .nws-fl__login-sub { margin: 0 0 20px; font-size: 15px; line-height: 22px; text-align: center; color: #646587; }
+.nws-fl__login-campo { display: block; margin-bottom: 16px; }
+.nws-fl__login-campo > span:first-child { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #282834; }
+.nws-fl__login-campo b { color: #d74009; }
+.nws-fl__login-campo input { box-sizing: border-box; width: 100%; height: 48px; padding: 0 16px; border: 1px solid #8788ab; border-radius: 12px; background: #fff; font: inherit; font-size: 15px; color: #282834; }
+.nws-fl__login-campo input::placeholder { color: #a8acbf; }
+.nws-fl__login-pass { position: relative; display: block; }
+.nws-fl__login-pass input { padding-right: 48px; }
+.nws-fl__login-ojo { position: absolute; right: 14px; top: 12px; width: 24px; height: 24px; color: #d74009; }
+.nws-fl__contenido .nws-fl__login-olvido { margin: 0 0 20px; text-align: right; font-size: 14px; color: #646587; }
+.nws-fl__login-link { padding: 0; border: 0; background: none; font: inherit; font-size: 14px; color: #1f5fbf; text-decoration: underline; cursor: pointer; }
+.nws-fl__login-link--naranja { color: #d74009; font-weight: 700; }
+.nws-fl__login-btn { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #b83100; color: #fff; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.nws-fl__contenido .nws-fl__login-legal { margin: 24px 0 24px; text-align: center; font-size: 14px; color: #646587; }
+.nws-fl__contenido .nws-fl__login-ayuda { margin: 0 0 8px; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: #646587; }
+.nws-fl__contenido .nws-fl__login-ayuda-t { margin: 0; text-align: center; font-size: 13px; line-height: 20px; color: #646587; }
+.nws-lp .nws-fl .nws-fl__login-x, .nws-fl .nws-fl__login-x * { color: #fff; }
+.nws-fl__login-logo { height: 60px; width: auto; max-width: none; object-fit: contain; }
+.nws-fl--naranja .nws-lpvw__estado, .nws-fl--naranja .nws-fl__top-naranja { border: 0; box-shadow: none; }
+.nws-fl--naranja .nws-lpvw__estado { margin-bottom: -1px; }
+
+/* Perfil de la institución (institution_profile_screen.dart): barra con logo y menú, cabecera, tarjetas y navegación inferior. */
+.nws-fl__top-logo { flex: none; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 20px; border-bottom: 1px solid #e7e9f3; background: #fff; }
+.nws-fl__top-logo-img { height: 36px; width: auto; }
+.nws-fl__hamb { width: 36px; height: 36px; padding: 6px; border: 0; background: none; color: #646587; cursor: pointer; }
+.nws-fl__inst-cab { display: flex; align-items: center; gap: 12px; margin: 8px 0 20px; }
+.nws-fl__inst-av { position: relative; flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: #e9f1ff; color: #434ce4; font-size: 32px; font-weight: 500; }
+.nws-fl__inst-ver { position: absolute; right: -2px; bottom: -2px; width: 24px; height: 24px; }
+.nws-fl__inst-tx { min-width: 0; }
+.nws-fl__inst-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 10px; background: #e9f1ff; color: #002b5b; font-size: 11px; font-weight: 600; line-height: 14px; }
+.nws-fl__inst-cal { width: 12px; height: 12px; }
+.nws-fl__contenido .nws-fl__inst-n { margin: 6px 0 4px; font-size: 22px; line-height: 24px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__inst-d { margin: 0; font-size: 14px; color: #646587; }
+.nws-fl__inst-card { margin: 0 0 16px; padding: 16px; }
+.nws-fl__contenido .nws-fl__inst-card h2 { margin: 0 0 12px; font-size: 18px; line-height: 22px; }
+.nws-fl__inst-card .nws-fl__celda-l { font-size: 13px; color: #646587; }
+.nws-fl__pie { flex: none; display: flex; justify-content: center; gap: 32px; padding: 10px 0 24px; border-top: 1px solid #e7e9f3; background: #fff; }
+.nws-fl__pie-it { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 88px; padding: 4px 0 8px; border: 0; border-bottom: 3px solid transparent; background: none; color: #646587; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.nws-fl__pie-it svg { width: 22px; height: 22px; }
+.nws-fl__pie-it--act { color: #d74009; border-bottom-color: #d74009; }
+/* Perfil: aire arriba, tarjetas solo con borde (sin sombra) y más espacio interno, como la app. */
+.nws-fl__inst-cab { margin: 28px 0 28px; }
+.nws-fl__inst-card { box-shadow: none; margin-bottom: 20px; padding: 16px 16px 20px; }
+.nws-fl__inst-card .nws-fl__grid { row-gap: 20px; }
+.nws-fl__top-logo-img { height: 44px; }
+
+/* Inscritos: título con actualizar, buscador y selector en una fila, filas de 120 px con documento, nombre, chip del deporte y personal de apoyo. */
+.nws-fl__insc-cab { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.nws-fl__contenido .nws-fl__insc-cab h2 { margin: 0; font-size: 17px; line-height: 22px; font-weight: 700; }
+.nws-fl__insc-act { width: 36px; height: 36px; padding: 6px; border: 0; background: none; color: #282834; cursor: pointer; }
+.nws-fl__contenido .nws-fl__insc-t { margin: 8px 0 16px; font-size: 13px; line-height: 17px; color: #282834; }
+.nws-fl__insc-filtros { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; margin-bottom: 16px; }
+.nws-fl__buscar--pill { border-radius: 999px; padding-left: 44px; }
+.nws-fl__insc-filtros .nws-fl__filtro { margin: 0; }
+.nws-fl__insc-filtros .nws-fl__filtro select { border-radius: 12px; }
+.nws-fl__insc-filtros .nws-fl__select--vacio { color: #282834; }
+.nws-fl__insc-lista { margin: 0 -16px; border-top: 1px solid #d0d4e6; }
+.nws-fl__insc-vacio { margin: 24px 0 0; text-align: center; font-size: 15px; font-weight: 700; color: #282834; }
+.nws-fl__insc-fila { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-height: 120px; padding: 12px 20px; border-bottom: 1px solid #d0d4e6; }
+.nws-fl__insc-doc { font-size: 16px; color: #282834; }
+.nws-fl__insc-linea { display: flex; align-items: center; gap: 8px; }
+.nws-fl__insc-n { flex: 1; min-width: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: #282834; }
+.nws-fl__insc-dep { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 2px solid #d74009; border-radius: 8px; box-shadow: 0 0 2px 2px #ffdaa3; font-size: 12px; font-weight: 600; color: #282834; }
+.nws-fl__insc-dep img { width: 14px; height: 14px; }
+.nws-fl__insc-apoyo { align-self: flex-start; padding: 3px 10px; border-radius: 999px; background: #ffedc7; color: #942700; font-size: 12px; font-weight: 600; }
+.nws-fl__insc-apoyo--con { background: #deface; color: #17641a; }
+.nws-fl__insc-apoyo { font-weight: 800; }
+
+/* Selector de listas: botón que abre una hoja inferior «Elige una opción» (NaoweeSelect de la app). */
+.nws-fl__sel-btn { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 48px; padding: 0 14px; border: 1px solid #8788ab; border-radius: 12px; background: #fff; color: #282834; font: inherit; font-size: 14px; cursor: pointer; }
+.nws-fl__sel-btn svg { flex: none; width: 14px; height: 9px; color: #441e63; }
+.nws-fl__hoja { display: none; position: absolute; inset: 0; z-index: 6; }
+.nws-fl__hoja--abierta { display: block; }
+.nws-fl__hoja-velo { position: absolute; inset: 0; background: rgb(24 30 71 / .5); }
+.nws-fl__hoja-panel { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 32px; border-radius: 28px 28px 0 0; background: #fff; }
+.nws-fl__hoja-asa { display: block; width: 36px; height: 4px; margin: 0 auto 12px; border-radius: 2px; background: #5b5f8a; }
+.nws-fl__hoja-cab { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.nws-fl__contenido .nws-fl__hoja-cab h3 { margin: 0; font-size: 20px; line-height: 26px; font-weight: 700; color: #282834; }
+.nws-fl__hoja-cab button { width: 36px; height: 36px; padding: 6px; border: 0; background: none; color: #646587; cursor: pointer; }
+.nws-fl__hoja-op { display: block; width: 100%; padding: 14px 0; border: 0; background: none; text-align: left; font: inherit; font-size: 15px; color: #282834; cursor: pointer; }
+.nws-fl__insc-rol { font-size: 13px; color: #646587; }
+/* Filas de inscritos más compactas. */
+.nws-fl__insc-fila { min-height: 0; padding: 10px 20px; gap: 2px; }
+.nws-fl__insc-apoyo { margin-top: 2px; }
+.nws-fl__insc-fila { min-height: 112px; padding: 12px 20px; gap: 3px; }
+
+/* Perfil del personal de apoyo (app): volver, cabecera con avatar, info personal, pestañas y listas. */
+button.nws-fl__insc-fila--btn { width: 100%; text-align: left; border: 0; border-bottom: 1px solid #d0d4e6; background: #fff; font: inherit; cursor: pointer; }
+.nws-fl__atras { display: block; width: 36px; height: 36px; margin: 4px 0 0 -6px; padding: 6px; border: 0; background: none; color: #d74009; cursor: pointer; }
+.nws-fl__contenido .nws-fl__apoyo-t { margin: 4px 0 16px; font-size: 17px; line-height: 22px; font-weight: 700; }
+.nws-fl__apoyo-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.nws-fl__apoyo-av { flex: none; display: grid; place-items: center; width: 66px; height: 66px; border-radius: 50%; background: #deface; color: #17641a; font-size: 28px; font-weight: 700; line-height: 1; text-transform: uppercase; text-align: center; }
+.nws-fl__apoyo-tx { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.nws-fl__contenido .nws-fl__apoyo-n { margin: 0; font-size: 19px; line-height: 23px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__apoyo-r { margin: 0; font-size: 14px; color: #646587; }
+.nws-fl__apoyo-info { margin: 0 0 20px; padding: 14px 16px; border-color: #d0d4e6; box-shadow: none; }
+.nws-fl__contenido .nws-fl__apoyo-info h3 { margin: 0 0 8px; font-size: 15px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__apoyo-sec { margin: 24px 0 12px; font-size: 18px; line-height: 22px; font-weight: 700; }
+.nws-fl__apoyo-dep { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #d74009; border-radius: 12px; box-shadow: 0 0 2px 2px #ffdaa3; font-size: 13px; font-weight: 700; color: #282834; }
+.nws-fl__apoyo-dep img { width: 16px; height: 16px; }
+.nws-fl__apoyo-fila { display: flex; flex-direction: column; gap: 2px; padding: 12px 0; border-bottom: 1px solid #d0d4e6; }
+.nws-fl__apoyo-fila--inst { flex-direction: row; align-items: center; justify-content: space-between; }
+.nws-fl__apoyo-fila-l { display: flex; flex-direction: column; gap: 2px; }
+.nws-fl__apoyo-doc { font-size: 14px; color: #646587; }
+.nws-fl__apoyo-nom { font-size: 15px; font-weight: 700; color: #282834; }
+.nws-fl__agregar { width: 100%; min-height: 48px; margin-top: 28px; border: 0; border-radius: 12px; background: #c9ccee; color: #8e92c0; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+/* Perfil del deportista inscrito: avatar grande y tarjetas. */
+.nws-fl__apoyo-av--g { width: 80px; height: 80px; font-size: 32px; }
+
+/* Perfil del grupo (equipo inscrito). */
+.nws-fl__minmax { display: inline-flex; gap: 16px; padding: 6px 14px; margin-bottom: 16px; border: 1px solid #d0d4e6; border-radius: 12px; font-size: 13px; color: #646587; }
+.nws-fl__minmax strong { color: #282834; font-weight: 700; }
+.nws-fl__equipo-acc { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.nws-fl__btn-sec, .nws-fl__btn-pri { min-height: 44px; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.nws-fl__btn-sec { border: 1.5px solid #d74009; background: #fff; color: #d74009; }
+.nws-fl__btn-pri { border: 0; background: #d74009; color: #fff; }
+.nws-fl__contenido .nws-fl__apoyo-sec--sm { margin: 20px 0 8px; }
