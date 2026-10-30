@@ -159,6 +159,39 @@ window.DATOS = {
     ],
     "app": {
       "salidas": false,
+      "flujos": {
+        "_ejemplo": "Todos los nombres, sedes, instituciones, marcas y resultados son ficticios. Estado congelado de ejemplo; no es información oficial.",
+        "aviso": "Datos de ejemplo · Sin actualización en vivo",
+        "ilustracionVacio": "assets/landing/sin-contenido.jpg",
+        "regionalTabs": ["Calendario", "Sedes", "Info. logística"],
+        "deportes": ["Baloncesto", "Atletismo"],
+        "categorias": ["Juvenil · Femenino", "Juvenil · Masculino"],
+        "dias": ["2026-10-26", "2026-10-27"],
+        "sedes": [
+          {"nombre": "Unidad deportiva Brisa Clara", "departamento": "Valle de los Vientos", "municipio": "Villa Aurora", "direccion": "Sector deportivo de Villa Aurora · ubicación de ejemplo", "zonas": ["Cancha múltiple", "Graderías", "Vestidores"], "img": "assets/landing/galeria-b.jpg"},
+          {"nombre": "Pista Horizonte", "departamento": "Valle de los Vientos", "municipio": "Villa Aurora", "direccion": "Parque del Horizonte · ubicación de ejemplo", "zonas": ["Pista", "Zona de calentamiento"], "img": "assets/landing/galeria-c.jpg"}
+        ],
+        "competencias": [
+          {"id": "baloncesto", "deporte": "Baloncesto", "prueba": "Baloncesto 5 × 5", "categoria": "Juvenil · Femenino", "tipo": "equipo", "dias": ["2026-10-26", "2026-10-27"], "hora": "9:00 a. m.", "estado": "Finalizado", "sede": 0, "rondas": ["Fase de grupos"], "grupos": ["Grupo A", "Grupo B"]},
+          {"id": "atletismo", "deporte": "Atletismo", "prueba": "Combinada escolar", "categoria": "Juvenil · Masculino", "tipo": "individual", "dias": ["2026-10-26", "2026-10-27"], "hora": "10:00 a. m.", "estado": "Finalizado", "sede": 1, "rondas": ["Final"], "subpruebas": ["80 metros", "Salto largo"]},
+          {"id": "futbol-salon", "deporte": "Fútbol de salón", "prueba": "Campeonato de Fútbol de Salón", "categoria": "Juvenil · Mujer", "tipo": "equipo", "dias": ["2026-10-26", "2026-10-27"], "hora": "7:00 a. m.", "estado": "En curso", "sede": 0, "sedes": [0, 1], "rondas": ["Grupo A - Fecha 3"], "enCursoRondas": ["Grupo A - Fecha 3"], "grupos": ["Grupo A", "Grupo B"]}
+        ],
+        "equipos": [
+          {"nombre": "Instituto Brisa Clara", "departamento": "Valle de los Vientos", "grupo": "Grupo A", "pj": 2, "pg": 2, "pp": 0, "pf": 88, "pc": 70, "puntos": 4},
+          {"nombre": "Colegio Sendero Azul", "departamento": "Sierra del Alba", "grupo": "Grupo A", "pj": 2, "pg": 1, "pp": 1, "pf": 76, "pc": 78, "puntos": 3},
+          {"nombre": "Liceo Horizonte Nuevo", "departamento": "Llanura del Sol", "grupo": "Grupo B", "pj": 2, "pg": 2, "pp": 0, "pf": 92, "pc": 80, "puntos": 4},
+          {"nombre": "Instituto Nube Dorada", "departamento": "Sierra del Alba", "grupo": "Grupo B", "pj": 2, "pg": 1, "pp": 1, "pf": 80, "pc": 84, "puntos": 3}
+        ],
+        "deportistas": [
+          {"nombre": "Elian Brisaclara", "institucion": "Instituto Brisa Clara", "departamento": "Valle de los Vientos", "municipio": "Villa Aurora", "categoria": "Juvenil · Masculino", "deporte": "Atletismo", "numero": 101, "marcas": ["10,80 s", "5,35 m"], "total": "820", "medallas": [1, 1, 0]},
+          {"nombre": "Nicolás Senderoluz", "institucion": "Colegio Sendero Azul", "departamento": "Sierra del Alba", "municipio": "Villa Aurora", "categoria": "Juvenil · Masculino", "deporte": "Atletismo", "numero": 102, "marcas": ["11,10 s", "5,12 m"], "total": "780", "medallas": [0, 1, 1]},
+          {"nombre": "Darío Nubecalma", "institucion": "Liceo Horizonte Nuevo", "departamento": "Llanura del Sol", "municipio": "Villa Aurora", "categoria": "Juvenil · Masculino", "deporte": "Atletismo", "numero": 103, "marcas": ["11,30 s", "5,02 m"], "total": "740", "medallas": [0, 0, 1]},
+          {"nombre": "Lía Claraviento", "institucion": "Instituto Brisa Clara", "departamento": "Valle de los Vientos", "municipio": "Villa Aurora", "categoria": "Juvenil · Femenino", "deporte": "Baloncesto", "numero": 7},
+          {"nombre": "Alina Solsendero", "institucion": "Colegio Sendero Azul", "departamento": "Sierra del Alba", "municipio": "Villa Aurora", "categoria": "Juvenil · Femenino", "deporte": "Baloncesto", "numero": 12}
+        ],
+        "partido": {"ronda": "Fase de grupos", "fecha": "26 oct 2026", "hora": "9:00 a. m.", "estado": "Finalizado", "equipos": [0, 1], "marcador": [48, 42], "parciales": [[12, 10], [10, 12], [14, 8], [12, 12]], "nominas": [[3], [4]]},
+        "logistica": {"texto": "Si eres familiar o entrenador, ¡encuentra aquí la información que necesitas sobre pólizas y demás, durante el desarrollo de estos juegos!", "documentos": ["Instructivo de pólizas · ejemplo"]}
+      },
       "quote": {
         "texto": "“Juegos Intercolegiados es una iniciativa del Ministerio del Deporte de Colombia.”"
       },
@@ -362,8 +395,12 @@ window.DATOS = {
         ]
       },
       "resultados": {
-        "titulo": "Resultados",
-        "texto": "Vista de resultados"
+        "_ejemplo": "Resultados ficticios y congelados de demostración",
+        "titulo": "Resultados de enfrentamientos",
+        "items": [
+          {"nombre": "Instituto Brisa Clara", "deporte": "Baloncesto", "prueba": "Baloncesto 5 × 5", "categoria": "Juvenil · Femenino", "ronda": "Fase de grupos", "fase": "Regional", "estado": "Finalizado", "resultado": "48 — 42"},
+          {"nombre": "Elian Brisaclara", "deporte": "Atletismo", "prueba": "80 metros", "categoria": "Juvenil · Masculino", "ronda": "Final", "fase": "Regional", "estado": "Finalizado", "resultado": "10,80 s"}
+        ]
       },
       /* TEXTO DE EJEMPLO: las seis regionales de la captura de referencia (faltan las demás) y la final.
          Fotos: no hay atletismo ni salto largo en assets/, van las más cercanas (`pos` = encuadre). */

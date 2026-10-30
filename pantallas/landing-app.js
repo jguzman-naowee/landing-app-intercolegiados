@@ -800,7 +800,7 @@ window.PANTALLAS['landing-app'] = (function () {
   /* ---------- modo dev (DC-084): notas por sección sobre la vista plana ----------
      Herramienta del prototipo, no de la app. Ancho: notas a la derecha con conector;
      angosto: <details> bajo cada sección. Texto en pantallas/landing-dev.js. */
-  var ORDEN_DEV = ['header', 'hero', 'titular', 'competencias', 'novedades', 'galeria', 'video', 'cita', 'footer', 'tabbar'];
+  var ORDEN_DEV = ['header', 'hero', 'titular', 'competencias', 'novedades', 'galeria', 'video', 'cita', 'footer', 'tabbar', 'fl-regionales', 'fl-regional', 'fl-sede', 'fl-competencias', 'fl-competencia', 'fl-posiciones', 'fl-salida', 'fl-deportista', 'fl-partido', 'fl-podio', 'fl-resultados', 'fl-noticias', 'fl-noticia'];
   var DEV_ANCHO_MIN = 1100, DEV_NOTA = 440, DEV_SEPARA = 44;
   var DEV_ABIERTO = /[?&]abierto\b/.test(location.search); /* ?plana&dev&abierto despliega todo (capturas) */
   function modoDev(S, mob) {
@@ -831,7 +831,7 @@ window.PANTALLAS['landing-app'] = (function () {
       var d = window.LANDING_DEV || {}, out = [];
       ORDEN_DEV.forEach(function (id, i) {
         var el = mob.querySelector('[data-dev="' + id + '"]');
-        if (el && d[id]) { out.push({ id: id, num: i + 1, el: el, n: d[id] }); }
+        if (el && !el.closest('[inert]') && !el.hidden && d[id]) { out.push({ id: id, num: i + 1, el: el, n: d[id] }); }
       });
       return out;
     }
@@ -895,7 +895,8 @@ window.PANTALLAS['landing-app'] = (function () {
             mob.querySelector('[data-dev="titular"]').insertAdjacentElement('afterend', grupo); extra.push(grupo);
           }
           grupo.appendChild(d);
-        } else { it.el.insertAdjacentElement('afterend', d); }
+        } else if (it.id.indexOf('fl-') === 0 && it.el.querySelector('.nws-fl__contenido')) { it.el.querySelector('.nws-fl__contenido').appendChild(d); }
+        else { it.el.insertAdjacentElement('afterend', d); }
       });
     }
 
@@ -934,9 +935,11 @@ window.PANTALLAS['landing-app'] = (function () {
       if (s) { s.classList.add('nws-dev--foco'); }
     }
 
+    function alNavegar() { if (activo) { pintar(); } }
     function ocultar() {
       if (!activo) { return; }
       activo = false;
+      mob.removeEventListener('jin:vista', alNavegar);
       document.removeEventListener('mouseover', resaltar);
       window.removeEventListener('resize', alCambiar);
       if (ro) { ro.disconnect(); ro = null; }
@@ -947,6 +950,7 @@ window.PANTALLAS['landing-app'] = (function () {
       mostrar: function () {
         if (activo) { return; }
         activo = true;
+        mob.addEventListener('jin:vista', alNavegar);
         document.addEventListener('mouseover', resaltar);
         window.addEventListener('resize', alCambiar);
         if (window.ResizeObserver) {
@@ -1051,6 +1055,7 @@ window.PANTALLAS['landing-app'] = (function () {
         if (!L.app.salidas) { ctx.proximamente('Detalle de noticia', carta); alCerrar(); return; }
         detalle(S, L, mob, noticias[+carta.getAttribute('data-i')], carta, alCerrar);
       });
+
       var vistas = window.LANDING_VISTAS.montar(S, L, mob, { barraEstado: barraEstado, posicionarIndicadores: ctx.posicionarIndicadores, proximamente: ctx.proximamente });
       var timers = [];
       var lento = /[?&]lento\b/.test(location.search);
@@ -1202,8 +1207,9 @@ window.PANTALLAS['landing-app'] = (function () {
         /* Tarjeta de acceso (hoy abre «Regional de conjuntos»): vista inmersiva; el foco vuelve a la tarjeta */
         var vi = ev.target.closest('[data-vista]');
         if (vi) { vistas.abrir(vi.getAttribute('data-vista'), vi); return; }
-        /* Medallas/Certificados (pestañas): aviso propio con fecha estimada (datos.js) */
+        /* Flutter mantiene Medallas desactivado; Certificados conserva su aviso. */
         var tab = ev.target.closest('.nws-lpx__tabbar [data-tab]');
+        if (tab && tab.getAttribute('data-tab') === 'medallas') { ctx.proximamente('Medallas', tab); return; }
         if (tab && tab.getAttribute('data-tab') !== 'inicio') {
           var it = L.app.tabs.filter(function (m) { return m.id === tab.getAttribute('data-tab'); })[0];
           if (it && it.toast) {

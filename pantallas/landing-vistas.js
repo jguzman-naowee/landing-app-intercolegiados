@@ -1,5 +1,5 @@
 /* Vistas inmersivas de la App JIN: entran en push y la home queda inerte debajo.
-   Hoy solo `regionales` tiene acceso; calendario y resultados esperan sus salidas.
+   La pila conserva cada pantalla, su scroll y el foco de entrada.
    Estilos: bloque nws-lpvw de app.css. */
 window.LANDING_VISTAS = (function () {
 
@@ -16,10 +16,12 @@ window.LANDING_VISTAS = (function () {
   function corta(f) { var p = partes(f); return p.d + ' ' + MESES[p.m - 1].slice(0, 3); }
 
   function montar(S, L, mob, o) {
-    var C = L.app.calendario, R = L.app.resultados, G = L.app.regionales, e = S.esc;
+    var C = L.app.calendario, G = L.app.regionales, e = S.esc;
     var reducido = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var capas = [mob.querySelector('#lp-scroll'), mob.querySelector('#lpi-top'), mob.querySelector('.nws-lpi__bottom')];
-    var vistas = {}, actual = null, timer = null, hoja = null, origenHoja = null, foco = null, tReg = null, tEntra = null;
+    var vistas = {}, pila = [], actual = null, hoja = null, origenHoja = null, tReg = null, tEntra = null;
+    var flujos = window.LANDING_FLUJOS(S, L), pendientes = [], destruido = false;
+    function despues(fn, ms) { var t = setTimeout(function () { if (!destruido) { fn(); } }, ms); pendientes.push(t); return t; }
     var est = { mes: C.hoy.slice(0, 7), dia: C.hoy };
 
     function eventosDe(f) { return C.eventos.filter(function (x) { return x.fecha === f; }); }
@@ -81,7 +83,7 @@ window.LANDING_VISTAS = (function () {
       return S.h('ul', { class: S.cls('nws-lpvw__reg-lista', op.tarjetas.length === 1 && 'nws-lpvw__reg-lista--una', entra && 'nws-lpvw__reg-lista--entra'), role: 'list' }, op.tarjetas.map(function (k, i) {
         var x = G.items[k];
         return S.h('li', { style: '--nws-i:' + i },
-          S.h('button', { type: 'button', class: 'nws-lpvw__reg nws-ios-press', 'aria-label': x.nombre + ', ' + x.ciudad, 'data-toast': x.nombre },
+          S.h('button', { type: 'button', class: 'nws-lpvw__reg nws-ios-press', 'aria-label': x.nombre + ', ' + x.ciudad, 'data-flujo': regActual().id !== 'final' ? 'regional' : null, 'data-clave': regActual().id + ':' + k, 'data-toast': regActual().id === 'final' ? x.nombre : null },
             S.h('span', { class: 'nws-lpvw__reg-foto' }, S.h('img', { src: x.img, alt: '', draggable: 'false', style: x.pos ? 'object-position:' + x.pos : null })),
             S.h('span', { class: 'nws-lpvw__reg-ciudad' }, e(x.ciudad)),
             S.h('span', { class: 'nws-lpvw__reg-fila' },
@@ -195,23 +197,47 @@ window.LANDING_VISTAS = (function () {
       if (o2 && o2.isConnected) { o2.focus({ preventScroll: true }); }
     }
 
+    /* Indicador de las pestañas de los flujos: mide el texto de la pestaña activa, como NwtTabs de la app.
+       Las medidas van en variables y el CSS las aplica con !important, porque app.js le pone el ancho de la pestaña en línea. */
+    function medirIndicadores(root) {
+      root.querySelectorAll('.nws-fl__tabs').forEach(function (tabs) {
+        var act = tabs.querySelector('.nwt-tabs__tab--active'), txt = act && act.querySelector('.nwt-tabs__label-text');
+        if (!act || !txt || !txt.offsetWidth) { return; }
+        tabs.style.setProperty('--fl-ind-x', (act.offsetLeft + (act.offsetWidth - txt.offsetWidth) / 2) + 'px');
+        tabs.style.setProperty('--fl-ind-w', txt.offsetWidth + 'px');
+      });
+    }
+
     /* ---------- cascarón común ---------- */
-    function crear(id) {
+    function crear(id, clave, estado) {
+      var contenido = flujos.vista(id, clave, estado);
       var el = document.createElement('section');
       el.className = 'nws-lpvw nws-lpvw--' + id;
       el.hidden = true;
       el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
-      el.setAttribute('aria-label', id === 'regionales' ? regActual().nombre : id === 'calendario' ? C.titulo : R.titulo);
-      var volver = S.iconButton({ icon: 'chevron-left', size: 'medium', variant: 'mute', theme: 'neutral', label: id === 'regionales' ? 'Volver' : 'Volver a Inicio', cls: 'nws-lpvw__volver', attrs: { 'data-vw-cerrar': true } });
+      el.setAttribute('aria-label', contenido ? contenido.titulo : id === 'regionales' ? regActual().nombre : C.titulo);
+      var volver = S.iconButton({ icon: 'chevron-left', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Volver', cls: 'nws-lpvw__volver', attrs: { 'data-vw-cerrar': true } });
       var cabecera, cuerpo;
-      if (id === 'regionales') {
+      if (contenido) {
+        el.classList.add('nws-fl');
+        if (contenido.dialogo) { el.classList.add('nws-fl--dialogo'); }
+        if (contenido.violeta) { el.classList.add('nws-fl--violeta'); }
+        el.setAttribute('data-dev', contenido.dev);
+        cabecera = contenido.dialogo
+          ? S.h('header', { class: 'nws-fl__modal-cab' }, S.h('h1', { class: 'nws-fl__modal-t' }, e(contenido.titulo)), S.iconButton({ icon: 'close', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Cerrar', cls: 'nws-fl__modal-x', attrs: { 'data-vw-cerrar': true } }))
+          : contenido.foto
+          ? S.h('header', { class: 'nws-lpvw__top nws-fl__top--foto', style: 'background-image:url(' + contenido.foto + ')' }, volver, S.h('h1', { class: 'nws-fl__sr' }, e(contenido.titulo)))
+          : contenido.violeta
+          ? S.h('header', { class: 'nws-fl__top nws-fl__top--violeta' }, S.h('div', { class: 'nws-fl__top-fila' }, volver), S.h('h1', { class: 'nws-fl__top-t' }, e(contenido.titulo)), contenido.sub ? S.h('p', { class: 'nws-fl__top-sub' }, e(contenido.sub)) : '')
+          : S.h('header', { class: 'nws-lpvw__top' }, volver, S.h('h1', { class: contenido.sinTitulo ? 'nws-fl__sr' : 'nws-lpvw__titulo' }, e(contenido.titulo)));
+        cuerpo = S.h('div', { class: 'nws-lpvw__scroll' }, S.h('div', { class: 'nws-fl__contenido' }, S.h('div', { 'data-fl-contenido': true }, contenido.html), S.h('p', { class: 'nws-fl__aviso' }, e(L.app.flujos.aviso))));
+      } else if (id === 'regionales') {
+        el.setAttribute('data-dev', 'fl-regionales');
         cabecera = cabeceraRegionales(volver);
         cuerpo = S.h('div', { class: 'nws-lpvw__scroll' }, regionalesHtml());
       } else {
-        cabecera = S.h('header', { class: 'nws-lpvw__top' }, volver, id === 'calendario' ? S.h('h1', { class: 'nws-lpvw__titulo' }, e(C.titulo)) : '');
-        cuerpo = id === 'calendario'
-          ? S.h('div', { class: 'nws-lpvw__scroll' }, calendario())
-          : S.h('div', { class: 'nws-lpvw__centro' }, S.h('p', null, e(R.texto)));
+        cabecera = S.h('header', { class: 'nws-lpvw__top' }, volver, S.h('h1', { class: 'nws-lpvw__titulo' }, e(C.titulo)));
+        cuerpo = S.h('div', { class: 'nws-lpvw__scroll' }, calendario());
       }
       el.innerHTML = S.h('div', { class: 'nws-lpvw__bloque' },
         S.h('div', { class: 'nws-lpvw__estado' }, o.barraEstado(S, L.hora)), cabecera, cuerpo,
@@ -226,8 +252,35 @@ window.LANDING_VISTAS = (function () {
         });
       }
       el.addEventListener('keydown', moverOpcion);
+      el.addEventListener('keydown', function (ev) {
+        var tab = ev.target.closest('.nws-fl__tabs [data-tab]');
+        if (!tab || ['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(ev.key) < 0) { return; }
+        var botones = Array.from(tab.closest('.nws-fl__tabs').querySelectorAll('[data-tab]'));
+        var i = botones.indexOf(tab), n = ev.key === 'Home' ? 0 : ev.key === 'End' ? botones.length - 1 : (i + (ev.key === 'ArrowLeft' ? -1 : 1) + botones.length) % botones.length;
+        ev.preventDefault(); botones[n].click();
+      });
+      el.addEventListener('change', function (ev) {
+        var f = ev.target.closest('[data-filtro]'); if (!f || f.type === 'search') { return; }
+        var key = f.getAttribute('data-filtro'); estado[key] = f.value;
+        if (key === 'departamento') { estado.municipio = ''; }
+        if (key === 'deporte') { estado.categoria = ''; }
+        repintar(el, id, clave, estado);
+        var nuevo = el.querySelector('[data-filtro="' + key + '"]'); if (nuevo) { nuevo.focus({ preventScroll: true }); }
+      });
+      el.addEventListener('input', function (ev) {
+        if (!ev.target.matches('input[data-filtro="busqueda"]')) { return; }
+        estado.busqueda = ev.target.value;
+        var region = el.querySelector('[data-fl-calendario]');
+        if (region) { region.innerHTML = flujos.calendarioRegional(estado, clave); }
+      });
       el.addEventListener('click', function (ev) {
         var t = ev.target;
+        var ir = t.closest('[data-flujo]');
+        if (ir) { ev.stopPropagation(); abrir(ir.getAttribute('data-flujo'), ir, ir.getAttribute('data-clave')); return; }
+        var dia = t.closest('[data-fl-dia]');
+        if (dia) { ev.stopPropagation(); estado.dia = dia.getAttribute('data-fl-dia'); repintar(el, id, clave, estado); el.querySelector('[data-fl-dia="' + estado.dia + '"]').focus({ preventScroll: true }); return; }
+        var tab = t.closest('.nws-fl__tabs [data-tab]');
+        if (tab) { ev.stopPropagation(); var destino = flujos.destinoTab(id, clave, tab.getAttribute('data-tab')); if (destino) { abrir(destino.id, tab, destino.clave); return; } estado.tab = tab.getAttribute('data-tab'); repintar(el, id, clave, estado); el.querySelector('[data-tab="' + estado.tab + '"]').focus({ preventScroll: true }); return; }
         var cb = t.closest('[data-reg-cambiar]');
         if (cb) { ev.stopPropagation(); ponerCambio(!cambioAbierto(), true); return; }
         var op = t.closest('[data-reg-op]');
@@ -260,44 +313,67 @@ window.LANDING_VISTAS = (function () {
 
     function inerte(v) { capas.forEach(function (c) { if (c) { c.inert = v; } }); }
 
-    function abrir(id, origen) {
-      if (actual === id || !(id === 'regionales' || id === 'calendario' || id === 'resultados')) { return; }
-      if (actual) { return; }
-      var v = vistas[id] || (vistas[id] = { el: crear(id) });
-      clearTimeout(timer);
-      actual = id; foco = origen || null;
+    function repintar(el, id, clave, estado) {
+      var v = flujos.vista(id, clave, estado);
+      el.querySelector('[data-fl-contenido]').innerHTML = v.html;
+      medirIndicadores(el);
+      if (o.posicionarIndicadores) { o.posicionarIndicadores(el); }
+      mob.dispatchEvent(new CustomEvent('jin:vista'));
+    }
+    function abrir(id, origen, clave, alCerrar) {
+      var estado = {}, contenido;
+      if (id === 'competencias' && actual) { Object.assign(estado, actual.estado); estado.tab = '0'; }
+      if ((id === 'competencia' || id === 'partido' || id === 'salida') && actual && actual.estado.dia) { estado.dia = actual.estado.dia; }
+      contenido = flujos.vista(id, clave, estado);
+      if (!contenido && id !== 'regionales' && id !== 'calendario') {
+        if (o.proximamente) { o.proximamente(id, origen); } return;
+      }
+      if (actual && actual.id === id && actual.clave === clave) { return; }
+      if (actual) { ponerCambio(false, false); actual.el.inert = true; actual.el.setAttribute('aria-modal', 'false'); }
+      var v = { id: id, clave: clave, estado: estado, origen: origen || document.activeElement, alCerrar: alCerrar };
+      v.el = crear(id, clave, estado); vistas[id] = v;
+      pila.push(v); actual = v;
       v.el.hidden = false;
       void v.el.offsetWidth;
+      medirIndicadores(v.el);
       v.el.classList.add('nws-lpvw--abierta');
-      inerte(true);
-      mob.classList.add('nws-lp--vista');
+      inerte(true); mob.classList.add('nws-lp--vista');
       document.addEventListener('keydown', onEsc);
-      setTimeout(function () { var b = v.el.querySelector('.nws-lpvw__volver button'); if (b) { b.focus({ preventScroll: true }); } }, reducido ? 0 : 60);
+      if (o.posicionarIndicadores) { o.posicionarIndicadores(v.el); }
+      var enfoque = v.el.querySelector('.nws-lpvw__volver button') || v.el.querySelector('.nws-fl__modal-x button');
+      if (enfoque) { enfoque.focus({ preventScroll: true }); }
+      mob.dispatchEvent(new CustomEvent('jin:vista'));
     }
     function cerrar() {
       if (!actual) { return; }
-      cerrarHoja();
-      ponerCambio(false, false);   /* la vista queda en caché: al reabrir, el panel arranca cerrado */
-      var v = vistas[actual]; actual = null;
+      cerrarHoja(); ponerCambio(false, false);
+      var v = pila.pop(); actual = pila[pila.length - 1] || null;
+      v.el.inert = true; v.el.setAttribute('aria-modal', 'false');
       v.el.classList.remove('nws-lpvw--abierta');
-      inerte(false);
-      mob.classList.remove('nws-lp--vista');
-      document.removeEventListener('keydown', onEsc);
-      timer = setTimeout(function () { v.el.hidden = true; }, reducido ? 0 : DUR);
-      var t = foco || mob.querySelector('.nws-lpx__tabbar [data-tab="inicio"]'); foco = null;
-      if (t) { t.focus({ preventScroll: true }); }
+      despues(function () { v.el.remove(); }, reducido ? 0 : DUR);
+      if (actual) { actual.el.inert = false; actual.el.setAttribute('aria-modal', 'true'); vistas[actual.id] = actual; }
+      else { inerte(false); mob.classList.remove('nws-lp--vista'); document.removeEventListener('keydown', onEsc); }
+      if (v.origen && v.origen.isConnected) { v.origen.focus({ preventScroll: true }); }
+      if (v.alCerrar) { v.alCerrar(); }
+      mob.dispatchEvent(new CustomEvent('jin:vista'));
     }
     function onEsc(ev) {
+      if (ev.key === 'Tab' && actual) {
+        var controles = Array.from((hoja || actual.el).querySelectorAll('button:not([disabled]), input, select, summary, a[href], [tabindex="0"]')).filter(function (x) { return !x.closest('[inert]') && x.getClientRects().length; });
+        var primero = controles[0], ultimo = controles[controles.length - 1];
+        if (ev.shiftKey && document.activeElement === primero) { ev.preventDefault(); ultimo.focus(); }
+        else if (!ev.shiftKey && document.activeElement === ultimo) { ev.preventDefault(); primero.focus(); }
+      }
       if (ev.key !== 'Escape') { return; }
-      ev.preventDefault();
+      ev.preventDefault(); ev.stopImmediatePropagation();
       if (hoja) { cerrarHoja(); } else if (cambioAbierto()) { ponerCambio(false, true); } else { cerrar(); }
     }
 
     return {
       abrir: abrir, cerrar: cerrar,
       destruir: function () {
-        clearTimeout(timer); clearTimeout(tReg); clearTimeout(tEntra); document.removeEventListener('keydown', onEsc);
-        Object.keys(vistas).forEach(function (k) { vistas[k].el.remove(); });
+        destruido = true; pendientes.forEach(clearTimeout); clearTimeout(tReg); clearTimeout(tEntra); document.removeEventListener('keydown', onEsc);
+        mob.querySelectorAll('.nws-lpvw').forEach(function (el) { el.remove(); }); pila = []; actual = null;
         inerte(false);
       }
     };
