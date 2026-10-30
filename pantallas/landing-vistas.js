@@ -280,6 +280,11 @@ window.LANDING_VISTAS = (function () {
       });
       el.addEventListener('click', function (ev) {
         var t = ev.target;
+        /* hoja inferior «Elige una opción» de las listas de inscritos */
+        var hj = t.closest('[data-fl-hoja]');
+        if (hj) { ev.stopPropagation(); var hoja_ = el.querySelector('.nws-fl__hoja'); if (hoja_) { hoja_.classList.toggle('nws-fl__hoja--abierta', hj.getAttribute('data-fl-hoja') === 'abrir'); } return; }
+        var opc = t.closest('[data-fl-opcion]');
+        if (opc) { ev.stopPropagation(); estado.lista = opc.getAttribute('data-fl-opcion'); repintar(el, id, clave, estado); return; }
         var ir = t.closest('[data-flujo]');
         if (ir) { ev.stopPropagation(); abrir(ir.getAttribute('data-flujo'), ir, ir.getAttribute('data-clave')); return; }
         var dia = t.closest('[data-fl-dia]');

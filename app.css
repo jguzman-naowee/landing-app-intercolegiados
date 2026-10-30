@@ -2206,3 +2206,67 @@ body.nws-modo-dev [data-dev].nws-dev--foco { outline: 2.5px solid var(--nws-jic-
 .nws-fl__inst-card { box-shadow: none; margin-bottom: 20px; padding: 16px 16px 20px; }
 .nws-fl__inst-card .nws-fl__grid { row-gap: 20px; }
 .nws-fl__top-logo-img { height: 44px; }
+
+/* Inscritos: título con actualizar, buscador y selector en una fila, filas de 120 px con documento, nombre, chip del deporte y personal de apoyo. */
+.nws-fl__insc-cab { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.nws-fl__contenido .nws-fl__insc-cab h2 { margin: 0; font-size: 17px; line-height: 22px; font-weight: 700; }
+.nws-fl__insc-act { width: 36px; height: 36px; padding: 6px; border: 0; background: none; color: #282834; cursor: pointer; }
+.nws-fl__contenido .nws-fl__insc-t { margin: 8px 0 16px; font-size: 13px; line-height: 17px; color: #282834; }
+.nws-fl__insc-filtros { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; margin-bottom: 16px; }
+.nws-fl__buscar--pill { border-radius: 999px; padding-left: 44px; }
+.nws-fl__insc-filtros .nws-fl__filtro { margin: 0; }
+.nws-fl__insc-filtros .nws-fl__filtro select { border-radius: 12px; }
+.nws-fl__insc-filtros .nws-fl__select--vacio { color: #282834; }
+.nws-fl__insc-lista { margin: 0 -16px; border-top: 1px solid #d0d4e6; }
+.nws-fl__insc-vacio { margin: 24px 0 0; text-align: center; font-size: 15px; font-weight: 700; color: #282834; }
+.nws-fl__insc-fila { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-height: 120px; padding: 12px 20px; border-bottom: 1px solid #d0d4e6; }
+.nws-fl__insc-doc { font-size: 16px; color: #282834; }
+.nws-fl__insc-linea { display: flex; align-items: center; gap: 8px; }
+.nws-fl__insc-n { flex: 1; min-width: 0; font-size: 16px; line-height: 20px; font-weight: 600; color: #282834; }
+.nws-fl__insc-dep { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 2px solid #d74009; border-radius: 8px; box-shadow: 0 0 2px 2px #ffdaa3; font-size: 12px; font-weight: 600; color: #282834; }
+.nws-fl__insc-dep img { width: 14px; height: 14px; }
+.nws-fl__insc-apoyo { align-self: flex-start; padding: 3px 10px; border-radius: 999px; background: #ffedc7; color: #942700; font-size: 12px; font-weight: 600; }
+.nws-fl__insc-apoyo--con { background: #deface; color: #17641a; }
+.nws-fl__insc-apoyo { font-weight: 800; }
+
+/* Selector de listas: botón que abre una hoja inferior «Elige una opción» (NaoweeSelect de la app). */
+.nws-fl__sel-btn { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 48px; padding: 0 14px; border: 1px solid #8788ab; border-radius: 12px; background: #fff; color: #282834; font: inherit; font-size: 14px; cursor: pointer; }
+.nws-fl__sel-btn svg { flex: none; width: 14px; height: 9px; color: #441e63; }
+.nws-fl__hoja { display: none; position: absolute; inset: 0; z-index: 6; }
+.nws-fl__hoja--abierta { display: block; }
+.nws-fl__hoja-velo { position: absolute; inset: 0; background: rgb(24 30 71 / .5); }
+.nws-fl__hoja-panel { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 32px; border-radius: 28px 28px 0 0; background: #fff; }
+.nws-fl__hoja-asa { display: block; width: 36px; height: 4px; margin: 0 auto 12px; border-radius: 2px; background: #5b5f8a; }
+.nws-fl__hoja-cab { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.nws-fl__contenido .nws-fl__hoja-cab h3 { margin: 0; font-size: 20px; line-height: 26px; font-weight: 700; color: #282834; }
+.nws-fl__hoja-cab button { width: 36px; height: 36px; padding: 6px; border: 0; background: none; color: #646587; cursor: pointer; }
+.nws-fl__hoja-op { display: block; width: 100%; padding: 14px 0; border: 0; background: none; text-align: left; font: inherit; font-size: 15px; color: #282834; cursor: pointer; }
+.nws-fl__insc-rol { font-size: 13px; color: #646587; }
+/* Filas de inscritos más compactas. */
+.nws-fl__insc-fila { min-height: 0; padding: 10px 20px; gap: 2px; }
+.nws-fl__insc-apoyo { margin-top: 2px; }
+.nws-fl__insc-fila { min-height: 112px; padding: 12px 20px; gap: 3px; }
+
+/* Perfil del personal de apoyo (app): volver, cabecera con avatar, info personal, pestañas y listas. */
+button.nws-fl__insc-fila--btn { width: 100%; text-align: left; border: 0; border-bottom: 1px solid #d0d4e6; background: #fff; font: inherit; cursor: pointer; }
+.nws-fl__atras { display: block; width: 36px; height: 36px; margin: 4px 0 0 -6px; padding: 6px; border: 0; background: none; color: #d74009; cursor: pointer; }
+.nws-fl__contenido .nws-fl__apoyo-t { margin: 4px 0 16px; font-size: 17px; line-height: 22px; font-weight: 700; }
+.nws-fl__apoyo-cab { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.nws-fl__apoyo-av { flex: none; display: grid; place-items: center; width: 66px; height: 66px; border-radius: 50%; background: #deface; color: #17641a; font-size: 28px; font-weight: 700; line-height: 1; text-transform: uppercase; text-align: center; }
+.nws-fl__apoyo-tx { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.nws-fl__contenido .nws-fl__apoyo-n { margin: 0; font-size: 19px; line-height: 23px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__apoyo-r { margin: 0; font-size: 14px; color: #646587; }
+.nws-fl__apoyo-info { margin: 0 0 20px; padding: 14px 16px; border-color: #d0d4e6; box-shadow: none; }
+.nws-fl__contenido .nws-fl__apoyo-info h3 { margin: 0 0 8px; font-size: 15px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__apoyo-sec { margin: 24px 0 12px; font-size: 18px; line-height: 22px; font-weight: 700; }
+.nws-fl__apoyo-dep { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #d74009; border-radius: 12px; box-shadow: 0 0 2px 2px #ffdaa3; font-size: 13px; font-weight: 700; color: #282834; }
+.nws-fl__apoyo-dep img { width: 16px; height: 16px; }
+.nws-fl__apoyo-fila { display: flex; flex-direction: column; gap: 2px; padding: 12px 0; border-bottom: 1px solid #d0d4e6; }
+.nws-fl__apoyo-fila--inst { flex-direction: row; align-items: center; justify-content: space-between; }
+.nws-fl__apoyo-fila-l { display: flex; flex-direction: column; gap: 2px; }
+.nws-fl__apoyo-doc { font-size: 14px; color: #646587; }
+.nws-fl__apoyo-nom { font-size: 15px; font-weight: 700; color: #282834; }
+.nws-fl__agregar { width: 100%; min-height: 48px; margin-top: 28px; border: 0; border-radius: 12px; background: #c9ccee; color: #8e92c0; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+/* Perfil del deportista inscrito: avatar grande y tarjetas. */
+.nws-fl__apoyo-av--g { width: 80px; height: 80px; font-size: 32px; }

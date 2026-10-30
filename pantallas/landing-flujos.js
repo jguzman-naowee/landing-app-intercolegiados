@@ -116,7 +116,70 @@ window.LANDING_FLUJOS = function (S, L) {
         + cardP('Datos de ubicación', [celdaP('Departamento', 'VALLE DE LOS VIENTOS'), celdaP('Municipio', 'VILLA AURORA'), celdaP('Dirección', 'No asignado')])
         + cardP('Datos del representante', [celdaP('Nombre representante', 'Representante de ejemplo'), celdaP('Tipo de documento', 'No asignado'), celdaP('Número de documento', 'No asignado')]);
       pie = h('button', { type: 'button', class: 'nws-fl__pie-it nws-fl__pie-it--act', 'aria-current': 'page' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Perfil</span>')
-        + h('button', { type: 'button', class: 'nws-fl__pie-it', 'data-toast': 'Inscritos' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Inscritos</span>');
+        + h('button', { type: 'button', class: 'nws-fl__pie-it', 'data-flujo': 'inscritos', 'data-clave': '' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Inscritos</span>');
+    } else if (id === 'inscritos') {
+      t = 'Inscritos'; barraLogo = true;
+      /* listas de inscritos (registered_sportman_and_team_and_support_staff_screen.dart y sportsman_registered_list.dart) */
+      var lista = st.lista || '';
+      var filas = lista === ''
+        ? F.deportistas.map(function (a, i) {
+          var con = i % 2 === 0;
+          return h('button', { type: 'button', class: 'nws-fl__insc-fila nws-fl__insc-fila--btn', 'data-flujo': 'atleta', 'data-clave': String(i) }, h('span', { class: 'nws-fl__insc-doc' }, '10203040' + (50 + i)),
+            h('span', { class: 'nws-fl__insc-linea' }, h('span', { class: 'nws-fl__insc-n' }, e(a.nombre)),
+              h('span', { class: 'nws-fl__insc-dep' }, h('img', { src: ICONO_DEPORTE[a.deporte] || ICONO_PIN, alt: '' }), e(a.deporte)), ir()),
+            h('span', { class: 'nws-fl__insc-apoyo' + (con ? ' nws-fl__insc-apoyo--con' : '') }, con ? 'Con personal de apoyo' : 'Sin personal de apoyo'));
+        }).join('')
+        : (lista === 'Personal de apoyo'
+          ? h('button', { type: 'button', class: 'nws-fl__insc-fila nws-fl__insc-fila--btn', 'data-flujo': 'apoyo', 'data-clave': '' }, h('span', { class: 'nws-fl__insc-doc' }, '1020304099'),
+            h('span', { class: 'nws-fl__insc-linea' }, h('span', { class: 'nws-fl__insc-n' }, 'Marisol Aurora Cielo'), h('span', { class: 'nws-fl__insc-dep' }, h('img', { src: ICONO_DEPORTE['Atletismo'], alt: '' }), 'Atletismo'), ir()),
+            h('span', { class: 'nws-fl__insc-rol' }, 'Docente/Entrenador'), h('span', { class: 'nws-fl__insc-apoyo nws-fl__insc-apoyo--con' }, 'Asignado'))
+          : h('p', { class: 'nws-fl__insc-vacio' }, 'No hay equipos inscritos'));
+      b = h('div', { class: 'nws-fl__insc-cab' }, h('h2', null, 'Listas de inscritos'),
+          h('button', { type: 'button', class: 'nws-fl__insc-act', 'data-toast': 'Actualizar', 'aria-label': 'Actualizar' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'))
+        + h('p', { class: 'nws-fl__insc-t' }, 'Busca en la lista tus estudiantes y personal de apoyo inscritos.')
+        + h('div', { class: 'nws-fl__insc-filtros' }, h('input', { class: 'nws-fl__buscar nws-fl__buscar--pill', type: 'search', placeholder: 'Buscar', 'aria-label': 'Buscar', 'data-search': '' }),
+          h('button', { type: 'button', class: 'nws-fl__sel-btn', 'data-fl-hoja': 'abrir', 'aria-haspopup': 'dialog' }, h('span', null, e({ '': 'Deportistas', 'Personal de apoyo': 'P. de apoyo', 'Equipos': 'Equipos' }[lista])), '<svg viewBox="0 0 16 10" aria-hidden="true"><path d="M2 2l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+          + h('div', { class: 'nws-fl__hoja' }, h('div', { class: 'nws-fl__hoja-velo', 'data-fl-hoja': 'cerrar' }),
+            h('div', { class: 'nws-fl__hoja-panel', role: 'dialog', 'aria-label': 'Elige una opción' }, h('span', { class: 'nws-fl__hoja-asa' }),
+              h('div', { class: 'nws-fl__hoja-cab' }, h('h3', null, 'Elige una opción'), h('button', { type: 'button', 'data-fl-hoja': 'cerrar', 'aria-label': 'Cerrar' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>')),
+              [['', 'Deportistas'], ['Personal de apoyo', 'Personal de apoyo'], ['Equipos', 'Equipos']].map(function (o) { return h('button', { type: 'button', class: 'nws-fl__hoja-op', 'data-fl-opcion': o[0] }, e(o[1])); }).join(''))))
+        + h('div', { class: 'nws-fl__insc-lista' }, filas);
+      pie = h('button', { type: 'button', class: 'nws-fl__pie-it', 'data-vw-cerrar': 'true' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Perfil</span>')
+        + h('button', { type: 'button', class: 'nws-fl__pie-it nws-fl__pie-it--act', 'aria-current': 'page' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Inscritos</span>');
+    } else if (id === 'atleta') {
+      x = F.deportistas[+k || 0]; t = 'Perfil del deportista'; barraLogo = true;
+      /* perfil del deportista inscrito de la app: datos de ejemplo */
+      var partes = String(x.categoria).split(' · '), sexo = /Fem/.test(partes[1] || '') ? 'Mujer' : 'Hombre';
+      var cardA = function (tit, cuerpo) { return tarjeta('nws-fl__inst-card', h('h2', null, e(tit)) + cuerpo); };
+      b = h('button', { type: 'button', class: 'nws-fl__atras', 'data-vw-cerrar': 'true', 'aria-label': 'Volver' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+        + h('h2', { class: 'nws-fl__apoyo-t' }, 'Perfil del deportista')
+        + h('div', { class: 'nws-fl__apoyo-cab' }, h('span', { class: 'nws-fl__apoyo-av nws-fl__apoyo-av--g', 'aria-hidden': 'true' }, e(x.nombre.charAt(0))), h('p', { class: 'nws-fl__apoyo-n' }, e(x.nombre)))
+        + cardA('Info. Personal', h('div', { class: 'nws-fl__grid' }, celdaX('Fecha de nacimiento', '15 de mayo, 2010'), celdaX('Sexo', sexo),
+          h('div', { class: 'nws-fl__celda' }, h('span', { class: 'nws-fl__celda-l' }, 'Deporte'), h('span', { class: 'nws-fl__chip-dep' }, h('img', { src: ICONO_DEPORTE[x.deporte] || ICONO_PIN, alt: '' }), e(x.deporte)))))
+        + cardA('Info. Deportiva', h('div', { class: 'nws-fl__grid' }, celdaX('Tipo de deporte', x.deporte === 'Atletismo' ? 'Individual' : 'Equipo'), celdaX('Categoría', partes[0])))
+        + cardA('Personal de apoyo', h('div', { class: 'nws-fl__grid' }, celdaX('Nombre', 'Marisol Aurora Cielo')));
+      pie = h('button', { type: 'button', class: 'nws-fl__pie-it', 'data-vw-cerrar': 'true' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Perfil</span>')
+        + h('button', { type: 'button', class: 'nws-fl__pie-it nws-fl__pie-it--act', 'aria-current': 'page' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Inscritos</span>');
+    } else if (id === 'apoyo') {
+      t = 'Perfil del personal de apoyo'; barraLogo = true;
+      /* perfil del personal de apoyo de la app: datos de ejemplo */
+      var dep = function (nom) { return h('span', { class: 'nws-fl__insc-dep' }, h('img', { src: ICONO_DEPORTE['Atletismo'], alt: '' }), e(nom)); };
+      b = h('button', { type: 'button', class: 'nws-fl__atras', 'data-vw-cerrar': 'true', 'aria-label': 'Volver' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+        + h('h2', { class: 'nws-fl__apoyo-t' }, 'Perfil del personal de apoyo')
+        + h('div', { class: 'nws-fl__apoyo-cab' }, h('span', { class: 'nws-fl__apoyo-av', 'aria-hidden': 'true' }, 'M'),
+          h('div', { class: 'nws-fl__apoyo-tx' }, h('span', { class: 'nws-fl__insc-apoyo nws-fl__insc-apoyo--con' }, 'Asignado'), h('p', { class: 'nws-fl__apoyo-n' }, 'Marisol Aurora Cielo'), h('p', { class: 'nws-fl__apoyo-r' }, 'Entrenador')))
+        + tarjeta('nws-fl__apoyo-info', h('h3', null, 'Info. Personal') + h('div', { class: 'nws-fl__grid' }, celdaX('Instituciones', '1 asignadas'), celdaX('Email', 'marisol@ejemplo.com')))
+        + tabs(['Instituciones', 'Deportes', 'Deportistas'], st);
+      if (+st.tab === 1) {
+        b += h('h2', { class: 'nws-fl__apoyo-sec' }, 'Deportes asignados') + h('span', { class: 'nws-fl__apoyo-dep' }, h('img', { src: ICONO_DEPORTE['Atletismo'], alt: '' }), 'Atletismo - Juvenil');
+      } else if (+st.tab === 2) {
+        b += h('h2', { class: 'nws-fl__apoyo-sec' }, 'Deportistas asignados')
+          + [['1020304050', 'Elian Brisaclara'], ['1020304052', 'Darío Nubecalma']].map(function (d) { return h('div', { class: 'nws-fl__apoyo-fila' }, h('span', { class: 'nws-fl__apoyo-doc' }, d[0]), h('span', { class: 'nws-fl__apoyo-nom' }, d[1]), h('span', { class: 'nws-fl__apoyo-doc' }, 'Atletismo - Juvenil')); }).join('')
+          + h('button', { type: 'button', class: 'nws-fl__agregar', 'data-toast': 'Agregar deportistas' }, '+ Agregar deportistas');
+      } else {
+        b += h('h2', { class: 'nws-fl__apoyo-sec' }, 'Instituciones relacionadas')
+          + h('div', { class: 'nws-fl__apoyo-fila nws-fl__apoyo-fila--inst' }, h('span', { class: 'nws-fl__apoyo-fila-l' }, h('span', { class: 'nws-fl__apoyo-nom' }, 'Institución de ejemplo'), h('span', { class: 'nws-fl__apoyo-doc' }, 'Entrenador')), dep('Atletismo'));
+      }
     } else if (id === 'noticias') {
       t = 'Noticias';
       b = h('h1', { class: 'nws-fl__h1 nws-fl__h1--noticias' }, 'Noticias') + [L.novedad].concat(L.noticias).map(function (n, i) {
@@ -273,7 +336,7 @@ window.LANDING_FLUJOS = function (S, L) {
         return tarjeta('nws-fl__resultado', h('details', { name: 'jin-resultados' }, h('summary', null, e(r.nombre)), texto(r.categoria + ' · ' + r.ronda + ' · ' + r.fase) + tabla(['Competencia', 'Estado', 'Resultados'], [[r.prueba, r.estado, r.resultado]])));
       }).join('') + texto('Página 1 de 1');
     } else { return null; }
-    return { titulo: t, sub: sub, violeta: violeta, foto: foto, naranja: naranja, barraLogo: barraLogo, pie: pie, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia' || id === 'login' || id === 'perfil', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
+    return { titulo: t, sub: sub, violeta: violeta, foto: foto, naranja: naranja, barraLogo: barraLogo, pie: pie, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia' || id === 'login' || id === 'perfil' || id === 'inscritos', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
   }
   /* Tabla genérica: cada celda es texto o { html } ya armado. */
   function celda(c) { return c && typeof c === 'object' ? c.html : e(String(c)); }
@@ -315,6 +378,7 @@ window.LANDING_FLUJOS = function (S, L) {
   var ICONO_BAJAR = '<svg class="nws-fl__mes-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ESTRELLA = '<svg class="nws-fl__barra-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6-4.5-4.2 6.1-.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
   var TODAS = 'Todas las fechas';
+  function celdaX(l, v) { return h('div', { class: 'nws-fl__celda' }, h('span', { class: 'nws-fl__celda-l' }, e(l)), h('span', { class: 'nws-fl__celda-v' }, e(v))); }
   var PINCHIP = '<svg class="nws-fl__chip-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="11" r="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
   var FLECHA_GRUPO = '<svg class="nws-fl__grupo-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ICONO_BARRAS = '<svg class="nws-fl__leyenda-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
