@@ -133,7 +133,9 @@ window.LANDING_FLUJOS = function (S, L) {
           ? h('button', { type: 'button', class: 'nws-fl__insc-fila nws-fl__insc-fila--btn', 'data-flujo': 'apoyo', 'data-clave': '' }, h('span', { class: 'nws-fl__insc-doc' }, '1020304099'),
             h('span', { class: 'nws-fl__insc-linea' }, h('span', { class: 'nws-fl__insc-n' }, 'Marisol Aurora Cielo'), h('span', { class: 'nws-fl__insc-dep' }, h('img', { src: ICONO_DEPORTE['Atletismo'], alt: '' }), 'Atletismo'), ir()),
             h('span', { class: 'nws-fl__insc-rol' }, 'Docente/Entrenador'), h('span', { class: 'nws-fl__insc-apoyo nws-fl__insc-apoyo--con' }, 'Asignado'))
-          : h('p', { class: 'nws-fl__insc-vacio' }, 'No hay equipos inscritos'));
+          : h('button', { type: 'button', class: 'nws-fl__insc-fila nws-fl__insc-fila--btn', 'data-flujo': 'equipo', 'data-clave': '' }, h('span', { class: 'nws-fl__insc-rol' }, 'Equipo inscrito'),
+            h('span', { class: 'nws-fl__insc-linea' }, h('span', { class: 'nws-fl__insc-n' }, e(competencia('baloncesto').prueba + ' - ' + competencia('baloncesto').categoria.replace(' · ', ' '))),
+              h('span', { class: 'nws-fl__insc-dep' }, h('img', { src: ICONO_DEPORTE['Baloncesto'], alt: '' }), 'Baloncesto'), ir())));
       b = h('div', { class: 'nws-fl__insc-cab' }, h('h2', null, 'Listas de inscritos'),
           h('button', { type: 'button', class: 'nws-fl__insc-act', 'data-toast': 'Actualizar', 'aria-label': 'Actualizar' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'))
         + h('p', { class: 'nws-fl__insc-t' }, 'Busca en la lista tus estudiantes y personal de apoyo inscritos.')
@@ -146,6 +148,22 @@ window.LANDING_FLUJOS = function (S, L) {
         + h('div', { class: 'nws-fl__insc-lista' }, filas);
       pie = h('button', { type: 'button', class: 'nws-fl__pie-it', 'data-vw-cerrar': 'true' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Perfil</span>')
         + h('button', { type: 'button', class: 'nws-fl__pie-it nws-fl__pie-it--act', 'aria-current': 'page' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Inscritos</span>');
+    } else if (id === 'equipo') {
+      t = 'Perfil del grupo'; barraLogo = true; x = competencia('baloncesto');
+      /* perfil del grupo (registered_team_details_screen.dart): estructura según el código, datos de ejemplo */
+      b = h('button', { type: 'button', class: 'nws-fl__atras', 'data-vw-cerrar': 'true', 'aria-label': 'Volver' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+        + h('h2', { class: 'nws-fl__apoyo-t' }, 'Perfil del grupo')
+        + h('div', { class: 'nws-fl__apoyo-cab' }, h('span', { class: 'nws-fl__reg-ico', 'aria-hidden': 'true' }, h('img', { class: 'nws-fl__reg-img', src: ICONO_DEPORTE['Baloncesto'], alt: '' })), h('p', { class: 'nws-fl__apoyo-n' }, e(x.prueba + ' - ' + x.categoria.replace(' · ', ' '))))
+        + h('div', { class: 'nws-fl__minmax' }, h('span', null, 'Mínimo <strong>5</strong>'), h('span', null, 'Máximo <strong>12</strong>'))
+        + h('div', { class: 'nws-fl__equipo-acc' }, h('button', { type: 'button', class: 'nws-fl__btn-sec', 'data-toast': 'Inscribir P. de apoyo' }, 'Inscribir P. de apoyo'), h('button', { type: 'button', class: 'nws-fl__btn-pri', 'data-toast': 'Inscribir deportista' }, 'Inscribir deportista'))
+        + tabs(['Deportistas', 'Personal de apoyo'], st);
+      if (+st.tab === 1) {
+        b += h('h2', { class: 'nws-fl__apoyo-sec' }, 'Personal de apoyo asignado')
+          + h('div', { class: 'nws-fl__apoyo-fila' }, h('span', { class: 'nws-fl__apoyo-doc' }, '1020304099'), h('span', { class: 'nws-fl__apoyo-nom' }, 'Marisol Aurora Cielo'), h('span', { class: 'nws-fl__apoyo-doc' }, 'Sin rol asignado'));
+      } else {
+        b += h('div', { class: 'nws-fl__insc-cab' }, h('h2', { class: 'nws-fl__apoyo-sec nws-fl__apoyo-sec--sm' }, 'Deportistas Actuales'), h('span', { class: 'nws-fl__apoyo-doc' }, '2 de 12'))
+          + F.deportistas.filter(function (a) { return a.deporte === 'Baloncesto'; }).map(function (a, i) { return h('div', { class: 'nws-fl__apoyo-fila' }, h('span', { class: 'nws-fl__apoyo-doc' }, '10203040' + (53 + i)), h('span', { class: 'nws-fl__apoyo-nom' }, e(a.nombre))); }).join('');
+      }
     } else if (id === 'atleta') {
       x = F.deportistas[+k || 0]; t = 'Perfil del deportista'; barraLogo = true;
       /* perfil del deportista inscrito de la app: datos de ejemplo */
@@ -336,7 +354,7 @@ window.LANDING_FLUJOS = function (S, L) {
         return tarjeta('nws-fl__resultado', h('details', { name: 'jin-resultados' }, h('summary', null, e(r.nombre)), texto(r.categoria + ' · ' + r.ronda + ' · ' + r.fase) + tabla(['Competencia', 'Estado', 'Resultados'], [[r.prueba, r.estado, r.resultado]])));
       }).join('') + texto('Página 1 de 1');
     } else { return null; }
-    return { titulo: t, sub: sub, violeta: violeta, foto: foto, naranja: naranja, barraLogo: barraLogo, pie: pie, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia' || id === 'login' || id === 'perfil' || id === 'inscritos', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
+    return { titulo: t, sub: sub, violeta: violeta, foto: foto, naranja: naranja, barraLogo: barraLogo, pie: pie, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia' || id === 'login' || id === 'perfil' || id === 'inscritos' || id === 'equipo', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
   }
   /* Tabla genérica: cada celda es texto o { html } ya armado. */
   function celda(c) { return c && typeof c === 'object' ? c.html : e(String(c)); }

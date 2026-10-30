@@ -2270,3 +2270,12 @@ button.nws-fl__insc-fila--btn { width: 100%; text-align: left; border: 0; border
 
 /* Perfil del deportista inscrito: avatar grande y tarjetas. */
 .nws-fl__apoyo-av--g { width: 80px; height: 80px; font-size: 32px; }
+
+/* Perfil del grupo (equipo inscrito). */
+.nws-fl__minmax { display: inline-flex; gap: 16px; padding: 6px 14px; margin-bottom: 16px; border: 1px solid #d0d4e6; border-radius: 12px; font-size: 13px; color: #646587; }
+.nws-fl__minmax strong { color: #282834; font-weight: 700; }
+.nws-fl__equipo-acc { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.nws-fl__btn-sec, .nws-fl__btn-pri { min-height: 44px; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.nws-fl__btn-sec { border: 1.5px solid #d74009; background: #fff; color: #d74009; }
+.nws-fl__btn-pri { border: 0; background: #d74009; color: #fff; }
+.nws-fl__contenido .nws-fl__apoyo-sec--sm { margin: 20px 0 8px; }
