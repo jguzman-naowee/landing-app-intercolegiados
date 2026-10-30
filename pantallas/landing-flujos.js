@@ -232,7 +232,7 @@ window.LANDING_FLUJOS = function (S, L) {
         return tarjeta('nws-fl__resultado', h('details', { name: 'jin-resultados' }, h('summary', null, e(r.nombre)), texto(r.categoria + ' · ' + r.ronda + ' · ' + r.fase) + tabla(['Competencia', 'Estado', 'Resultados'], [[r.prueba, r.estado, r.resultado]])));
       }).join('') + texto('Página 1 de 1');
     } else { return null; }
-    return { titulo: t, sub: sub, violeta: violeta, foto: foto, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
+    return { titulo: t, sub: sub, violeta: violeta, foto: foto, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
   }
   /* Tabla genérica: cada celda es texto o { html } ya armado. */
   function celda(c) { return c && typeof c === 'object' ? c.html : e(String(c)); }
