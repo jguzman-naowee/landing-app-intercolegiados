@@ -41,7 +41,7 @@ window.PANTALLAS['landing-app'] = (function () {
      Sobre la portada va transparente —la banda violeta es de la portada— con
      logo blanco; al pasar la portada se vuelve material con división. */
   function accion(S, icono, label, extra) {
-    return S.iconButton({ icon: icono, size: 'small', variant: 'mute', theme: 'neutral', label: label, cls: S.cls('nws-lpx__accion', extra), attrs: { 'data-toast': label } });
+    return S.iconButton({ icon: icono, size: 'small', variant: 'mute', theme: 'neutral', label: label, cls: S.cls('nws-lpx__accion', extra), attrs: icono === 'user' ? { 'data-vista': 'login' } : { 'data-toast': label } });
   }
   function header(S) {
     return S.h('header', { class: 'nws-lpx__bar' },

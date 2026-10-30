@@ -2150,3 +2150,59 @@ body.nws-modo-dev [data-dev].nws-dev--foco { outline: 2.5px solid var(--nws-jic-
 .nws-fl__contenido .nws-fl__noticia-aut { margin: 0 0 12px; font-size: 12px; font-style: italic; color: #646587; }
 .nws-fl__contenido .nws-fl__noticia-txt { margin: 0 0 24px; font-size: 13px; line-height: 20px; color: #181e47; text-align: justify; }
 .nws-fl__noticia-btn { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #561b78; color: #fff; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+
+/* Inicio de sesión (pantalla de login de la app): cabecera naranja con X, formulario y enlaces. */
+.nws-fl--naranja .nws-lpvw__estado { background: #b83100; }
+.nws-fl--naranja .nws-mob__status { color: #fff; }
+.nws-fl__top-naranja { flex: none; position: relative; display: flex; align-items: center; justify-content: center; height: 48px; background: #b83100; color: #fff; }
+.nws-fl__login-x { position: absolute; left: 8px; --pvt-button-font-color: #fff; --pvt-button-dimension: 40px; }
+.nws-fl .nws-fl__login-x .nwt-icon-button__content { background: transparent; }
+.nws-fl__top-naranja-t { margin: 0; font-size: 16px; line-height: 20px; font-weight: 500; color: #fff; }
+.nws-fl__login-logo { display: block; height: 48px; margin: 8px 0 12px; }
+.nws-fl__contenido .nws-fl__login-t { margin: 8px 0 12px; font-size: 28px; line-height: 34px; font-weight: 400; text-align: center; color: #282834; }
+.nws-fl__login-t strong { font-weight: 700; }
+.nws-fl__contenido .nws-fl__login-sub { margin: 0 0 20px; font-size: 15px; line-height: 22px; text-align: center; color: #646587; }
+.nws-fl__login-campo { display: block; margin-bottom: 16px; }
+.nws-fl__login-campo > span:first-child { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #282834; }
+.nws-fl__login-campo b { color: #d74009; }
+.nws-fl__login-campo input { box-sizing: border-box; width: 100%; height: 48px; padding: 0 16px; border: 1px solid #8788ab; border-radius: 12px; background: #fff; font: inherit; font-size: 15px; color: #282834; }
+.nws-fl__login-campo input::placeholder { color: #a8acbf; }
+.nws-fl__login-pass { position: relative; display: block; }
+.nws-fl__login-pass input { padding-right: 48px; }
+.nws-fl__login-ojo { position: absolute; right: 14px; top: 12px; width: 24px; height: 24px; color: #d74009; }
+.nws-fl__contenido .nws-fl__login-olvido { margin: 0 0 20px; text-align: right; font-size: 14px; color: #646587; }
+.nws-fl__login-link { padding: 0; border: 0; background: none; font: inherit; font-size: 14px; color: #1f5fbf; text-decoration: underline; cursor: pointer; }
+.nws-fl__login-link--naranja { color: #d74009; font-weight: 700; }
+.nws-fl__login-btn { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #b83100; color: #fff; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.nws-fl__contenido .nws-fl__login-legal { margin: 24px 0 24px; text-align: center; font-size: 14px; color: #646587; }
+.nws-fl__contenido .nws-fl__login-ayuda { margin: 0 0 8px; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: #646587; }
+.nws-fl__contenido .nws-fl__login-ayuda-t { margin: 0; text-align: center; font-size: 13px; line-height: 20px; color: #646587; }
+.nws-lp .nws-fl .nws-fl__login-x, .nws-fl .nws-fl__login-x * { color: #fff; }
+.nws-fl__login-logo { height: 60px; width: auto; max-width: none; object-fit: contain; }
+.nws-fl--naranja .nws-lpvw__estado, .nws-fl--naranja .nws-fl__top-naranja { border: 0; box-shadow: none; }
+.nws-fl--naranja .nws-lpvw__estado { margin-bottom: -1px; }
+
+/* Perfil de la institución (institution_profile_screen.dart): barra con logo y menú, cabecera, tarjetas y navegación inferior. */
+.nws-fl__top-logo { flex: none; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 20px; border-bottom: 1px solid #e7e9f3; background: #fff; }
+.nws-fl__top-logo-img { height: 36px; width: auto; }
+.nws-fl__hamb { width: 36px; height: 36px; padding: 6px; border: 0; background: none; color: #646587; cursor: pointer; }
+.nws-fl__inst-cab { display: flex; align-items: center; gap: 12px; margin: 8px 0 20px; }
+.nws-fl__inst-av { position: relative; flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: #e9f1ff; color: #434ce4; font-size: 32px; font-weight: 500; }
+.nws-fl__inst-ver { position: absolute; right: -2px; bottom: -2px; width: 24px; height: 24px; }
+.nws-fl__inst-tx { min-width: 0; }
+.nws-fl__inst-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 10px; background: #e9f1ff; color: #002b5b; font-size: 11px; font-weight: 600; line-height: 14px; }
+.nws-fl__inst-cal { width: 12px; height: 12px; }
+.nws-fl__contenido .nws-fl__inst-n { margin: 6px 0 4px; font-size: 22px; line-height: 24px; font-weight: 700; color: #282834; }
+.nws-fl__contenido .nws-fl__inst-d { margin: 0; font-size: 14px; color: #646587; }
+.nws-fl__inst-card { margin: 0 0 16px; padding: 16px; }
+.nws-fl__contenido .nws-fl__inst-card h2 { margin: 0 0 12px; font-size: 18px; line-height: 22px; }
+.nws-fl__inst-card .nws-fl__celda-l { font-size: 13px; color: #646587; }
+.nws-fl__pie { flex: none; display: flex; justify-content: center; gap: 32px; padding: 10px 0 24px; border-top: 1px solid #e7e9f3; background: #fff; }
+.nws-fl__pie-it { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 88px; padding: 4px 0 8px; border: 0; border-bottom: 3px solid transparent; background: none; color: #646587; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.nws-fl__pie-it svg { width: 22px; height: 22px; }
+.nws-fl__pie-it--act { color: #d74009; border-bottom-color: #d74009; }
+/* Perfil: aire arriba, tarjetas solo con borde (sin sombra) y más espacio interno, como la app. */
+.nws-fl__inst-cab { margin: 28px 0 28px; }
+.nws-fl__inst-card { box-shadow: none; margin-bottom: 20px; padding: 16px 16px 20px; }
+.nws-fl__inst-card .nws-fl__grid { row-gap: 20px; }
+.nws-fl__top-logo-img { height: 44px; }

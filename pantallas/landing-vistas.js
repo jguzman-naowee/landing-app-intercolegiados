@@ -223,7 +223,12 @@ window.LANDING_VISTAS = (function () {
         if (contenido.dialogo) { el.classList.add('nws-fl--dialogo'); }
         if (contenido.violeta) { el.classList.add('nws-fl--violeta'); }
         el.setAttribute('data-dev', contenido.dev);
-        cabecera = contenido.dialogo
+        if (contenido.naranja) { el.classList.add('nws-fl--naranja'); }
+        cabecera = contenido.barraLogo
+          ? S.h('header', { class: 'nws-fl__top-logo' }, S.h('img', { class: 'nws-fl__top-logo-img', src: window.JIC.logos.intercolegiados, alt: 'Juegos Intercolegiados' }), S.h('button', { type: 'button', class: 'nws-fl__hamb', 'data-toast': 'Menú', 'aria-label': 'Menú' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'))
+          : contenido.naranja
+          ? S.h('header', { class: 'nws-fl__top-naranja' }, S.iconButton({ icon: 'close', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Cerrar', cls: 'nws-fl__login-x', attrs: { 'data-vw-cerrar': true } }), S.h('h1', { class: 'nws-fl__top-naranja-t' }, e(contenido.titulo)))
+          : contenido.dialogo
           ? S.h('header', { class: 'nws-fl__modal-cab' }, S.h('h1', { class: 'nws-fl__modal-t' }, e(contenido.titulo)), S.iconButton({ icon: 'close', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Cerrar', cls: 'nws-fl__modal-x', attrs: { 'data-vw-cerrar': true } }))
           : contenido.foto
           ? S.h('header', { class: 'nws-lpvw__top nws-fl__top--foto', style: 'background-image:url(' + contenido.foto + ')' }, volver, S.h('h1', { class: 'nws-fl__sr' }, e(contenido.titulo)))
@@ -240,7 +245,7 @@ window.LANDING_VISTAS = (function () {
         cuerpo = S.h('div', { class: 'nws-lpvw__scroll' }, calendario());
       }
       el.innerHTML = S.h('div', { class: 'nws-lpvw__bloque' },
-        S.h('div', { class: 'nws-lpvw__estado' }, o.barraEstado(S, L.hora)), cabecera, cuerpo,
+        S.h('div', { class: 'nws-lpvw__estado' }, o.barraEstado(S, L.hora)), cabecera, cuerpo + (contenido && contenido.pie ? S.h('nav', { class: 'nws-fl__pie', 'aria-label': 'Navegación' }, contenido.pie) : ''),
         id === 'regionales' ? S.h('p', { class: 'nws-lpvw__sr', 'aria-live': 'polite', 'data-reg-aviso': true }) : '');
       mob.appendChild(el);
       if (id === 'regionales' && o.proximamente) {
@@ -340,7 +345,7 @@ window.LANDING_VISTAS = (function () {
       inerte(true); mob.classList.add('nws-lp--vista');
       document.addEventListener('keydown', onEsc);
       if (o.posicionarIndicadores) { o.posicionarIndicadores(v.el); }
-      var enfoque = v.el.querySelector('.nws-lpvw__volver button') || v.el.querySelector('.nws-fl__modal-x button');
+      var enfoque = v.el.querySelector('.nws-lpvw__volver button') || v.el.querySelector('.nws-fl__modal-x button') || v.el.querySelector('.nws-fl__login-x button');
       if (enfoque) { enfoque.focus({ preventScroll: true }); }
       mob.dispatchEvent(new CustomEvent('jin:vista'));
     }

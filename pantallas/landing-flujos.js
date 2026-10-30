@@ -64,7 +64,7 @@ window.LANDING_FLUJOS = function (S, L) {
     return h('div', { class: 'nws-fl__dato' }, h('span', { class: 'nws-fl__dato-l' }, e(label)), h('span', { class: 'nws-fl__dato-v' }, e(valor)));
   }
   function vista(id, k, st) {
-    var t, sub = null, violeta = false, b, x, foto = null;
+    var t, sub = null, violeta = false, b, x, foto = null, naranja = false, barraLogo = false, pie = null;
     if (id === 'regional') {
       x = regional(k); t = (String(k).indexOf('individuales:') === 0 ? 'Regional de individuales' : 'Regional de conjuntos') + ' · ' + x.nombre.replace(/^Regional /, ''); sub = 'Sede ' + x.ciudad; violeta = true;
       b = tabs(F.regionalTabs, st);
@@ -88,6 +88,35 @@ window.LANDING_FLUJOS = function (S, L) {
         b += buscar(st, String(k).indexOf('individuales:') === 0 ? 'Buscar por nombre de la prueba' : 'Buscar por nombre del deporte') + select('Deporte', 'deporte', deportesRegional(k), st) + select('Categoría', 'categoria', categoriasRegional(k), st);
         b += h('div', { 'data-fl-calendario': true }, calendarioRegional(st, k));
       }
+    } else if (id === 'login') {
+      t = 'Iniciar sesión'; naranja = true;
+      /* pantalla de inicio de sesión de la app: solo la maqueta; ningún botón envía datos */
+      var logo = (window.JIC && window.JIC.logos && window.JIC.logos.mindeporte) || 'assets/landing/logo-mindeporte.svg';
+      var ojo = '<svg class="nws-fl__login-ojo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9c2.2 3.2 5.2 5 9 5s6.8-1.8 9-5M6 13l-2 3M12 14.5V18M18 13l2 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+      b = h('img', { class: 'nws-fl__login-logo', src: logo, alt: 'Deporte' })
+        + h('h1', { class: 'nws-fl__login-t' }, 'Bienvenido a <strong>Juegos Intercolegiados Nacionales 2026</strong> 👋')
+        + h('p', { class: 'nws-fl__login-sub' }, 'Ingresa tus credenciales para acceder a tu perfil y gestionar tu información deportiva.')
+        + h('label', { class: 'nws-fl__login-campo' }, h('span', null, 'Correo electrónico o código DANE <b>*</b>'), h('input', { type: 'text', placeholder: 'correo@ejemplo.com o código DANE', autocomplete: 'off' }))
+        + h('label', { class: 'nws-fl__login-campo' }, h('span', null, 'Contraseña <b>*</b>'), h('span', { class: 'nws-fl__login-pass' }, h('input', { type: 'password', placeholder: 'Ingresa tu contraseña', autocomplete: 'off' }), ojo))
+        + h('p', { class: 'nws-fl__login-olvido' }, '¿Olvidaste la contraseña? ' + h('button', { type: 'button', class: 'nws-fl__login-link nws-fl__login-link--naranja', 'data-toast': 'Recuperar contraseña' }, 'Recuperar'))
+        + h('button', { type: 'button', class: 'nws-fl__login-btn', 'data-flujo': 'perfil', 'data-clave': '' }, 'Iniciar sesión')
+        + h('p', { class: 'nws-fl__login-legal' }, h('button', { type: 'button', class: 'nws-fl__login-link', 'data-toast': 'Política de tratamiento de datos' }, 'Política de tratamiento de datos') + ' y ' + h('button', { type: 'button', class: 'nws-fl__login-link', 'data-toast': 'Términos y condiciones' }, 'Términos y condiciones'))
+        + h('p', { class: 'nws-fl__login-ayuda' }, '💬 ¿NECESITAS AYUDA?')
+        + h('p', { class: 'nws-fl__login-ayuda-t' }, 'Si tienes dudas o problemas con la activación de tu cuenta, puedes comunicarte con el equipo de soporte.');
+    } else if (id === 'perfil') {
+      t = 'Perfil de la institución'; barraLogo = true;
+      /* perfil de la institución (institution_profile_screen.dart) con datos de ejemplo */
+      var cal = '<svg class="nws-fl__inst-cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16M9 3v4M15 3v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+      var verif = '<svg class="nws-fl__inst-ver" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#d74009"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      var celdaP = function (l, v) { return h('div', { class: 'nws-fl__celda' }, h('span', { class: 'nws-fl__celda-l' }, e(l)), h('span', { class: 'nws-fl__celda-v' }, e(v))); };
+      var cardP = function (tit, celdas) { return tarjeta('nws-fl__inst-card', h('h2', null, e(tit)) + h('div', { class: 'nws-fl__grid' }, celdas.join(''))); };
+      b = h('div', { class: 'nws-fl__inst-cab' }, h('span', { class: 'nws-fl__inst-av' }, 'I' + verif),
+          h('div', { class: 'nws-fl__inst-tx' }, h('span', { class: 'nws-fl__inst-pill' }, cal + 'Inscripción 23 de Septiembre, 2026'), h('h1', { class: 'nws-fl__inst-n' }, 'INSTITUCIÓN DE EJEMPLO'), h('p', { class: 'nws-fl__inst-d' }, 'Código DANE 999000000001')))
+        + cardP('Datos básicos', [celdaP('Correo electrónico', 'correo@ejemplo.com'), celdaP('Teléfono', 'No asignado')])
+        + cardP('Datos de ubicación', [celdaP('Departamento', 'VALLE DE LOS VIENTOS'), celdaP('Municipio', 'VILLA AURORA'), celdaP('Dirección', 'No asignado')])
+        + cardP('Datos del representante', [celdaP('Nombre representante', 'Representante de ejemplo'), celdaP('Tipo de documento', 'No asignado'), celdaP('Número de documento', 'No asignado')]);
+      pie = h('button', { type: 'button', class: 'nws-fl__pie-it nws-fl__pie-it--act', 'aria-current': 'page' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Perfil</span>')
+        + h('button', { type: 'button', class: 'nws-fl__pie-it', 'data-toast': 'Inscritos' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Inscritos</span>');
     } else if (id === 'noticias') {
       t = 'Noticias';
       b = h('h1', { class: 'nws-fl__h1 nws-fl__h1--noticias' }, 'Noticias') + [L.novedad].concat(L.noticias).map(function (n, i) {
@@ -244,7 +273,7 @@ window.LANDING_FLUJOS = function (S, L) {
         return tarjeta('nws-fl__resultado', h('details', { name: 'jin-resultados' }, h('summary', null, e(r.nombre)), texto(r.categoria + ' · ' + r.ronda + ' · ' + r.fase) + tabla(['Competencia', 'Estado', 'Resultados'], [[r.prueba, r.estado, r.resultado]])));
       }).join('') + texto('Página 1 de 1');
     } else { return null; }
-    return { titulo: t, sub: sub, violeta: violeta, foto: foto, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
+    return { titulo: t, sub: sub, violeta: violeta, foto: foto, naranja: naranja, barraLogo: barraLogo, pie: pie, sinTitulo: id === 'competencias' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia' || id === 'login' || id === 'perfil', html: b, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
   }
   /* Tabla genérica: cada celda es texto o { html } ya armado. */
   function celda(c) { return c && typeof c === 'object' ? c.html : e(String(c)); }
