@@ -77,13 +77,14 @@ un protagonista (el mensaje y el hero) y un único bloque de acciones.
 
 - **Pestañas:** Juegos (inicio, con balón), Medallas, Certificados. Las dos últimas
   aún no tienen contenido: muestran un toast corto con la fecha estimada.
-- **Vistas inmersivas:** «Regional de conjuntos» (activa): cabecera en tres filas (volver; título y
-  «Cambiar» alineados por arriba; subtítulo) y una cuadrícula de 2 columnas con una tarjeta por
-  regional (foto, ciudad, nombre y flecha). «Cambiar» despliega, bajo el título, la lista
-  (Regional de conjuntos, Regional de individuales y Final nacional, de ejemplo, por confirmar)
-  con la actual seleccionada; al elegir otra cambia el título y se reordena el contenido de abajo.
-  Con una sola tarjeta (Final nacional, Bogotá) ocupa todo el espacio disponible. Tocar una
-  tarjeta sigue avisando «Disponible próximamente»; no navega. Calendario (mes, cuadrícula, agenda
+- **Vistas inmersivas:** «Fase Regional» (activa): cabecera con volver; título y «Cambiar» alineados por
+  arriba; subtítulo en dos líneas; panel de fases (colapsado) y pestañas Individual | Conjuntos en píldora.
+  Debajo, una cuadrícula de 2 columnas con una tarjeta por regional (foto, ciudad, nombre y flecha). Dos ejes,
+  como «Eventos y fases» de la web: «Cambiar» despliega el panel con la fase (Fase Regional o Fase Final
+  Nacional, la actual con check) y las pestañas eligen el tipo (Individual o Conjuntos). Al cambiar de fase
+  cambia el título; al cambiar cualquiera de los dos se reordena el contenido de abajo.
+  Conjuntos lista las ocho regionales de la web (Pacífico, Eje Cafetero, Centro Oriente, Centro Sur, Caribe 1, Caribe 2, Amazonía y Orinoquía, con su sede); Individual lista los cuatro eventos de atletismo que reciben dos regionales cada uno (Montería, Sopó, Armenia y Villavicencio). Con una sola tarjeta (Fase Final Nacional, Bogotá) ocupa todo el espacio disponible. Tocar una
+  tarjeta sigue avisando «Disponible próximamente»; no navega. Dentro de una regional, «Fase de Conjuntos» (o de Individuales) muestra los controles en la zona violeta (deporte, búsqueda, mes y género/edad) y, en una hoja sangrada de borde a borde, el calendario con los deportes fijos a la izquierda (una fila por deporte) y los días que se desplazan; cada tarjeta cae en la fila de su deporte, con Inicio y Final bajo el número del día. Los días de la cabecera solo marcan el rango; tocar una tarjeta del calendario abre el deporte con ese día. En atletismo se entra a la prueba (hits y final directa, podio y «Ver más» de cada enfrentamiento); en los deportes de conjunto, a sus pruebas por sexo y edad, con las fichas Partidos | Grupos | Posiciones y el detalle de cada partido (parciales por cuartos, tiempos o sets, y nómina). Voleibol del Pacífico y las pruebas de atletismo de Villavicencio usan datos reales de la web; marcas, parciales y nóminas son de ejemplo. Las fechas del calendario de atletismo salen de la web (Villavicencio: 26 y 27 de sept; Montería, Sopó y Armenia: 29 de sept al 2 de oct). Calendario (mes, cuadrícula, agenda
   del día, detalle) y Resultados (solo el texto «Vista de resultados») siguen en el
   código, sin camino de entrada.
 - **Sin enlaces que saquen de la app**, salvo el de la lista de videos de YouTube.

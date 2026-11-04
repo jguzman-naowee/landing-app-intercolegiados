@@ -5,8 +5,9 @@ window.LANDING_VISTAS = (function () {
 
   var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   var DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-  var DUR = 300;
-  var elegida = null;   /* regional elegida: en memoria, sobrevive a un nuevo montar(); sin localStorage */
+  var DUR = 440;
+  var elegida = null;   /* fase elegida (regional / final): en memoria, sobrevive a un nuevo montar(); sin localStorage */
+  var tipoElegido = null;   /* tipo elegido (conjuntos / individuales): igual que `elegida` */
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function iso(a, m, d) { return a + '-' + pad(m) + '-' + pad(d); }
@@ -75,17 +76,23 @@ window.LANDING_VISTAS = (function () {
         S.h('div', { class: 'nws-lpvw__agenda' }));
     }
 
-    /* ---------- Regional de conjuntos: cuadrícula de 2 columnas (una sola tarjeta: a pantalla llena) ---------- */
-    function opcionDe(id) { return G.opciones.filter(function (x) { return x.id === id; })[0]; }
-    function regActual() { return opcionDe(elegida) || opcionDe(G.actual) || G.opciones[0]; }
+    /* ---------- Fase regional / final: cuadrícula de 2 columnas (una sola tarjeta: a pantalla llena) ----------
+       Dos ejes: la FASE (panel de «Cambiar») y el TIPO (pestañas Individual | Conjuntos). */
+    var ICONO_TIPO = {
+      individuales: '<svg class="nws-lpvw__reg-tipo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15.5" cy="4.6" r="1.7"/><path d="M14.2 8.4l-2.8 5.2 3.4 2.6 1 4.6M11.4 13.6L8 15.2l-1.4 3.2M13.6 9.6l3.6 1.8 1.6-2.6M9.8 9.2l2.4-.8"/></svg>',
+      conjuntos: '<svg class="nws-lpvw__reg-tipo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></svg>'
+    };
+    function opcionDe(id) { return G.fases.filter(function (x) { return x.id === id; })[0]; }
+    function regActual() { return opcionDe(elegida) || opcionDe(G.actual) || G.fases[0]; }
+    function tipoActual() { return G.tipos.filter(function (x) { return x.id === tipoElegido; })[0] || G.tipos.filter(function (x) { return x.id === G.tipoActual; })[0] || G.tipos[0]; }
     function regionalesHtml(entra) {
-      var op = regActual();
-      return S.h('ul', { class: S.cls('nws-lpvw__reg-lista', op.tarjetas.length === 1 && 'nws-lpvw__reg-lista--una', entra && 'nws-lpvw__reg-lista--entra'), role: 'list' }, op.tarjetas.map(function (k, i) {
+      var op = regActual(), tipo = tipoActual(), ks = G.tarjetas[op.id][tipo.id];
+      return S.h('ul', { class: S.cls('nws-lpvw__reg-lista', ks.length === 1 && 'nws-lpvw__reg-lista--una', entra && 'nws-lpvw__reg-lista--entra'), role: 'list' }, op.id === 'regional' ? S.h('li', { class: 'nws-lpvw__reg-sec' }, S.h('h2', { class: 'nws-lpvw__reg-sec-t' }, e(tipo.titulo))) : '', ks.map(function (k, i) {
         var x = G.items[k];
         return S.h('li', { style: '--nws-i:' + i },
-          S.h('button', { type: 'button', class: 'nws-lpvw__reg nws-ios-press', 'aria-label': x.nombre + ', ' + x.ciudad, 'data-flujo': regActual().id !== 'final' ? 'regional' : null, 'data-clave': regActual().id + ':' + k, 'data-toast': regActual().id === 'final' ? x.nombre : null },
+          S.h('button', { type: 'button', class: 'nws-lpvw__reg nws-ios-press', 'aria-label': x.nombre + ', sede ' + x.ciudad, 'data-flujo': op.id !== 'final' ? 'regional' : null, 'data-clave': tipo.id + ':' + k, 'data-toast': op.id === 'final' ? x.nombre : null },
             S.h('span', { class: 'nws-lpvw__reg-foto' }, S.h('img', { src: x.img, alt: '', draggable: 'false', style: x.pos ? 'object-position:' + x.pos : null })),
-            S.h('span', { class: 'nws-lpvw__reg-ciudad' }, e(x.ciudad)),
+            S.h('span', { class: 'nws-lpvw__reg-ciudad' }, 'Sede ' + e(x.ciudad)),
             S.h('span', { class: 'nws-lpvw__reg-fila' },
               S.h('span', { class: 'nws-lpvw__reg-nombre' }, e(x.nombre)),
               S.icon('arrow-right', 'nws-lpvw__reg-ir'))));
@@ -95,22 +102,27 @@ window.LANDING_VISTAS = (function () {
     function cambioHtml() {
       return S.h('div', { class: 'nws-lpvw__reg-cambio', id: 'nws-reg-cambio', inert: true },
         S.h('div', { class: 'nws-lpvw__reg-cambio-v' },
-          S.h('div', { class: 'nws-lpvw__reg-ops', role: 'listbox', 'aria-label': 'Regionales disponibles' }, G.opciones.map(function (x) {
+          S.h('div', { class: 'nws-lpvw__reg-ops', role: 'listbox', 'aria-label': 'Fases disponibles' }, G.fases.map(function (x) {
             var sel = x.id === regActual().id;
             return S.h('button', { type: 'button', class: 'nws-lpvw__reg-op', role: 'option', 'aria-selected': sel ? 'true' : 'false', tabindex: sel ? '0' : '-1', 'data-reg-op': x.id },
               S.h('span', { class: 'nws-lpvw__reg-op-t' }, e(x.nombre)),
               sel ? S.icon('positive', 'nws-lpvw__reg-op-ok') : '');
           }))));
     }
-    /* Cuatro filas: volver; título y «Cambiar»; panel de regionales (colapsado); subtítulo. */
+    /* Pestañas Individual | Conjuntos: NwtTabs en píldora (el indicador y el divisor se ocultan por CSS). */
+    function tiposHtml() {
+      return S.h('div', { class: 'nws-lpvw__reg-tipo' }, S.tabs({ theme: 'primary', fullWidth: true, value: tipoActual().id, items: G.tipos.map(function (x) { return { value: x.id, label: x.label, iconHtml: ICONO_TIPO[x.id] }; }) }));
+    }
+    /* Filas: volver; título y «Cambiar»; subtítulo; panel de fases (colapsado); pestañas de tipo. */
     function cabeceraRegionales(volver) {
       return S.h('header', { class: 'nws-lpvw__top nws-lpvw__top--reg' },
         S.h('div', { class: 'nws-lpvw__cab-nav' }, volver),
         S.h('div', { class: 'nws-lpvw__cab-tit' },
           S.h('h1', { class: 'nws-lpvw__reg-t' }, e(regActual().nombre)),
-          S.button({ label: G.cambiar, size: 'medium', theme: 'neutral', cls: 'nws-lpvw__cambiar', attrs: { 'data-reg-cambiar': true, 'aria-label': 'Cambiar regional', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': 'nws-reg-cambio' } })),
+          S.button({ label: G.cambiar, size: 'medium', theme: 'neutral', cls: 'nws-lpvw__cambiar', attrs: { 'data-reg-cambiar': true, 'aria-label': 'Cambiar fase', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': 'nws-reg-cambio' } })),
+        S.h('p', { class: 'nws-lpvw__reg-sub' }, G.subtitulo.map(e).join('<br>')),
         cambioHtml(),
-        S.h('p', { class: 'nws-lpvw__reg-sub' }, e(G.subtitulo)));
+        tiposHtml());
     }
 
     /* ---------- «Cambiar»: abre/cierra el panel de regionales ---------- */
@@ -154,12 +166,25 @@ window.LANDING_VISTAS = (function () {
       clearTimeout(tReg);
       tReg = setTimeout(function () { pintarRegionales(v.el, op); }, 150);
     }
+    /* Pestaña de tipo: la activa cambia al instante y las tarjetas reentran como al cambiar de fase. */
+    function elegirTipo(id) {
+      var v = vistas.regionales; if (!v || id === tipoActual().id || !G.tipos.some(function (x) { return x.id === id; })) { return; }
+      tipoElegido = id;
+      ponerCambio(false, false);
+      v.el.querySelectorAll('.nws-lpvw__reg-tipo [data-tab]').forEach(function (b) {
+        var s = b.getAttribute('data-tab') === id;
+        b.classList.toggle('nwt-tabs__tab--active', s); b.setAttribute('aria-selected', s ? 'true' : 'false');
+      });
+      if (o.posicionarIndicadores) { o.posicionarIndicadores(v.el); }
+      clearTimeout(tReg);
+      pintarRegionales(v.el, regActual());
+    }
     function pintarRegionales(el, op) {
       ponerCambio(false, true);
       var sc = el.querySelector('.nws-lpvw__scroll');
       sc.innerHTML = regionalesHtml(!reducido);
       sc.scrollTop = 0;
-      el.querySelector('[data-reg-aviso]').textContent = 'Mostrando ' + op.nombre;
+      el.querySelector('[data-reg-aviso]').textContent = 'Mostrando ' + op.nombre + ', ' + tipoActual().label.toLowerCase();
       clearTimeout(tEntra);   /* la animación se retira: al reabrir la vista (display:none) se repetiría */
       if (!reducido) { tEntra = setTimeout(function () { var u = sc.firstElementChild; if (u) { u.classList.remove('nws-lpvw__reg-lista--entra'); } }, 460); }
     }
@@ -222,6 +247,8 @@ window.LANDING_VISTAS = (function () {
         el.classList.add('nws-fl');
         if (contenido.dialogo) { el.classList.add('nws-fl--dialogo'); }
         if (contenido.violeta) { el.classList.add('nws-fl--violeta'); }
+        if (contenido.zona || contenido.hoja) { el.classList.add('nws-fl--hoja'); }
+        if (contenido.zonaLista || contenido.hoja) { el.classList.add('nws-fl--hoja-lista'); }
         el.setAttribute('data-dev', contenido.dev);
         if (contenido.naranja) { el.classList.add('nws-fl--naranja'); }
         cabecera = contenido.barraLogo
@@ -233,9 +260,9 @@ window.LANDING_VISTAS = (function () {
           : contenido.foto
           ? S.h('header', { class: 'nws-lpvw__top nws-fl__top--foto', style: 'background-image:url(' + contenido.foto + ')' }, volver, S.h('h1', { class: 'nws-fl__sr' }, e(contenido.titulo)))
           : contenido.violeta
-          ? S.h('header', { class: 'nws-fl__top nws-fl__top--violeta' }, S.h('div', { class: 'nws-fl__top-fila' }, volver), S.h('h1', { class: 'nws-fl__top-t' }, e(contenido.titulo)), contenido.sub ? S.h('p', { class: 'nws-fl__top-sub' }, e(contenido.sub)) : '')
+          ? S.h('header', { class: S.cls('nws-fl__top nws-fl__top--violeta', contenido.zona && 'nws-fl__top--zona', contenido.eyebrow && 'nws-fl__top--prueba') }, S.h('div', { class: 'nws-fl__top-fila' }, volver, contenido.eyebrow ? S.h('span', { class: 'nws-fl__top-mini', 'aria-hidden': 'true' }, e(contenido.titulo)) : ''), contenido.eyebrow ? S.h('p', { class: 'nws-fl__top-eb' }, e(contenido.eyebrow)) : '', contenido.zona && !contenido.zonaLista ? S.h('div', { class: 'nws-fl__top-tit' }, S.h('h1', { class: 'nws-fl__top-t' }, e(contenido.titulo)), S.button({ label: 'Filtros', size: 'medium', theme: 'neutral', cls: 'nws-fl__filtros', attrs: { 'data-fl-filtros': true, 'aria-expanded': estado.filtrosCerrados === false ? 'true' : 'false', 'aria-controls': 'nws-fl-filtros', 'aria-label': 'Mostrar u ocultar filtros' } })) : S.h('h1', { class: 'nws-fl__top-t' }, e(contenido.titulo)), contenido.zona && !contenido.zonaLista ? S.h('p', { class: 'nws-fl__top-sub' }, e(contenido.sub || '')) : contenido.sub ? S.h('p', { class: 'nws-fl__top-sub' }, e(contenido.sub)) : '', contenido.zona || '')
           : S.h('header', { class: 'nws-lpvw__top' }, volver, S.h('h1', { class: contenido.sinTitulo ? 'nws-fl__sr' : 'nws-lpvw__titulo' }, e(contenido.titulo)));
-        cuerpo = S.h('div', { class: 'nws-lpvw__scroll' }, S.h('div', { class: 'nws-fl__contenido' }, S.h('div', { 'data-fl-contenido': true }, contenido.html), S.h('p', { class: 'nws-fl__aviso' }, e(L.app.flujos.aviso))));
+        cuerpo = S.h('div', { class: 'nws-lpvw__scroll' }, S.h('div', { class: 'nws-fl__contenido' }, S.h('div', { 'data-fl-contenido': true }, contenido.html), contenido.zona || contenido.sinAviso ? '' : S.h('p', { class: 'nws-fl__aviso' }, e(L.app.flujos.aviso))));
       } else if (id === 'regionales') {
         el.setAttribute('data-dev', 'fl-regionales');
         cabecera = cabeceraRegionales(volver);
@@ -258,6 +285,12 @@ window.LANDING_VISTAS = (function () {
       }
       el.addEventListener('keydown', moverOpcion);
       el.addEventListener('keydown', function (ev) {
+        var tp = ev.target.closest('.nws-lpvw__reg-tipo [data-tab]');
+        if (!tp || ['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(ev.key) < 0) { return; }
+        var bs = Array.from(tp.closest('.nws-lpvw__reg-tipo').querySelectorAll('[data-tab]')), i = bs.indexOf(tp), n = ev.key === 'Home' ? 0 : ev.key === 'End' ? bs.length - 1 : (i + (ev.key === 'ArrowLeft' ? -1 : 1) + bs.length) % bs.length;
+        ev.preventDefault(); bs[n].focus({ preventScroll: true }); elegirTipo(bs[n].getAttribute('data-tab'));
+      });
+      el.addEventListener('keydown', function (ev) {
         var tab = ev.target.closest('.nws-fl__tabs [data-tab]');
         if (!tab || ['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(ev.key) < 0) { return; }
         var botones = Array.from(tab.closest('.nws-fl__tabs').querySelectorAll('[data-tab]'));
@@ -272,6 +305,17 @@ window.LANDING_VISTAS = (function () {
         repintar(el, id, clave, estado);
         var nuevo = el.querySelector('[data-filtro="' + key + '"]'); if (nuevo) { nuevo.focus({ preventScroll: true }); }
       });
+      /* Arrastre con el mouse en los filtros y el calendario (en el celular ya desplazan con el dedo). */
+      el.addEventListener('mousedown', function (ev) {
+        var z = ev.button === 0 && ev.target.closest('.nws-fl__zona-f2, .nws-fl__cal, .nws-fl__dp-pil, .nws-fl__dp:not(.nws-fl__dp--nav)'); if (!z || ev.target.closest('input,select')) { return; }
+        var x0 = ev.clientX, l0 = z.scrollLeft, movio = false;
+        function mueve(m) { if (Math.abs(m.clientX - x0) > 4) { movio = true; } if (movio) { z.scrollLeft = l0 - (m.clientX - x0); } }
+        function suelta() {
+          window.removeEventListener('mousemove', mueve); window.removeEventListener('mouseup', suelta);
+          if (movio) { var traga = function (c) { c.stopPropagation(); c.preventDefault(); }; window.addEventListener('click', traga, true); setTimeout(function () { window.removeEventListener('click', traga, true); }, 0); }
+        }
+        window.addEventListener('mousemove', mueve); window.addEventListener('mouseup', suelta);
+      });
       el.addEventListener('input', function (ev) {
         if (!ev.target.matches('input[data-filtro="busqueda"]')) { return; }
         estado.busqueda = ev.target.value;
@@ -282,15 +326,82 @@ window.LANDING_VISTAS = (function () {
         var t = ev.target;
         /* hoja inferior «Elige una opción» de las listas de inscritos */
         var hj = t.closest('[data-fl-hoja]');
-        if (hj) { ev.stopPropagation(); var hoja_ = el.querySelector('.nws-fl__hoja'); if (hoja_) { hoja_.classList.toggle('nws-fl__hoja--abierta', hj.getAttribute('data-fl-hoja') === 'abrir'); } return; }
+        if (hj) {
+          ev.stopPropagation(); var hoja_ = el.querySelector('.nws-fl__hoja');
+          if (hoja_) {
+            var abre = hj.getAttribute('data-fl-hoja') === 'abrir';
+            hoja_.classList.toggle('nws-fl__hoja--abierta', abre); estado.hoja = abre;
+            if (!abre) { var diaSel = el.querySelector('button.nws-fl__cal-hd.nws-fl__cal-col--sel'); if (diaSel) { diaSel.focus({ preventScroll: true }); } }   /* el foco vuelve al día */
+          }
+          return;
+        }
         var opc = t.closest('[data-fl-opcion]');
         if (opc) { ev.stopPropagation(); estado.lista = opc.getAttribute('data-fl-opcion'); repintar(el, id, clave, estado); return; }
+        /* «Quitar filtros»: deja deportes/pruebas, género y edad como al entrar. */
+        if (t.closest('[data-fl-limpiar]')) {
+          ev.stopPropagation(); estado.sel = []; estado.genero = ''; estado.edad = ''; estado.multiAbierto = false;
+          var zv = el.querySelector('.nws-fl__zona'), nz = flujos.vista(id, clave, estado).zona; if (zv && nz) { zv.outerHTML = nz; }
+          repintar(el, id, clave, estado); var fb0 = el.querySelector('[data-fl-filtros]'); if (fb0) { fb0.focus({ preventScroll: true }); }
+          return;
+        }
+        /* Selector múltiple de deportes o pruebas: el panel de casillas se abre bajo el campo. */
+        var mb = t.closest('[data-fl-multi]');
+        if (mb) { ev.stopPropagation(); ponerMulti(el, estado, clave, !estado.multiAbierto, true); return; }
+        var mo = t.closest('[data-fl-op]');
+        if (mo) {
+          ev.stopPropagation();
+          var val = mo.getAttribute('data-fl-op'), ls = estado.sel || [];
+          estado.sel = !val ? [] : ls.indexOf(val) >= 0 ? ls.filter(function (x) { return x !== val; }) : ls.concat(val);
+          repintar(el, id, clave, estado); ponerMulti(el, estado, clave, true, false);
+          var nuevo = el.querySelector('[data-fl-op="' + val.replace(/"/g, '\\"') + '"]'); if (nuevo) { nuevo.focus({ preventScroll: true }); }
+          return;
+        }
+        if (estado.multiAbierto && !t.closest('.nws-fl__zmulti')) { ponerMulti(el, estado, clave, false, false); }
+        /* «Filtros»: colapsa o expande el panel de controles y el calendario sube o baja. */
+        var fb = t.closest('[data-fl-filtros]');
+        if (fb) {
+          ev.stopPropagation();
+          var pf = el.querySelector('.nws-fl__zona-cuerpo'), cierra = !pf.classList.contains('nws-fl__zona-cuerpo--cerrado');
+          if (cierra) { ponerMulti(el, estado, clave, false, false); } pf.classList.toggle('nws-fl__zona-cuerpo--cerrado', cierra); pf.inert = cierra; fb.setAttribute('aria-expanded', cierra ? 'false' : 'true'); estado.filtrosCerrados = cierra;
+          return;
+        }
+        /* Columna de deportes: colapsa a solo íconos y vuelve. */
+        var mn = t.closest('[data-fl-min]');
+        if (mn) {
+          ev.stopPropagation(); estado.min = !estado.min;
+          var cal = el.querySelector('.nws-fl__cal'); if (cal) { cal.classList.toggle('nws-fl__cal--min', estado.min); }
+          mn.setAttribute('aria-expanded', estado.min ? 'false' : 'true'); mn.setAttribute('aria-label', estado.min ? 'Mostrar nombres de deportes' : 'Ocultar nombres de deportes');
+          return;
+        }
+        /* Día del calendario de la regional: queda elegido y abre la hoja con sus deportes. */
+        var dc = t.closest('[data-fl-dia-cal]');
+        if (dc) {
+          ev.stopPropagation(); estado.dia = dc.getAttribute('data-fl-dia-cal'); estado.hoja = true;
+          repintar(el, id, clave, estado);
+          var p1 = el.querySelector('.nws-fl__hoja-dep'); if (p1) { p1.focus({ preventScroll: true }); }
+          return;
+        }
+        /* Segmentos de género y edad: la píldora se desliza (posicionarIndicadores) y solo se repinta el contenido. */
+        var sg = t.closest('.nws-fl__seg [data-seg]');
+        if (sg) {
+          ev.stopPropagation();
+          var grupo = sg.closest('.nws-fl__seg'), llave = grupo.classList.contains('nws-fl__seg--genero') ? 'genero' : 'edad', valor = sg.getAttribute('data-seg');
+          if ((estado[llave] || grupo.querySelector('[data-seg]').getAttribute('data-seg')) === valor) { return; }
+          estado[llave] = valor;
+          grupo.querySelectorAll('[data-seg]').forEach(function (b) { var s = b === sg; b.classList.toggle('nwt-tag-group__tag--active', s); b.setAttribute('aria-selected', s ? 'true' : 'false'); });
+          if (o.posicionarIndicadores) { o.posicionarIndicadores(grupo); }
+          repintar(el, id, clave, estado); return;
+        }
         var ir = t.closest('[data-flujo]');
-        if (ir) { ev.stopPropagation(); abrir(ir.getAttribute('data-flujo'), ir, ir.getAttribute('data-clave')); return; }
+        if (ir) { ev.stopPropagation(); estado.irPrueba = ir.getAttribute('data-prueba') || ''; estado.irSerie = ir.getAttribute('data-serie') || ''; if (ir.getAttribute('data-dia')) { estado.dia = ir.getAttribute('data-dia'); } var hjOp = el.querySelector('.nws-fl__hoja--abierta'); if (hjOp) { hjOp.classList.remove('nws-fl__hoja--abierta'); estado.hoja = false; } abrir(ir.getAttribute('data-flujo'), ir, ir.getAttribute('data-clave')); return; }
+        var chevSe = t.closest('[data-fl-se]');
+        if (chevSe) { ev.stopPropagation(); var arSe = chevSe.closest('.nws-fl__se'), cerSe = arSe.classList.toggle('nws-fl__se--c'); chevSe.setAttribute('aria-expanded', cerSe ? 'false' : 'true'); return; }
         var dia = t.closest('[data-fl-dia]');
         if (dia) { ev.stopPropagation(); estado.dia = dia.getAttribute('data-fl-dia'); repintar(el, id, clave, estado); el.querySelector('[data-fl-dia="' + estado.dia + '"]').focus({ preventScroll: true }); return; }
         var tab = t.closest('.nws-fl__tabs [data-tab]');
         if (tab) { ev.stopPropagation(); var destino = flujos.destinoTab(id, clave, tab.getAttribute('data-tab')); if (destino) { abrir(destino.id, tab, destino.clave); return; } estado.tab = tab.getAttribute('data-tab'); repintar(el, id, clave, estado); el.querySelector('[data-tab="' + estado.tab + '"]').focus({ preventScroll: true }); return; }
+        var tp = t.closest('.nws-lpvw__reg-tipo [data-tab]');
+        if (tp) { ev.stopPropagation(); elegirTipo(tp.getAttribute('data-tab')); return; }
         var cb = t.closest('[data-reg-cambiar]');
         if (cb) { ev.stopPropagation(); ponerCambio(!cambioAbierto(), true); return; }
         var op = t.closest('[data-reg-op]');
@@ -323,17 +434,85 @@ window.LANDING_VISTAS = (function () {
 
     function inerte(v) { capas.forEach(function (c) { if (c) { c.inert = v; } }); }
 
+    /* Abre/cierra el panel del selector múltiple y vuelve a pintar el campo y las casillas (viven fuera de data-fl-contenido). */
+    function ponerMulti(el, estado, clave, abierto, foco) {
+      estado.multiAbierto = abierto;
+      var zona = el.querySelector('.nws-fl__zona'); if (!zona) { return; }
+      var m = flujos.multiSelect(estado, clave), tmp = document.createElement('div');
+      tmp.innerHTML = m.boton + m.panel;
+      zona.querySelector('.nws-fl__zsel').replaceWith(tmp.children[0]); zona.querySelector('.nws-fl__zmulti').replaceWith(tmp.children[0]);
+      if (foco) { var d = abierto ? zona.querySelector('.nws-fl__zop--on') || zona.querySelector('.nws-fl__zop') : zona.querySelector('.nws-fl__zsel-b'); if (d) { d.focus({ preventScroll: true }); } }
+    }
     function repintar(el, id, clave, estado) {
       var v = flujos.vista(id, clave, estado);
+      var cal0 = el.querySelector('.nws-fl__cal'), sx = cal0 ? cal0.scrollLeft : 0, sy = cal0 ? cal0.scrollTop : 0;   /* el calendario no salta al repintar */
+      var tb0 = el.querySelector('.nws-fl__tabs'), ix = tb0 && tb0.style.getPropertyValue('--fl-ind-x'), iw = tb0 && tb0.style.getPropertyValue('--fl-ind-w'), sc = el.querySelector('.nws-lpvw__scroll'), st0 = sc ? sc.scrollTop : 0;
       el.querySelector('[data-fl-contenido]').innerHTML = v.html;
+      /* El indicador de la pestaña parte de donde estaba y la lista no salta de lugar: el repintado recrea ambos. */
+      var tb1 = el.querySelector('.nws-fl__tabs'); if (tb1 && ix) { tb1.style.setProperty('--fl-ind-x', ix); tb1.style.setProperty('--fl-ind-w', iw); }
+      if (sc && st0) { sc.scrollTop = st0; }
+      var cal1 = el.querySelector('.nws-fl__cal'); if (cal1 && (sx || sy)) { cal1.style.scrollBehavior = 'auto'; cal1.scrollLeft = sx; cal1.scrollTop = sy; cal1.style.scrollBehavior = ''; }
+      var res = el.querySelector('[data-fl-resumen]'); if (res && v.resumen != null) { res.textContent = v.resumen; }
+      var lb = el.querySelector('[data-fl-limpiar]'); if (lb) { lb.hidden = !flujos.hayFiltros(estado); }
+      var zd = el.querySelector('[data-fl-dias]'); if (zd && v.zonaLista && v.zona) {
+        var pl0 = zd.querySelector('.nws-fl__dp-pil'), sc0 = pl0 ? pl0.scrollLeft : zd.scrollLeft; zd.outerHTML = v.zona;
+        var zn = el.querySelector('[data-fl-dias]'), pl1 = zn.querySelector('.nws-fl__dp-pil'); (pl1 || zn).scrollLeft = sc0; zn.classList.add('nws-fl__dp--fija');
+        /* con muchos días, el elegido queda a la vista dentro de la franja */
+        var sel = pl1 && pl1.querySelector('.nws-fl__dp-d--sel'); if (sel && (sel.offsetLeft < pl1.scrollLeft || sel.offsetLeft + sel.offsetWidth > pl1.scrollLeft + pl1.clientWidth)) { pl1.scrollLeft = sel.offsetLeft - (pl1.clientWidth - sel.offsetWidth) / 2; }
+      }
+      /* En la prueba (día, Series o Podio) el contenido nuevo entra con un fundido suave. */
+      var cn = el.querySelector('[data-fl-contenido]');
+      if (v.eyebrow && cn && !reducido) {
+        /* solo se anima lo que está debajo de las pestañas o fichas; ellas y lo de arriba quedan quietos */
+        var tb = cn.querySelector('.nws-fl__tabs'), objetivos = [];
+        if (tb) { for (var sib = tb.nextElementSibling; sib; sib = sib.nextElementSibling) { objetivos.push(sib); } } else { objetivos.push(cn); }
+        objetivos.forEach(function (o2) { if (o2.animate) { o2.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)' }); } });
+      }
       medirIndicadores(el);
       if (o.posicionarIndicadores) { o.posicionarIndicadores(el); }
       mob.dispatchEvent(new CustomEvent('jin:vista'));
     }
+    /* Al desplazar la prueba: antetítulo, título grande y sede se pliegan, el título pasa a ser pequeño junto al botón de volver,
+       los días quedan fijos y la hoja blanca sube. El avance (0 a 1) sale de la posición del scroll. */
+    function colapsoPrueba(el) {
+      var sc = el.querySelector('.nws-lpvw__scroll'), hd = el.querySelector('.nws-fl__top--prueba'); if (!sc || !hd) { return; }
+      var piezas = ['.nws-fl__top-eb', '.nws-fl__top-t', '.nws-fl__top-sub'].map(function (s) { return hd.querySelector(s); }).filter(Boolean);
+      var mini = hd.querySelector('.nws-fl__top-mini'), D = 120, nat = [], meta = 0, cur = 0, corre = false;
+      function medir() {
+        piezas.forEach(function (p) { p.style.height = ''; p.style.marginTop = ''; });
+        nat = piezas.map(function (p) { return { h: p.offsetHeight, m: parseFloat(getComputedStyle(p).marginTop) || 0 }; });
+      }
+      /* El avance persigue a la posición del scroll con inercia y se curva (smoothstep): el pliegue no sigue los saltos de la rueda. */
+      function pinta() {
+        var p = cur * cur * (3 - 2 * cur);
+        piezas.forEach(function (el2, i) {
+          el2.style.height = (nat[i].h * (1 - p)) + 'px'; el2.style.marginTop = (nat[i].m * (1 - p)) + 'px';
+          el2.style.opacity = Math.max(0, 1 - p * 1.6);
+          if (el2.classList.contains('nws-fl__top-t')) { el2.style.transform = 'scale(' + (1 - .4 * p).toFixed(3) + ')'; }
+        });
+        if (mini) { mini.style.opacity = Math.max(0, (p - .5) / .5); mini.style.transform = 'translateY(' + ((1 - p) * 8).toFixed(1) + 'px)'; }
+      }
+      function paso() {
+        var d = meta - cur;
+        if (Math.abs(d) < .002 || reducido) { cur = meta; pinta(); corre = false; return; }
+        cur += d * .16; pinta(); requestAnimationFrame(paso);
+      }
+      sc.addEventListener('scroll', function () {
+        meta = Math.max(0, Math.min(1, sc.scrollTop / D));
+        if (!corre) { corre = true; requestAnimationFrame(paso); }
+      }, { passive: true });
+      medir(); pinta();
+    }
     function abrir(id, origen, clave, alCerrar) {
       var estado = {}, contenido;
       if (id === 'competencias' && actual) { Object.assign(estado, actual.estado); estado.tab = '0'; }
-      if ((id === 'competencia' || id === 'partido' || id === 'salida') && actual && actual.estado.dia) { estado.dia = actual.estado.dia; }
+      if ((id === 'deporte' || id === 'competencia' || id === 'partido' || id === 'salida' || id === 'serie') && actual && actual.estado.dia) { estado.dia = actual.estado.dia; }
+      if ((id === 'deporte' || id === 'competencia' || id === 'partido' || id === 'salida' || id === 'serie') && actual && actual.estado.dias) { estado.dias = actual.estado.dias; }
+      if ((id === 'deporte' || id === 'competencia' || id === 'partido' || id === 'salida' || id === 'serie') && actual && actual.estado.ag) { estado.ag = actual.estado.ag; }
+      if (id === 'deporte' && actual && actual.estado.irPrueba) { estado.prueba = actual.estado.irPrueba; }
+      if ((id === 'deporte' || id === 'competencia' || id === 'serie' || id === 'partido') && actual && actual.estado.regSub) { estado.regSub = actual.estado.regSub; estado.regTitulo = actual.estado.regTitulo; estado.regK = actual.estado.regK; }
+      if ((id === 'serie' || id === 'partido') && actual) { estado.prueba = actual.estado.prueba; estado.serie = actual.estado.irSerie; }
+      if (id === 'competencia' && actual && actual.estado.irPrueba != null) { estado.prueba = actual.estado.irPrueba; }
       contenido = flujos.vista(id, clave, estado);
       if (!contenido && id !== 'regionales' && id !== 'calendario') {
         if (o.proximamente) { o.proximamente(id, origen); } return;
@@ -345,6 +524,7 @@ window.LANDING_VISTAS = (function () {
       pila.push(v); actual = v;
       v.el.hidden = false;
       void v.el.offsetWidth;
+      if (contenido && contenido.eyebrow) { colapsoPrueba(v.el); }
       medirIndicadores(v.el);
       v.el.classList.add('nws-lpvw--abierta');
       inerte(true); mob.classList.add('nws-lp--vista');
@@ -376,7 +556,7 @@ window.LANDING_VISTAS = (function () {
       }
       if (ev.key !== 'Escape') { return; }
       ev.preventDefault(); ev.stopImmediatePropagation();
-      if (hoja) { cerrarHoja(); } else if (cambioAbierto()) { ponerCambio(false, true); } else { cerrar(); }
+      if (hoja) { cerrarHoja(); } else if (actual && actual.estado.multiAbierto) { ponerMulti(actual.el, actual.estado, actual.clave, false, true); } else if (cambioAbierto()) { ponerCambio(false, true); } else { cerrar(); }
     }
 
     return {
