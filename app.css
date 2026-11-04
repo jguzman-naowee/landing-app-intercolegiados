@@ -1455,13 +1455,13 @@ body.nws-modo-plano .nws-lpz { position: fixed; inset: 0 auto 0 50%; width: 428p
    nws-lpvw — vistas inmersivas de la App JIN (Regional de conjuntos · Calendario · Resultados).
    Cubren tabbar y contenido; entran en push. JS: pantallas/landing-vistas.js
    ========================================================================== */
-.nws-lpvw { position: absolute; inset: 0; z-index: 4; background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); transform: translateX(100%); transition: transform 300ms cubic-bezier(.32, .72, 0, 1); box-shadow: -12px 0 32px -12px rgb(from var(--nws-jic-azul-900) r g b / .28); }
+.nws-lpvw { position: absolute; inset: 0; z-index: 4; background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); transform: translateX(100%); transition: transform 440ms cubic-bezier(.33, .1, .2, 1), box-shadow 440ms ease; box-shadow: -12px 0 32px -12px rgb(from var(--nws-jic-azul-900) r g b / .28); }
 .nws-lpvw[hidden] { display: none; }
 .nws-lpvw--abierta { transform: none; }
 /* Vista plana: #mob mide todo el largo de la página; la vista se ancla al visor, en la columna de 428. */
 body.nws-modo-plano .nws-lpvw { position: fixed; inset: 0 auto 0 50%; width: 428px; margin-left: -214px; }
 .nws-lpvw__bloque { position: absolute; inset: 0; display: flex; flex-direction: column; }
-.nws-lpvw__top { position: relative; flex: none; display: flex; align-items: center; height: 56px; padding: 0 var(--naotech-sizing-12); }
+.nws-lpvw__top { position: relative; flex: none; display: flex; align-items: center; height: 56px; padding: 12px var(--naotech-sizing-12) 0 var(--naotech-sizing-16); }
 .nws-lpvw__titulo { position: absolute; left: 0; right: 0; margin: 0; text-align: center; font-size: 18px; line-height: 22px; font-weight: var(--naotech-font-weight-bold); color: var(--nws-jic-violeta-900); pointer-events: none; }
 .nws-lp .nws-lpvw__volver { position: relative; z-index: 1; --pvt-button-dimension: 44px; --naotech-icon-button-sizing: 24px; --pvt-button-font-color: var(--nws-jic-violeta-700); }
 .nws-lp .nws-lpvw--calendario .nws-lpvw__volver .nwt-icon-button__content { background: var(--nws-jic-azul-050); border-radius: var(--naotech-radius-circle); }
@@ -1516,19 +1516,19 @@ body.nws-modo-plano .nws-lpvw { position: fixed; inset: 0 auto 0 50%; width: 428
 /* Regional de conjuntos: degradé violeta → magenta de la web, con brillos suaves como textura. */
 .nws-lpvw--regionales { color: var(--naotech-app-background); background: radial-gradient(120% 40% at 100% 62%, rgb(240 126 140 / .2), transparent 70%), radial-gradient(90% 36% at 0% 100%, rgb(176 92 204 / .22), transparent 70%), linear-gradient(180deg, var(--nws-jic-violeta-700) 0%, var(--nws-jic-violeta-titular) 70%, var(--nws-jic-violeta-pie) 100%); }
 .nws-lpvw--regionales .nws-mob__status { color: var(--naotech-app-background); }
-.nws-lpvw__top--reg { height: auto; flex-direction: column; align-items: stretch; padding: 0 var(--naotech-sizing-16) var(--naotech-sizing-4); }
+.nws-lpvw__top--reg { height: auto; flex-direction: column; align-items: stretch; padding: 12px var(--naotech-sizing-16) var(--naotech-sizing-16); }
 .nws-lpvw__cab-nav { display: flex; align-items: center; height: 44px; }
 /* 48px mínimos entre el título y «Cambiar»: si no cabe, el título parte en varias líneas. */
 .nws-lpvw__cab-tit { display: flex; align-items: flex-start; gap: var(--naotech-sizing-48, 48px); margin-top: var(--naotech-sizing-16); }
-.nws-lpvw__reg-sub { margin: var(--naotech-sizing-8) 0 0; font-size: 16px; line-height: 22px; color: rgb(255 255 255 / .9); }
-.nws-lp .nws-lpvw--regionales .nws-lpvw__volver { flex: none; margin-left: calc(-1 * var(--naotech-sizing-8)); --pvt-button-font-color: var(--naotech-app-background); --pvt-button-background: rgb(255 255 255 / .18); --pvt-button-background-hover: rgb(255 255 255 / .28); --pvt-button-background-active: rgb(255 255 255 / .28); }
+.nws-lpvw__reg-sub { margin: var(--naotech-sizing-2) 0 0; font-size: var(--naotech-subtitle-font-size); line-height: 22px; color: rgb(255 255 255 / .9); }
+.nws-lp .nws-lpvw--regionales .nws-lpvw__volver { flex: none; --pvt-button-font-color: var(--naotech-app-background); --pvt-button-background: rgb(255 255 255 / .18); --pvt-button-background-hover: rgb(255 255 255 / .28); --pvt-button-background-active: rgb(255 255 255 / .28); }
 .nws-lp .nws-lpvw--regionales .nwt-icon-button__content { border-radius: var(--naotech-radius-circle); }
-.nws-lp .nws-lpvw--regionales .nwt-icon-button__content:focus-visible { outline-color: var(--naotech-app-background); outline-offset: 0; }
+.nws-lp .nws-lpvw--regionales .nwt-icon-button__content:focus-visible { outline: 0; box-shadow: none; background: rgb(255 255 255 / .28); }
 .nws-lpvw__reg-t { flex: 1 1 0; min-width: 0; margin: 0; overflow-wrap: anywhere; font-size: 36px; line-height: 40px; font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.02em; color: var(--naotech-app-background); }
 .nws-lp .nws-lpvw .nws-lpvw__cambiar { flex: none; width: auto; height: 44px; min-height: 44px; margin-left: 0; padding: 0 var(--naotech-sizing-14); --naotech-button-radius: var(--naotech-radius-pill); --pvt-button-background: var(--naotech-app-background); --pvt-button-background-hover: var(--nws-jic-azul-050); --pvt-button-background-active: var(--nws-jic-azul-050); --pvt-button-font-color: var(--nws-jic-violeta-titular); --pvt-button-font-size: 16px; --pvt-button-line-height: 20px; }
 .nws-lpvw__cambiar:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: 2px; }
 /* Panel de «Cambiar» (DC-100/101): crece en el flujo con grid 0fr → 1fr. Cerrado no ocupa nada ni se ve.
-   16px sobre el panel; abajo 8px + los 8px propios del subtítulo = 16px visibles. */
+   Va entre el subtítulo y las pestañas de tipo: 16px sobre el panel; abajo 8px + los 16px de las pestañas. */
 .nws-lpvw__reg-cambio { display: grid; grid-template-rows: 0fr; margin: 0; overflow: hidden; visibility: hidden; border-radius: var(--naotech-radius-xxl); background: color-mix(in srgb, var(--nws-jic-violeta-titular) 14%, white); box-shadow: none; transition: grid-template-rows 220ms var(--naotech-animation-standard), margin 220ms var(--naotech-animation-standard), box-shadow 220ms var(--naotech-animation-standard), visibility 0s linear 220ms; }
 .nws-lpvw__reg-cambio--abierto { grid-template-rows: 1fr; margin: var(--naotech-sizing-16) 0 var(--naotech-sizing-8); visibility: visible; box-shadow: var(--nws-sombra-2); transition-delay: 0s; }
 /* Sin transición en los hijos: con movimiento reducido foundations les da 0,01 ms y la visibilidad heredada tarda un cuadro (el foco no entra al abrir). */
@@ -1542,12 +1542,22 @@ body.nws-modo-plano .nws-lpvw { position: fixed; inset: 0 auto 0 50%; width: 428
 .nws-lpvw__reg-op:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: -3px; }
 .nws-lpvw__reg-op-t { min-width: 0; }
 .nws-lpvw__reg-op-ok { flex: none; color: var(--nws-jic-violeta-700); }
-.nws-lpvw--regionales .nws-lpvw__scroll { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12px); mask-image: linear-gradient(180deg, transparent 0, #000 12px); }
+.nws-lpvw__reg-tipo { margin: var(--naotech-sizing-16) 0 0; }
+.nws-lpvw__reg-tipo .nwt-tabs__list { height: 52px; overflow: hidden; border-radius: var(--naotech-radius-pill); background: rgb(255 255 255 / .16); }
+.nws-lpvw__reg-tipo .nwt-tabs__divider, .nws-lpvw__reg-tipo .nwt-tabs__indicator { display: none; }
+.nws-lpvw__reg-tipo .nwt-tabs__tab { height: 52px; border: 0; border-radius: var(--naotech-radius-pill); background: transparent; transition: background-color 180ms var(--naotech-animation-standard); }
+.nws-lpvw__reg-tipo .nwt-tabs__tab:hover { background: rgb(255 255 255 / .08); }
+.nws-lpvw__reg-tipo .nwt-tabs__tab--active, .nws-lpvw__reg-tipo .nwt-tabs__tab--active:hover { background: rgb(255 255 255 / .3); }
+.nws-lpvw__reg-tipo .nwt-tabs__tab:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: -2px; box-shadow: none; }
+.nws-lpvw__reg-tipo .nwt-tabs__label, .nws-lpvw__reg-tipo .nwt-tabs__tab--active .nwt-tabs__label { gap: var(--naotech-sizing-8); color: var(--naotech-app-background); font-size: 18px; line-height: 22px; font-weight: var(--naotech-font-weight-medium); }
+.nws-lpvw__reg-tipo-ico { display: block; width: 22px; height: 22px; flex: none; }
 .nws-lpvw__reg-lista { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--naotech-sizing-12); margin: 0; padding: var(--naotech-sizing-20) var(--naotech-sizing-16) var(--naotech-sizing-32); list-style: none; }
 .nws-lpvw__reg-lista > li { display: flex; min-width: 0; }
-.nws-lpvw__reg { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: var(--naotech-sizing-12); border: 0; border-radius: var(--naotech-radius-xxl); background: var(--naotech-app-background); box-shadow: var(--nws-sombra-1); color: var(--naotech-color-gray-900); font: inherit; text-align: left; cursor: pointer; }
+.nws-lpvw__reg-lista > .nws-lpvw__reg-sec { display: block; grid-column: 1 / -1; }
+.nws-lpvw__reg-sec-t { margin: 0; font-size: 20px; line-height: 25px; font-weight: var(--naotech-font-weight-bold); color: var(--naotech-app-background); }
+.nws-lpvw__reg { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: var(--naotech-sizing-12); border: 0; border-radius: var(--naotech-radius-xl); background: var(--naotech-app-background); box-shadow: var(--nws-sombra-1); color: var(--naotech-color-gray-900); font: inherit; text-align: left; cursor: pointer; }
 .nws-lpvw__reg:focus-visible { outline: 3px solid var(--naotech-app-background); outline-offset: 2px; }
-.nws-lpvw__reg-foto { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: calc(var(--naotech-radius-xxl) * .8); background: var(--naotech-color-gray-200); }
+.nws-lpvw__reg-foto { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--naotech-radius-lg); background: var(--naotech-color-gray-200); }
 .nws-lpvw__reg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* app-color-600 mide 3,4:1 sobre blanco (no pasa AA a 14 px): va el 700 (5,6:1). */
 .nws-lpvw__reg-ciudad { margin-top: var(--naotech-sizing-12); font-size: 14px; line-height: 18px; color: var(--naotech-app-color-700); }
@@ -1567,9 +1577,161 @@ body.nws-modo-plano .nws-lpvw { position: fixed; inset: 0 auto 0 50%; width: 428
 @keyframes nws-reg-entra { from { opacity: 0; transform: translateY(12px); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .nws-lpvw, .nws-lpvw__velo, .nws-lpvw__panel, .nws-lpvw__dia, .nws-lpvw__reg-cambio { transition: none; }
+  .nws-lpvw, .nws-lpvw__velo, .nws-lpvw__panel, .nws-lpvw__dia, .nws-lpvw__reg-cambio, .nws-lpvw__reg-tipo .nwt-tabs__tab { transition: none; }
   .nws-lpvw__reg-lista--entra > li { animation: none; }
 }
+
+/* Calendario de la regional (DC-105): zona de controles sobre el violeta y hoja sangrada con la matriz de días por deportes. */
+.nws-fl__top--zona { padding-right: 16px; }
+.nws-fl__top--zona .nws-fl__top-t { margin-top: 12px; font-size: 36px; line-height: 40px; letter-spacing: -0.02em; }
+.nws-fl__top--zona .nws-fl__top-sub { margin-top: 16px; font-size: 18px; line-height: 24px; }
+/* Panel de filtros colapsable (grid 0fr → 1fr, igual que el panel de «Cambiar»): el resumen queda siempre a la vista. */
+.nws-fl__zona { display: flex; flex-direction: column; }
+.nws-fl__zona-cuerpo { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 240ms var(--naotech-animation-standard), opacity 200ms var(--naotech-animation-standard); }
+.nws-fl__zona-cuerpo--cerrado { grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 240ms var(--naotech-animation-standard), opacity 160ms var(--naotech-animation-standard), visibility 0s 240ms; }
+.nws-fl__zona-cv { min-height: 0; overflow: hidden; }
+.nws-fl__zona-cvi { display: flex; flex-direction: column; gap: 12px; padding: 20px 0 12px; }
+.nws-fl__zona-cuerpo--cerrado + .nws-fl__zona-resfila { margin-top: 4px; }
+.nws-fl__zona-resfila { display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: margin-top 240ms var(--naotech-animation-standard); }
+.nws-fl__zona-resfila .nws-fl__zona-res { flex: 1; min-width: 0; }
+.nws-fl__zlimpiar { flex: none; min-height: 32px; padding: 0 12px; border: 1px solid rgb(255 255 255 / .55); border-radius: var(--naotech-radius-pill); background: transparent; color: var(--naotech-app-background); font: inherit; font-size: 14px; font-weight: var(--naotech-font-weight-semibold); cursor: pointer; }
+.nws-fl__zlimpiar[hidden] { display: none; }
+.nws-fl__zlimpiar:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: 2px; }
+/* Título y «Filtros» en la misma fila, el botón a la altura de «Cambiar» de Regionales; el título parte en dos líneas. */
+.nws-fl__top-tit { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--naotech-sizing-16); margin-top: var(--naotech-sizing-12); }
+.nws-fl__top-tit .nws-fl__top-t { margin: 0; max-width: 7.5em; }
+.nws-lp .nws-lpvw .nws-fl__filtros { flex: none; width: auto; height: 44px; min-height: 44px; padding: 0 var(--naotech-sizing-14); --naotech-button-radius: var(--naotech-radius-pill); --pvt-button-background: var(--naotech-app-background); --pvt-button-background-hover: var(--naotech-app-background); --pvt-button-background-active: var(--naotech-app-background); --pvt-button-font-color: var(--nws-jic-violeta-titular); --pvt-button-font-size: 16px; --pvt-button-line-height: 20px; }
+.nws-fl__filtros::after { content: ''; width: 7px; height: 7px; margin: 3px 0 0 8px; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(-135deg); transition: transform 240ms var(--naotech-animation-standard); }
+.nws-fl__filtros[aria-expanded="false"]::after { margin-top: -3px; transform: rotate(45deg); }
+.nws-fl__filtros:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .nws-fl__zona-cuerpo, .nws-fl__zona-cuerpo--cerrado, .nws-fl__zona-resfila, .nws-fl__filtros::after { transition: none; } }
+.nws-fl__zona-f1 { display: flex; align-items: center; gap: 8px; }
+.nws-fl__zsel { position: relative; flex: 1; min-width: 0; display: block; }
+.nws-fl__zsel-b { display: flex; align-items: center; width: 100%; height: 48px; padding: 0 44px 0 16px; border: 0; border-radius: var(--naotech-radius-pill); background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); font: inherit; font-size: 16px; font-weight: var(--naotech-font-weight-medium); text-align: left; cursor: pointer; }
+.nws-fl__zsel-b span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nws-fl__zsel-b[aria-expanded="true"] .nws-fl__z-chev { transform: rotate(180deg); }
+.nws-fl__z-chev { transition: transform 200ms var(--naotech-animation-standard); }
+.nws-fl__zsel-b:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: 2px; }
+/* Panel de casillas: flota sobre el calendario, con elevación; vive fuera del panel colapsable para no quedar recortado. */
+.nws-fl__top--zona { position: relative; z-index: 6; }
+.nws-fl__zona { position: relative; }
+.nws-fl__zmulti { display: none; position: absolute; left: 0; top: 74px; z-index: 8; width: calc(100% - 56px); max-height: 280px; overflow-y: auto; padding: 8px; border-radius: 24px; background: #fff; box-shadow: 0 12px 32px rgb(40 18 59 / .28), 0 2px 6px rgb(40 18 59 / .14); }
+.nws-fl__zmulti--abierto { display: block; }
+.nws-fl__zop { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 16px; background: transparent; color: var(--nws-jic-violeta-900); font: inherit; font-size: 16px; font-weight: var(--naotech-font-weight-medium); text-align: left; cursor: pointer; }
+.nws-fl__zop:hover { background: #f4f1f9; }
+.nws-fl__zop:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: -3px; }
+.nws-fl__zchk { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid #8788ab; border-radius: 7px; color: transparent; transition: background-color 160ms var(--naotech-animation-standard), border-color 160ms var(--naotech-animation-standard); }
+.nws-fl__zchk svg { width: 16px; height: 16px; }
+.nws-fl__zop--on .nws-fl__zchk { border-color: var(--nws-jic-violeta-titular); background: var(--nws-jic-violeta-titular); color: #fff; }
+@media (prefers-reduced-motion: reduce) { .nws-fl__zchk, .nws-fl__z-chev { transition: none; } }
+.nws-fl__zsel select { display: block; width: 100%; height: 48px; padding: 0 44px 0 16px; border: 0; border-radius: var(--naotech-radius-pill); background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); font: inherit; font-size: 16px; font-weight: var(--naotech-font-weight-medium); appearance: none; -webkit-appearance: none; text-overflow: ellipsis; cursor: pointer; }
+.nws-fl__zsel select:focus-visible, .nws-fl__zib:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: 2px; }
+.nws-fl__z-chev { position: absolute; right: 14px; top: 14px; width: 20px; height: 20px; pointer-events: none; color: var(--nws-jic-violeta-900); }
+.nws-fl__zib { flex: none; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: var(--naotech-radius-circle); background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); cursor: pointer; }
+.nws-fl__zib svg { width: 22px; height: 22px; }
+.nws-fl__zona-f2 { touch-action: pan-x; overscroll-behavior-x: contain; display: flex; gap: 8px; margin: 0 -16px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; }
+.nws-fl__zona-f2::-webkit-scrollbar { display: none; }
+.nws-fl__zona .nwt-tag-group { display: block; flex: none; }
+.nws-fl__zona .nwt-tag-group__track { background: rgb(255 255 255 / .16); border: 0; border-radius: var(--naotech-radius-pill); }
+.nws-fl__zona .nwt-tag-group__pill { background: var(--naotech-app-background); border: 0; border-radius: var(--naotech-radius-pill); box-shadow: none; }
+.nws-fl__zona .nwt-tag-group__tag { min-height: 36px; padding: 0 14px; border-radius: var(--naotech-radius-pill); color: var(--naotech-app-background); font-size: 15px; line-height: 20px; white-space: nowrap; }
+.nws-fl__zona .nwt-tag-group__tag--active { color: var(--nws-jic-violeta-900); }
+.nws-fl__zona-res { margin: 0; font-size: 14px; line-height: 18px; color: rgb(255 255 255 / .78); }
+/* La hoja: el contenido sube como una hoja blanca de borde a borde; el violeta asoma tras las esquinas redondeadas. */
+.nws-fl--hoja .nws-lpvw__scroll { background: linear-gradient(90deg, #441e63, #602a8c) top / 100% 40px no-repeat; }
+.nws-fl--hoja .nws-fl__contenido { box-sizing: border-box; min-height: 100%; padding: 8px 16px 0; border-radius: 28px 28px 0 0; background: var(--naotech-app-background); }
+.nws-fl__mx-mes { display: flex; align-items: center; justify-content: space-between; height: 48px; }
+.nws-fl__mx-mes b { font-size: 16px; line-height: 22px; font-weight: var(--naotech-font-weight-bold); color: var(--nws-jic-violeta-900); }
+.nws-fl__mx-mes button { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--naotech-radius-circle); background: transparent; color: var(--nws-jic-violeta-900); cursor: pointer; }
+.nws-fl__mx-mes .nws-fl__mes-ico { width: 22px; height: 22px; }
+.nws-fl__mx-vacio { margin: 24px 0 0; text-align: center; font-size: 16px; line-height: 22px; color: #646587; }
+/* Sangrado: la matriz rompe el relleno de 16px y llega de borde a borde. */
+/* Calendario sangrado con deportes fijos: columna de deportes fija, días que se desplazan, una fila por deporte. */
+@property --nws-cal-c0 { syntax: '<length>'; inherits: true; initial-value: 128px; }
+/* Navegar el calendario: desplazamiento suave, columna de deportes que se encoge con transición y tarjetas con respuesta al tacto. */
+.nws-fl__cal { padding-bottom: 0; scroll-behavior: smooth; transition: --nws-cal-c0 320ms var(--naotech-animation-standard); }
+.nws-fl__cal-hd, .nws-fl__cal-ce { transition: background-color 240ms var(--naotech-animation-standard); }
+.nws-fl__cal-ev { transition: transform 160ms var(--naotech-animation-standard), box-shadow 160ms var(--naotech-animation-standard); }
+button.nws-fl__cal-ev:active { transform: scale(.95); }
+@media (prefers-reduced-motion: reduce) { .nws-fl__cal { scroll-behavior: auto; transition: none; } .nws-fl__cal-hd, .nws-fl__cal-ce, .nws-fl__cal-ev { transition: none; } }
+.nws-fl__cal { --nws-cal-c0: 128px; margin: 8px -16px 0; flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: none; background: linear-gradient(90deg, transparent calc(var(--nws-cal-c0) - 1px), #eceef5 calc(var(--nws-cal-c0) - 1px), #eceef5 var(--nws-cal-c0), transparent var(--nws-cal-c0)) no-repeat; }
+.nws-fl__cal--min { --nws-cal-c0: 68px; }
+.nws-fl__cal-c0.nws-fl__cal-esq { top: 0; z-index: 4; box-sizing: border-box; height: 80px; justify-content: space-between; gap: 4px; }
+/* Elevación sutil bajo la barra fija de días. */
+/* Sombra como un sólido: una franja degradada por celda, sin esquinas ni cortes, que al estar pegadas se leen como una sola.
+   Abajo de la barra de días y a la derecha de la columna de deportes. */
+.nws-fl__cal-hd::after, .nws-fl__cal-c0.nws-fl__cal-esq::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; z-index: -2; height: 10px; pointer-events: none; background: linear-gradient(rgb(40 18 59 / .16), rgb(40 18 59 / .06) 45%, transparent); }
+.nws-fl__cal-lab::after { content: ''; position: absolute; top: 0; bottom: 0; left: 100%; width: 10px; pointer-events: none; background: linear-gradient(90deg, rgb(40 18 59 / .16), rgb(40 18 59 / .06) 45%, transparent); }
+/* En la primera fila la sombra lateral entra con fundido bajo la franja de la barra de días: sin corte duro ni suma oscura en la esquina. */
+/* La franja bajo «Deportes» lleva base blanca: al desplazar, la de los días que pasan por debajo no se suma. */
+.nws-fl__cal-c0.nws-fl__cal-esq::after { background: linear-gradient(rgb(40 18 59 / .16), rgb(40 18 59 / .06) 45%, transparent), var(--naotech-app-background); }
+.nws-fl__cal-lab--p::after { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10px); mask-image: linear-gradient(180deg, transparent 0, #000 10px); }
+.nws-fl__cal-min { display: grid; place-items: center; flex: none; width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--naotech-radius-circle); background: transparent; color: var(--nws-jic-violeta-900); cursor: pointer; }
+.nws-fl__cal-min .nws-fl__mes-ico { width: 18px; height: 18px; transition: transform .2s; }
+.nws-fl__cal--min .nws-fl__cal-min .nws-fl__mes-ico { transform: scaleX(-1); }
+.nws-fl__cal-min:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 1px; }
+.nws-fl__cal-lab > img { display: none; width: 28px; height: 28px; }
+.nws-fl__cal--min .nws-fl__cal-lab { align-items: center; padding: 12px 4px; }
+.nws-fl__cal--min .nws-fl__cal-lab > img { display: block; }
+.nws-fl__cal--min .nws-fl__cal-lab > b, .nws-fl__cal--min .nws-fl__cal-esq > span { display: none; }
+.nws-fl__cal--min .nws-fl__cal-esq { justify-content: center; padding: 0; }
+.nws-fl__cal::-webkit-scrollbar { display: none; }
+/* El calendario sangra hasta el borde inferior de la hoja: sin relleno bajo la matriz. */
+.nws-fl--hoja .nws-fl__contenido:has(.nws-fl__cal) { padding-bottom: 0; }
+.nws-fl__cal-tb { display: grid; width: max-content; min-width: 100%; min-height: 100%; }
+.nws-fl__cal-c0 { position: sticky; left: 0; z-index: 2; background: var(--naotech-app-background); }
+.nws-fl__cal-esq { display: flex; align-items: center; padding: 0 16px; font-size: 14px; line-height: 18px; font-weight: var(--naotech-font-weight-bold); letter-spacing: .04em; text-transform: uppercase; color: var(--nws-jic-violeta-900); }
+/* Barra de días por encima de la columna de deportes (z 2): la sombra lateral de las filas que suben por debajo no la cruza. */
+.nws-fl__cal-hd { position: sticky; top: 0; z-index: 3; box-sizing: border-box; height: 80px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 2px 8px; border: 0; background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); font: inherit; }
+button.nws-fl__cal-hd { cursor: pointer; }
+.nws-fl__cal-hd span { font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__cal-hd b { font-size: 18px; line-height: 24px; font-weight: var(--naotech-font-weight-medium); }
+.nws-fl__cal-hd small { min-height: 16px; font-size: 14px; line-height: 16px; font-weight: var(--naotech-font-weight-bold); }
+.nws-fl__cal-hd--vacio span, .nws-fl__cal-hd--vacio b { color: #a9a4b6; }
+/* Días de competencia: lavanda; Inicio y Final, violeta oscuro con texto claro. */
+.nws-fl__cal-hd--rango { background: #efedf4; }
+.nws-fl__cal-hd, .nws-fl__cal-ev { -webkit-tap-highlight-color: transparent; }
+/* La celda es opaca (blanca) y el violeta redondeado va detrás del texto: las esquinas nunca dejan ver lo que se desplaza. */
+.nws-fl__cal-hd--ini, .nws-fl__cal-hd--fin, .nws-fl__cal-hd.nws-fl__cal-col--sel { background: #efedf4; border-radius: 0; }
+/* Bajo las esquinas del recuadro oscuro va el color del vecino: lavanda hacia los días de competencia y blanco hacia los vacíos, sin corte. */
+.nws-fl__cal-hd.nws-fl__cal-hd--ini { background: linear-gradient(90deg, var(--naotech-app-background) 50%, #efedf4 50%); }
+.nws-fl__cal-hd.nws-fl__cal-hd--fin { background: linear-gradient(90deg, #efedf4 50%, var(--naotech-app-background) 50%); }
+.nws-fl__cal-hd--ini::before, .nws-fl__cal-hd--fin::before, .nws-fl__cal-hd.nws-fl__cal-col--sel::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 16px; background: #3d2863; }
+.nws-fl__cal-hd.nws-fl__cal-col--sel::before { border-radius: 18px 18px 0 0; background: var(--nws-jic-violeta-titular); }
+.nws-fl__cal-hd--ini span, .nws-fl__cal-hd--ini b, .nws-fl__cal-hd--ini small, .nws-fl__cal-hd--fin span, .nws-fl__cal-hd--fin b, .nws-fl__cal-hd--fin small { color: var(--naotech-app-background); }
+.nws-fl__cal-lab { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 12px 16px; min-height: 90px; box-sizing: border-box; border-top: 1px solid #eceef5; color: var(--nws-jic-violeta-900); }
+.nws-fl__cal-lab b { font-size: var(--naotech-body-font-size); line-height: var(--naotech-smalltext-line-height); }
+/* Los nombres de deportes llevan fondo opaco: al desplazar, las tarjetas pasan por debajo sin cruzarse con el texto. */
+.nws-fl__cal-c0.nws-fl__cal-lab { background: var(--naotech-app-background); }
+.nws-fl__cal-lab small { font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__cal-ce { display: flex; align-items: center; justify-content: center; padding: 8px 4px; border-top: 1px solid #eceef5; border-left: 1px solid #eceef5; }
+.nws-fl__cal-ev { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; width: 54px; min-height: 66px; padding: 7px 0 6px; border: 0; border-radius: 12px; background: #f3eefa; font: inherit; }
+button.nws-fl__cal-ev { cursor: pointer; }
+.nws-fl__cal-ev img { display: block; width: 22px; height: 22px; }
+.nws-fl__cal-ev--atl { background: #fbecd9; }
+.nws-fl__cal-ev--fut { background: #fbe8f1; }
+.nws-fl__cal-ev--bal { background: #fde9e0; }
+.nws-fl__cal-ev--vol { background: #e9eefb; }
+.nws-fl__cal-ev i { min-width: 36px; padding: 2px 0; border-radius: var(--naotech-radius-pill); background: #fff; color: var(--nws-jic-violeta-900); font-size: 15px; font-style: normal; font-weight: var(--naotech-font-weight-bold); line-height: 20px; text-align: center; }
+.nws-fl__cal-ev:focus-visible, .nws-fl__cal-hd:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 1px; }
+/* Día elegido: una sola columna violeta, del encabezado a la última fila. */
+.nws-fl__cal-col--sel { background: var(--nws-jic-violeta-titular); border-top-color: rgb(255 255 255 / .2); }
+.nws-fl__cal-col--ini { border-radius: 18px 18px 0 0; }
+.nws-fl__cal-col--fin { border-radius: 0 0 18px 18px; }
+.nws-fl__cal-hd.nws-fl__cal-col--sel span, .nws-fl__cal-hd.nws-fl__cal-col--sel b, .nws-fl__cal-hd.nws-fl__cal-col--sel small { color: var(--naotech-app-background); }
+.nws-fl__cal-col--sel .nws-fl__cal-ev { background: var(--naotech-app-background); }
+/* Hoja del día (reusa la hoja de las listas de inscritos) y convenciones. */
+.nws-fl__hoja-sub { margin: 0 0 12px; font-size: 15px; line-height: 20px; color: #646587; }
+.nws-fl__hoja-dep { display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 8px; padding: 12px; border: 1px solid #e3e5ef; border-radius: 16px; background: #fff; color: var(--nws-jic-violeta-900); font: inherit; text-align: left; cursor: pointer; }
+.nws-fl__hoja-dep img { flex: none; width: 28px; height: 28px; }
+.nws-fl__hoja-dep-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.nws-fl__hoja-dep-t b { font-size: 16px; line-height: 20px; }
+.nws-fl__hoja-dep-t span { font-size: 14px; line-height: 18px; color: #646587; }
+.nws-fl__hoja-dep .nws-fl__mes-ico { flex: none; width: 20px; height: 20px; color: var(--nws-jic-violeta-titular); }
+.nws-fl__hoja-dep:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 1px; }
+.nws-fl--hoja .nws-lpvw__scroll { overflow: hidden; }
+.nws-fl--hoja .nws-fl__contenido { display: flex; flex-direction: column; height: 100%; }
+.nws-fl--hoja .nws-fl__contenido > [data-fl-contenido] { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
 /* nws-lps2 · splash DC-035/DC-040: tinte violeta, logo JIC con zoom y MinDeporte fijo. */
 .nws-lps__tinte { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgb(68 30 99 / .6), rgb(68 30 99 / .7)); }
@@ -1996,7 +2158,7 @@ body.nws-modo-dev [data-dev].nws-dev--foco { outline: 2.5px solid var(--nws-jic-
 .nws-fl__sede-pin svg { width: 20px; height: 20px; }
 .nws-fl__sede-card .nws-fl__divisor { margin: 16px 0; }
 /* Sede: la foto es la cabecera (el botón volver va encima) y la tarjeta blanca la cubre (pantalla de sede de la app). */
-.nws-lpvw__top.nws-fl__top--foto { height: 236px; margin-bottom: -28px; padding-top: 12px; align-items: flex-start; background-color: #e7e9f3; background-size: cover; background-position: center; }
+.nws-lpvw__top.nws-fl__top--foto { height: 236px; margin-bottom: -28px; padding-top: 12px; padding-left: 16px; align-items: flex-start; background-color: #e7e9f3; background-size: cover; background-position: center; }
 .nws-fl__sede-card { margin: 0; }
 /* Partido centrado (match_detail_screen.dart): estado arriba, tarjeta de ronda centrada, escudos de 56 px. */
 .nws-fl__pill-centro { display: flex; justify-content: center; margin: 16px 0 0; }
@@ -2279,3 +2441,288 @@ button.nws-fl__insc-fila--btn { width: 100%; text-align: left; border: 0; border
 .nws-fl__btn-sec { border: 1.5px solid #d74009; background: #fff; color: #d74009; }
 .nws-fl__btn-pri { border: 0; background: #d74009; color: #fff; }
 .nws-fl__contenido .nws-fl__apoyo-sec--sm { margin: 20px 0 8px; }
+
+/* Competencia: días en píldoras sobre la cabecera violeta y lista de partidos sobre la hoja blanca. */
+.nws-fl--hoja-lista .nws-lpvw__scroll { overflow-y: auto; }
+.nws-fl--hoja-lista .nws-fl__contenido { display: block; height: auto; padding: 16px 16px 40px; }
+.nws-fl--hoja-lista .nws-fl__contenido > [data-fl-contenido] { display: block; }
+.nws-fl__top--zona:has(.nws-fl__dp) .nws-fl__top-t { margin-top: 12px; font-size: 28px; line-height: 32px; letter-spacing: -0.01em; }
+.nws-fl__dp { display: flex; gap: 8px; margin: 16px -16px 0 -16px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; justify-content: safe center; }
+.nws-fl__dp::-webkit-scrollbar { display: none; }
+.nws-fl__dp-d { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 54px; padding: 10px 0 8px; border: 0; border-radius: var(--naotech-sizing-18); background: rgb(255 255 255 / .16); color: var(--naotech-app-background); font: inherit; cursor: pointer; transition: background-color 180ms var(--naotech-animation-standard); }
+.nws-fl__dp-d:hover { background: rgb(255 255 255 / .24); }
+.nws-fl__dp-d:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: 2px; }
+.nws-fl__dp-s { font-size: 14px; line-height: 18px; opacity: .85; }
+.nws-fl__dp-n { font-size: 22px; line-height: 28px; font-weight: var(--naotech-font-weight-bold); }
+.nws-fl__dp-pt { width: 6px; height: 6px; margin: 4px 0; border-radius: var(--naotech-radius-circle); background: currentColor; }
+.nws-fl__dp-e { font-size: 11px; line-height: 14px; font-weight: var(--naotech-font-weight-bold); }
+/* Con los días bajo el título, el subtítulo de región y sede queda pegado a él. */
+.nws-fl__top--zona:has(.nws-fl__dp) .nws-fl__top-sub { margin-top: 4px; }
+.nws-fl__dp-d--sin { opacity: .55; }
+.nws-fl__dp-d--sin .nws-fl__dp-pt { visibility: hidden; }
+.nws-fl__dp-d--sel, .nws-fl__dp-d--sel:hover { background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); opacity: 1; }
+
+/* Dentro de la prueba (atletismo): antetítulo (el título de la vista anterior), prueba grande, sede y días; abajo, series y podio. */
+.nws-fl__top-eb { margin: 12px 0 0; font-size: 16px; line-height: 20px; font-weight: var(--naotech-font-weight-medium); color: rgb(255 255 255 / .88); transform-origin: 0 0; }
+.nws-fl__top--prueba .nws-fl__top-t { margin-top: 4px; font-size: 36px; line-height: 40px; letter-spacing: -0.02em; }
+.nws-fl__top--prueba .nws-fl__top-sub { margin-top: 6px; font-size: 18px; line-height: 24px; }
+.nws-fl__top--prueba .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-sub, .nws-fl__top--prueba .nws-fl__dp { animation: nws-fl-sube 380ms var(--naotech-animation-standard) both; }
+.nws-fl__top--prueba .nws-fl__top-sub { animation-delay: 70ms; }
+.nws-fl__top--prueba .nws-fl__dp { animation-delay: 140ms; }
+@keyframes nws-fl-sube { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .nws-fl__top--prueba .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-sub, .nws-fl__top--prueba .nws-fl__dp { animation: none; } }
+.nws-fl__serie-sub { margin: 2px 0 12px; font-size: 15px; line-height: 20px; color: #646587; }
+.nws-fl__serie { box-sizing: border-box; width: 100%; }
+.nws-fl__serie .nws-fl__fila-t { color: var(--nws-jic-violeta-titular); }
+.nws-fl__serie-1 { font-weight: var(--naotech-font-weight-semibold); }
+.nws-fl__serie-mas { align-self: flex-start; margin-top: 10px; min-height: 36px; padding: 0 16px; border: 1px solid #8788ab; border-radius: var(--naotech-radius-pill); background: #fff; color: var(--nws-jic-violeta-titular); font: inherit; font-size: 14px; font-weight: var(--naotech-font-weight-semibold); cursor: pointer; }
+.nws-fl__serie-mas:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+.nws-fl__podio { display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; gap: 8px; margin: 4px 0 8px; }
+.nws-fl__pod { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 6px 12px; border-radius: 20px; background: #f3eefa; color: var(--nws-jic-violeta-900); text-align: center; }
+.nws-fl__pod--1 { padding-top: 22px; padding-bottom: 18px; background: var(--nws-jic-durazno); }
+.nws-fl__pod--3 { background: #fbe8f1; }
+.nws-fl__pod-m { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--naotech-radius-circle); background: var(--nws-jic-violeta-titular); color: var(--naotech-app-background); font-size: 16px; font-weight: var(--naotech-font-weight-bold); }
+.nws-fl__pod--1 .nws-fl__pod-m { width: 40px; height: 40px; font-size: 20px; }
+.nws-fl__pod-n { font-size: 14px; line-height: 18px; overflow-wrap: anywhere; }
+.nws-fl__pod-i { font-size: 12px; line-height: 16px; color: #646587; overflow-wrap: anywhere; }
+.nws-fl__pod-v { font-size: 15px; line-height: 20px; }
+.nws-fl__tabla small { font-size: 12px; line-height: 16px; color: #646587; }
+/* Título de la prueba: el tamaño de la zona con días (28px) no debe ganarle al de la prueba. */
+.nws-fl__top--zona.nws-fl__top--prueba:has(.nws-fl__dp) .nws-fl__top-t { font-size: 36px; line-height: 40px; letter-spacing: -0.02em; }
+/* Series: la hora ocupa el alto de la tarjeta; «Ver más» queda en la línea de la sede, a la derecha. */
+.nws-fl__serie.nws-fl__fila--partido .nws-fl__hora { align-self: stretch; height: auto; }
+.nws-fl__serie-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.nws-fl__serie-pie .nws-fl__chip-sede { margin-top: 0; align-self: center; }
+.nws-fl__serie-pie .nws-fl__serie-mas { margin-top: 0; align-self: center; min-height: 32px; }
+
+/* ---- Prueba de atletismo (series, podio y resultado de la serie) ---- */
+/* Título de la prueba más pequeño y aire entre los días y la hoja blanca. */
+.nws-fl__top--zona.nws-fl__top--prueba:has(.nws-fl__dp) .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-t { font-size: 26px; line-height: 30px; letter-spacing: -0.01em; }
+.nws-fl__top--prueba:has(.nws-fl__dp) { padding-bottom: 28px; }
+/* Días con una flecha a cada lado y las píldoras al centro. */
+.nws-fl__dp--nav { margin-inline: 0; padding-inline: 0; overflow: visible; justify-content: space-between; align-items: center; }
+.nws-fl__dp-pil { display: flex; gap: 8px; }
+.nws-fl__dp-nav { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgb(255 255 255 / .16); color: #fff; font-size: 18px; cursor: pointer; }
+.nws-fl__dp-nav:disabled { opacity: .35; cursor: default; }
+.nws-fl__dp-nav:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+/* Fichas de filtro: Series y Podio general se reparten el ancho. */
+.nws-fl__ch { display: flex; gap: 8px; margin-bottom: 4px; }
+.nws-fl__ch-b { flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #e3e0ee; border-radius: var(--naotech-radius-pill); background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.nws-fl__ch-b--on { background: #f1e6f6; border-color: var(--nws-jic-violeta-titular); color: var(--nws-jic-violeta-titular); }
+.nws-fl__ch-b:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+.nws-fl__ch-n { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: #f1e6f6; color: var(--nws-jic-violeta-titular); font-size: 12px; display: grid; place-items: center; }
+.nws-fl__ch-b--on .nws-fl__ch-n { background: var(--nws-jic-violeta-titular); color: #fff; }
+.nws-fl__ch-ico { width: 16px; height: 16px; }
+.nws-fl__cab-r { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.nws-fl__cab-r .nws-fl__explora { margin: 0; }
+/* Tarjeta de serie: se contrae con una transición suave y deja ver la hora a la izquierda. */
+.nws-fl__se-l { display: grid; gap: 14px; }
+.nws-fl__se { border: 1px solid #d6d3e0; border-radius: 22px; background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); }
+.nws-fl__se-h { display: flex; align-items: center; padding: 14px; }
+.nws-fl__se-hb { flex: none; width: 0; height: 0; margin-right: 0; opacity: 0; overflow: hidden; transition: height .6s cubic-bezier(.4, 0, .2, 1), width .6s cubic-bezier(.4, 0, .2, 1), margin .6s cubic-bezier(.4, 0, .2, 1), opacity .45s ease; }
+.nws-fl__se-hb > div { width: 60px; height: 72px; border-radius: 14px; background: #ffedc7; color: #d74009; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; font-size: 14px; line-height: 16px; font-weight: 700; }
+.nws-fl__se-hb svg { width: 22px; height: 22px; }
+.nws-fl__se--c .nws-fl__se-hb { width: 60px; height: 72px; margin-right: 12px; opacity: 1; transition-delay: 0s, 0s, 0s, .12s; }
+.nws-fl__se-tx { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.nws-fl__se-tx b { font-size: 17px; line-height: 22px; }
+.nws-fl__se-tx small { font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__se-der { display: flex; align-items: center; gap: 6px; }
+.nws-fl__se-chev { width: 34px; height: 34px; border: 0; border-radius: 50%; background: none; color: var(--nws-jic-violeta-900); display: grid; place-items: center; cursor: pointer; }
+.nws-fl__se-chev svg { width: 20px; height: 20px; transition: transform .6s cubic-bezier(.4, 0, .2, 1); }
+.nws-fl__se--c .nws-fl__se-chev svg { transform: rotate(180deg); }
+.nws-fl__se-chev:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+.nws-fl__se-w { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .6s cubic-bezier(.4, 0, .2, 1); }
+.nws-fl__se--c .nws-fl__se-w { grid-template-rows: 0fr; }
+.nws-fl__se-in { overflow: hidden; min-height: 0; visibility: visible; }
+.nws-fl__se--c .nws-fl__se-in { visibility: hidden; transition: visibility 0s .6s; }
+.nws-fl__se-pad { padding: 0 12px 10px; }
+.nws-fl__se-pad--fuera { padding-top: 12px; margin: 0 2px; border-top: 1px solid #e6e3f0; }
+.nws-fl__se-c { border-top: 1px solid #e6e3f0; padding: 12px 8px 4px; }
+.nws-fl__se-hora { display: inline-block; margin-bottom: 4px; padding: 4px 10px; border-radius: 10px; background: #ffedc7; color: #d74009; font-size: 13px; font-weight: 700; }
+.nws-fl__se-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e6e3f0; }
+.nws-fl__se-pad--fuera .nws-fl__se-pie { margin-top: 0; padding-top: 0; border-top: 0; }
+.nws-fl__se-pie .nws-fl__chip-sede { margin-top: 0; align-self: center; }
+.nws-fl__se-pie .nws-fl__serie-mas { margin-top: 0; align-self: center; }
+@media (prefers-reduced-motion: reduce) { .nws-fl__se-hb, .nws-fl__se-w, .nws-fl__se-chev svg, .nws-fl__se-in, .nws-fl__se--c .nws-fl__se-in { transition: none !important; } }
+/* Fila de resultado compartida: series, posiciones y resultado de la serie. */
+.nws-fl__rf-l--caja { border: 1px solid #dcd9e8; border-radius: 14px; overflow: hidden; background: var(--naotech-app-background); }
+.nws-fl__rf-l--sep { margin-top: 22px; }
+.nws-fl__rf { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px; }
+.nws-fl__rf-l--caja .nws-fl__rf:nth-child(even) { background: #f6f5fb; }
+.nws-fl__se .nws-fl__rf { padding-inline: 0; border-top: 1px solid #e6e3f0; }
+.nws-fl__se .nws-fl__rf:first-child { border-top: 0; }
+.nws-fl__rf:has(.nws-fl__rf-perfil) { grid-template-columns: 28px minmax(0, 1fr) auto 36px; }
+.nws-fl__rf-p { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #efedf4; color: var(--nws-jic-violeta-titular); font-size: 12px; font-weight: 700; }
+.nws-fl__rf-n { min-width: 0; display: grid; gap: 2px; }
+.nws-fl__rf-n b { font-size: 14px; line-height: 18px; font-weight: 600; }
+.nws-fl__rf-n small { font-size: 11px; line-height: 16px; color: #646587; }
+.nws-fl__rf-m { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.nws-fl__rf-perfil { width: 36px; height: 36px; border: 0; border-radius: 50%; background: #efedf4; color: var(--nws-jic-violeta-titular); display: grid; place-items: center; cursor: pointer; }
+.nws-fl__rf-perfil svg { width: 20px; height: 20px; }
+.nws-fl__rf-perfil:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+/* Podio: avatares con anillo violeta, el primero con halo dorado que late despacio. */
+.nws-fl__pdio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; align-items: start; padding-top: 4px; }
+.nws-fl__pd { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.nws-fl__pd--2 { padding-top: 40px; } .nws-fl__pd--3 { padding-top: 62px; }
+.nws-fl__pd-av { position: relative; display: grid; place-items: center; margin-bottom: 18px; border-radius: 50%; }
+.nws-fl__pd--1 .nws-fl__pd-av { width: 112px; height: 112px; }
+.nws-fl__pd-av i { position: relative; display: grid; place-items: center; border-radius: 50%; border: 4px solid #5a2a85; background: #efedf4; color: #9b9aae; }
+.nws-fl__pd--1 .nws-fl__pd-av i { width: 88px; height: 88px; } .nws-fl__pd--2 .nws-fl__pd-av i, .nws-fl__pd--3 .nws-fl__pd-av i { width: 66px; height: 66px; }
+.nws-fl__pd-av svg { width: 55%; height: 55%; }
+.nws-fl__pd--1 .nws-fl__pd-av::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #f2c53d; opacity: .5; animation: nws-fl-brilla 3.6s ease-in-out infinite; }
+.nws-fl__pd-m { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); width: 26px; height: 26px; border-radius: 50%; background: #5a2a85; color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.nws-fl__pd--1 .nws-fl__pd-m { bottom: -1px; }
+.nws-fl__pd b { font-size: 13px; line-height: 17px; font-weight: 500; } .nws-fl__pd--1 b { font-size: 14px; }
+.nws-fl__pd small { margin-top: 4px; font-size: 12px; color: #646587; }
+.nws-fl__pd-v { margin-top: 6px; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+@keyframes nws-fl-brilla { 0%, 100% { opacity: .25; transform: scale(.96); } 50% { opacity: .7; transform: scale(1.03); } }
+@media (prefers-reduced-motion: reduce) { .nws-fl__pd--1 .nws-fl__pd-av::before { animation: none; } }
+.nws-fl__ch + .nws-fl__cab-r { margin-top: 16px; }
+/* Tamaños del artefacto: antetítulo 14, título 26, sede 16 y encabezados de sección 18. */
+.nws-fl__top--prueba .nws-fl__top-eb { font-size: 14px; line-height: 18px; }
+.nws-fl__top--prueba .nws-fl__top-sub { margin-top: 4px; font-size: 16px; line-height: 22px; }
+.nws-fl__top--prueba .nws-fl__top-t { margin-top: 2px; }
+.nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__explora { margin: 18px 0 10px; font-size: 18px; line-height: 24px; font-weight: 700; }
+.nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__cab-r .nws-fl__explora { margin: 0; }
+.nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__cab-r { margin: 18px 0 10px; }
+/* Al cambiar de día la franja se repinta: sin volver a animar su entrada (era el parpadeo). */
+.nws-fl__top--prueba .nws-fl__dp.nws-fl__dp--fija { animation: none !important; }
+/* Igualar los textos al artefacto (tamaño, interlínea y grosor). */
+.nws-fl__top--prueba .nws-fl__top-eb { line-height: 19.6px; font-weight: 400; }
+.nws-fl__top--prueba .nws-fl__top-t { font-weight: 800; }
+.nws-fl__top--prueba .nws-fl__top-sub { line-height: 22.4px; }
+.nws-fl__dp--nav .nws-fl__dp-s { font-size: 12px; font-weight: 500; }
+.nws-fl__dp--nav .nws-fl__dp-n { line-height: 26px; }
+.nws-fl__dp--nav .nws-fl__dp-e { font-size: 10px; line-height: normal; }
+.nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__explora { line-height: 25.2px; }
+.nws-fl__se-tx b { line-height: 23.8px; }
+.nws-fl__se-tx small { line-height: 16.8px; }
+.nws-fl__se .nws-fl__pill, .nws-fl__cab-r .nws-fl__pill { padding: 4px 9px; font-size: 12px; line-height: 16.8px; font-weight: 700; white-space: nowrap; }
+.nws-fl__se-hora { font-size: 12px; line-height: 16.8px; }
+.nws-fl__se-pie .nws-fl__chip-sede { padding: 5px 10px; font-size: 12px; line-height: 16.8px; font-weight: 600; }
+.nws-fl__se-pie .nws-fl__chip-sede svg { width: 12px; height: 12px; }
+.nws-fl__se-pie .nws-fl__serie-mas { font-size: 13px; font-weight: 700; padding: 7px 14px; min-height: 0; height: auto; }
+.nws-fl__rf-n small { font-size: 12px; }
+.nws-fl__rf-l--det .nws-fl__rf-n small { font-size: 11px; }
+.nws-fl__rf-m { line-height: 21px; }
+.nws-fl__pd small { line-height: 16.8px; }
+.nws-fl__pd-v { line-height: 21px; }
+/* El artefacto se diseñó sobre 374 px de ancho útil y el teléfono de la demo mide 428: se escala el contenido de la prueba
+   por 428/374 para que cada texto, espacio y avatar guarde la misma proporción con el teléfono. */
+.nws-fl__top--prueba > :not(.nws-fl__top-fila), .nws-fl__top--prueba ~ .nws-lpvw__scroll { zoom: 1.1444; }
+/* Menos aire entre antetítulo, título y sede en la cabecera de la prueba. */
+.nws-fl__top--prueba .nws-fl__top-eb { margin-top: 8px; line-height: 16px; }
+.nws-fl__top--prueba .nws-fl__top-t { margin-top: 0; line-height: 28px; }
+.nws-fl__top--prueba .nws-fl__top-sub { margin-top: 2px; line-height: 20px; }
+.nws-fl__top--prueba .nws-fl__dp { margin-top: 12px; }
+/* La barra de estado toma el violeta de la cabecera: el fondo ya no se corta arriba ni al deslizar la vista. */
+.nws-lpvw__estado:has(+ .nws-fl__top--violeta) { background: linear-gradient(90deg, #441e63, #602a8c); }
+.nws-lpvw__estado:has(+ .nws-fl__top--violeta) .nws-mob__status { color: #fff; }
+/* Título de la prueba a 30 px (DC-050). */
+.nws-fl__top--zona.nws-fl__top--prueba:has(.nws-fl__dp) .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-t { font-size: 30px; line-height: 30px; }
+/* Sin línea entre la barra de estado y la cabecera: se solapan 1 px para tapar la costura (DC-052). */
+.nws-lpvw__estado:has(+ .nws-fl__top--violeta) { position: relative; z-index: 1; margin-bottom: -1px; }
+/* La hoja blanca queda fija con sus esquinas redondeadas; la lista se desliza por debajo sin subir sobre lo morado (DC-053). */
+.nws-fl--hoja-lista .nws-lpvw__scroll::before { content: ""; display: block; position: sticky; top: 0; z-index: 5; height: 28px; margin-bottom: -28px; pointer-events: none;
+  background: radial-gradient(circle at 28px 28px, transparent 27.5px, #451f64 28px) top left / 28px 28px no-repeat, radial-gradient(circle at 0 28px, transparent 27.5px, #5f2a8b 28px) top right / 28px 28px no-repeat; }
+/* Antetítulo con 6px de alto: el título sube y queda más cerca (DC-051 y DC-055). */
+.nws-fl__top--prueba .nws-fl__top-eb { height: 6px; }
+/* Sin hairline entre la cabecera violeta y la hoja: la zona de scroll sube 1px y su franja violeta tapa la costura. */
+.nws-fl__top--violeta + .nws-lpvw__scroll { margin-top: -1px; }
+/* Cabecera de la prueba que se pliega al desplazar (el avance lo pone landing-vistas.js). */
+.nws-fl__top--prueba .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-sub { overflow: hidden; }
+.nws-fl__top--prueba .nws-fl__top-t { transform-origin: 0 0; }
+.nws-fl__top-mini { flex: 1; min-width: 0; margin-left: 12px; font-size: 17px; line-height: 22px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; pointer-events: none; }
+.nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__contenido { box-sizing: border-box; min-height: calc(100% + 120px); }
+.nws-fl__top--prueba .nws-fl__top-eb, .nws-fl__top--prueba .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-sub, .nws-fl__top-mini { transition: none !important; }
+/* El título pequeño mide lo mismo que «Serie 1» (17 px dentro del zoom 1.1444) y su mismo grosor. */
+.nws-fl__top-mini { font-size: calc(17px * 1.1444); line-height: calc(23.8px * 1.1444); font-weight: 700; }
+/* En el resultado de la serie el antetítulo conserva su línea completa: con 6px de alto el título grande lo tapaba. */
+.nws-lpvw--serie .nws-fl__top--prueba .nws-fl__top-eb { height: 18px; margin-top: 8px; }
+
+/* ---- Conjuntos: marcador, parciales, nómina y posiciones (mismos valores que la propuesta aprobada) ---- */
+.nws-fl__se-hb img { width: 22px; height: 22px; }
+.nws-fl__cj-mar { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; gap: 6px; }
+.nws-fl__cj-eq { display: grid; justify-items: center; gap: 6px; text-align: center; min-width: 0; }
+.nws-fl__cj-esc { width: 44px; height: 44px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+.nws-fl__cj-det .nws-fl__cj-esc { width: 56px; height: 56px; font-size: 13px; }
+.nws-fl__cj-nm { font-size: 11px; line-height: 14px; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.nws-fl__cj-dep { font-size: 11px; line-height: 14px; font-weight: 400; color: #9a99b0; }
+.nws-fl__cj-tab { display: flex; align-items: center; gap: 6px; padding-top: 4px; }
+.nws-fl__cj-num { display: flex; gap: 3px; }
+.nws-fl__cj-num span { width: 26px; height: 40px; border-radius: 8px; background: #efedf4; color: var(--nws-jic-violeta-900); display: grid; place-items: center; font: 700 24px "Chakra Petch", Inter, sans-serif; font-variant-numeric: tabular-nums; }
+.nws-fl__cj-num--gan span { background: #f1e6f6; color: var(--nws-jic-violeta-titular); }
+.nws-fl__cj-guion { color: #9b9aae; font-weight: 700; }
+.nws-fl__cj-det { padding: 16px 8px 12px; }
+/* Parciales */
+.nws-fl__pc-h, .nws-fl__pc-r { display: grid; grid-template-columns: minmax(0, 1fr) repeat(var(--n, 4), 32px) 40px; align-items: center; gap: 4px; padding: 0 12px; text-align: center; }
+.nws-fl__pc-h { padding-block: 12px 8px; font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #646587; text-transform: uppercase; }
+.nws-fl__pc-r { padding-block: 12px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.nws-fl__pc-r:nth-child(odd) { background: #f6f5fb; }
+.nws-fl__pc-h span:first-child, .nws-fl__pc-e { text-align: left; }
+.nws-fl__pc-e { font-weight: 600; }
+.nws-fl__pc-r--gan .nws-fl__pc-e { font-weight: 800; }
+.nws-fl__pc-t { font-weight: 800; color: var(--nws-jic-violeta-titular); }
+.nws-fl__pc-sin { margin: 0; padding: 6px 10px 10px; font-size: 13px; line-height: 18px; color: #646587; text-align: center; }
+/* Nómina */
+.nws-fl__nm-t { margin: 0 0 8px; font-size: 15px; line-height: 20px; font-weight: 700; }
+.nws-fl__nm-l { margin-bottom: 16px; }
+.nws-fl__nm-r { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 12px; }
+.nws-fl__nm-l .nws-fl__nm-r:nth-child(even) { background: #f6f5fb; }
+.nws-fl__nm-d { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #efedf4; color: var(--nws-jic-violeta-titular); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.nws-fl__nm-r b { display: block; font-size: 14px; line-height: 18px; font-weight: 600; }
+.nws-fl__nm-r small { display: block; font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__nm-cap { font-size: 11px; font-weight: 700; color: var(--nws-jic-violeta-titular); background: #f1e6f6; border-radius: 999px; padding: 3px 8px; }
+/* Posiciones */
+.nws-fl__pos-h, .nws-fl__pos-r { display: grid; grid-template-columns: 28px minmax(0, 1fr) 26px 26px 26px 38px 32px; align-items: center; gap: 6px; padding: 0 12px; }
+.nws-fl__pos-h { padding-block: 12px 8px; font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #646587; text-transform: uppercase; }
+.nws-fl__pos-r { padding-block: 12px; font-size: 13px; }
+.nws-fl__pos-t .nws-fl__pos-r:nth-child(even) { background: #f6f5fb; }
+.nws-fl__pos-h span:nth-child(n+3), .nws-fl__pos-r > span:nth-child(n+3) { text-align: center; }
+.nws-fl__pos-e { font-size: 13px; line-height: 17px; font-weight: 600; min-width: 0; }
+.nws-fl__pos-d { font-variant-numeric: tabular-nums; color: #646587; }
+.nws-fl__pos-p { font-weight: 800; color: var(--nws-jic-violeta-titular); }
+.nws-lpvw--partido .nws-fl__top--prueba .nws-fl__top-eb { height: 18px; margin-top: 8px; }
+.nws-fl__dp--nav .nws-fl__dp-pil { flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; justify-content: safe center; }
+.nws-fl__dp--nav .nws-fl__dp-pil::-webkit-scrollbar { display: none; }
+.nws-fl__dp--nav .nws-fl__dp-d { flex: none; }
+.nws-fl__se-c:has(.nws-fl__cj-mar) { display: grid; gap: 12px; }
+.nws-fl__se-c:has(.nws-fl__cj-mar) .nws-fl__se-hora { justify-self: start; margin-bottom: 0; }
+.nws-fl__tabs + .nws-fl__nm-t { margin-top: 16px; }
+.nws-lpvw--competencia .nws-fl__top--prueba .nws-fl__top-eb { height: 18px; margin-top: 8px; }
+
+/* «Todos»: tarjeta sencilla de partido con parciales */
+.nws-fl__cp { border: 1px solid #d6d3e0; border-radius: 22px; background: var(--naotech-app-background); padding: 14px 14px 12px; display: grid; gap: 10px; color: var(--nws-jic-violeta-900); }
+.nws-fl__cp-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.nws-fl__cp-n { display: block; font-size: 17px; line-height: 23.8px; }
+.nws-fl__cp-h small { display: block; font-size: 12px; line-height: 16.8px; color: #646587; }
+.nws-fl__cp-eq { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.nws-fl__cp-sig { height: 26px; border-radius: 9px; background: #efedf4; color: var(--nws-jic-violeta-titular); font-size: 11px; font-weight: 800; letter-spacing: .04em; display: grid; place-items: center; }
+.nws-fl__cp-nm { font-size: 14px; line-height: 18px; font-weight: 500; }
+.nws-fl__cp-pt { min-width: 28px; text-align: right; font-size: 20px; line-height: 24px; font-weight: 800; font-variant-numeric: tabular-nums; color: #646587; }
+.nws-fl__cp-eq--gan .nws-fl__cp-pt { color: var(--nws-jic-violeta-titular); }
+.nws-fl__cp-par { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 8px; font-size: 12px; line-height: 16px; color: #646587; padding-top: 2px; }
+.nws-fl__cp-par > span { display: inline-flex; align-items: center; gap: 4px; }
+.nws-fl__cp-par b { font-weight: 700; color: var(--nws-jic-violeta-900); font-variant-numeric: tabular-nums; }
+.nws-fl__cp-par i { width: 1px; height: 12px; background: #e3e0ee; }
+.nws-fl__cp-q { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.nws-fl__cp .nws-fl__se-pie { margin-top: 0; }
+.nws-fl__cp .nws-fl__pill { padding: 4px 9px; font-size: 12px; line-height: 16.8px; font-weight: 700; white-space: nowrap; }
+/* Voleibol: leyenda bajo el marcador y tabla con sets ganados y perdidos */
+.nws-fl__cj-tabw { display: grid; justify-items: center; gap: 6px; }
+.nws-fl__cj-cap { font-size: 10px; line-height: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #9a99b0; }
+.nws-fl__pos-e small { display: block; font-size: 11px; line-height: 14px; font-weight: 400; color: #9a99b0; }
+.nws-fl__pos-t--sets .nws-fl__pos-h, .nws-fl__pos-t--sets .nws-fl__pos-r { grid-template-columns: 28px minmax(0, 1fr) 20px 20px 20px 22px 22px 30px 26px; gap: 4px; padding-inline: 10px; }
+.nws-fl__pos-t--sets .nws-fl__pos-h { font-size: 9px; letter-spacing: .04em; }
+.nws-fl__pos-t--sets .nws-fl__pos-r { font-size: 12px; }
+/* Escudo, nombre y departamento de cada equipo comparten filas: los departamentos quedan alineados justo bajo el nombre más largo. */
+.nws-fl__cj-mar { grid-template-rows: auto auto auto; row-gap: 6px; }
+.nws-fl__cj-eq { grid-row: span 3; grid-template-rows: subgrid; row-gap: 6px; }
+.nws-fl__cj-tabw { grid-row: 1; }
+.nws-fl__cj-mar > :nth-child(1) { grid-column: 1; grid-row: 1 / span 3; }
+.nws-fl__cj-mar > :nth-child(2) { grid-column: 2; grid-row: 1; }
+.nws-fl__cj-mar > :nth-child(3) { grid-column: 3; grid-row: 1 / span 3; }
+/* Detalle de sets, cuartos o tiempos dentro de su propio contenedor, con título */
+.nws-fl__cp-caja { background: #f6f5fb; border: 1px solid #ebe8f3; border-radius: 14px; padding: 10px 12px; display: grid; gap: 6px; }
+.nws-fl__cp-tit { font-size: 12px; line-height: 16px; font-weight: 700; color: var(--nws-jic-violeta-900); }
+.nws-fl__cp-caja .nws-fl__cp-par { justify-content: flex-start; padding-top: 0; }

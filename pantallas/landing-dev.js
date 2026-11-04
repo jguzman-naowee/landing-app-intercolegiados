@@ -110,10 +110,10 @@ window.LANDING_DEV = {
       'Tarjeta de acceso de app (ícono + rótulo + toque), no un menú de enlaces.'
     ],
     logica: [
-      'La tarjeta (`activa: true` en `landing.app.menu`) abre «Regional de conjuntos» con push de ≈ 300 ms; es la única salida activa, lo demás de la home sigue avisando.',
-      'En la vista, «Cambiar» abre un panel lila con tres opciones de ejemplo (Regional de conjuntos, Regional de individuales y Final nacional) y la actual seleccionada. Elegir otra cambia el título y reordena la lista de tarjetas; con una sola tarjeta (Final nacional, Bogotá) ésta ocupa todo el espacio disponible. Las tarjetas de conjuntos e individuales abren el detalle regional; Final nacional responde «Disponible próximamente».',
-      'Panel: se despliega en el flujo bajo el título (≈ 220 ms) y empuja subtítulo y cuadrícula. Se cierra al tocar la actual, fuera del panel o con Esc (primero el panel, luego la vista); ↑/↓ mueven el foco. Opciones y orden en `landing.app.regionales.opciones[].tarjetas` (índices de `items`), de ejemplo y por confirmar.',
-      'Al elegir: check y título cambian al instante; a los 150 ms se cierra el panel, el foco vuelve a «Cambiar», el scroll sube y las tarjetas reentran con fundido y desplazamiento escalonado de 40 ms (≤ 400 ms; sin animación con `prefers-reduced-motion`). Una región `aria-live` anuncia «Mostrando …». La elección vive en memoria mientras la página siga abierta.',
+      'La tarjeta (`activa: true` en `landing.app.menu`) abre «Fase Regional» con push de ≈ 300 ms; es la única salida activa, lo demás de la home sigue avisando.',
+      'La vista tiene dos ejes, como «Eventos y fases» de la web: la FASE (Fase Regional o Fase Final Nacional) se elige en «Cambiar» y el TIPO (Individual | Conjuntos) en las pestañas en píldora (NwtTabs). Debajo del título va el subtítulo en dos líneas. Con una sola tarjeta (Fase Final Nacional, Bogotá) ésta ocupa todo el espacio disponible. Las tarjetas de la fase regional abren el detalle de la regional; la final responde «Disponible próximamente».',
+      'Panel: se despliega en el flujo bajo el subtítulo (≈ 220 ms) y empuja pestañas y cuadrícula. Se cierra al tocar la actual, fuera del panel o con Esc (primero el panel, luego la vista); ↑/↓ mueven el foco. Fases en `landing.app.regionales.fases`, tipos en `tipos` y tarjetas por fase y tipo en `tarjetas[fase][tipo]` (índices de `items`); los de individuales son de ejemplo y por confirmar.',
+      'Al elegir una fase: check y título cambian al instante; a los 150 ms se cierra el panel, el foco vuelve a «Cambiar», el scroll sube y las tarjetas reentran con fundido y desplazamiento escalonado de 40 ms (≤ 400 ms; sin animación con `prefers-reduced-motion`). Al elegir un tipo la pestaña cambia al instante y las tarjetas reentran igual. Una región `aria-live` anuncia «Mostrando …». La elección (fase y tipo) vive en memoria mientras la página siga abierta.',
       'Presión inmediata: escala .97 y brillo en 100 ms.'
     ],
     flutter: {
@@ -403,10 +403,10 @@ Object.assign(window.LANDING_DEV, {
   "fl-regionales": {
     "titulo": "Selección de regional",
     "ui": [
-      "Opciones de fase y tarjetas de regional."
+      "Fase en «Cambiar», tipo en pestañas Individual | Conjuntos y tarjetas de regional."
     ],
     "logica": [
-      "Conjuntos e individuales abren su detalle. Final nacional conserva proximamente().",
+      "Las tarjetas de la fase regional abren su detalle. La Fase Final Nacional conserva proximamente().",
       "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
     ],
     "flutter": {
@@ -427,17 +427,19 @@ Object.assign(window.LANDING_DEV, {
   "fl-regional": {
     "titulo": "Detalle regional",
     "ui": [
-      "Calendario, Sedes e Info. logística, en el orden actual de Flutter."
+      "Zona violeta con título («Regional de conjuntos» o «Regional de atletismo»), regional y sede, y los controles: deporte, búsqueda, flechas del mes y segmentos de género y edad, con el resumen de filtros activos debajo.",
+      "Hoja blanca sangrada con esquinas superiores redondeadas: mes y calendario de borde a borde. La columna de deportes queda fija a la izquierda, con una fila por deporte, y los días se desplazan; cada tarjeta (ícono y partidos o series) cae en la fila de su deporte. Inicio y Final van escritos bajo el número del día y el día elegido es una columna violeta completa. Los días sin competencias quedan en gris. Al pie, las convenciones (desplegable).",
+      "Las pestañas Sedes e Info. logística siguen en el código (`st.tab` 1 y 2) pero este diseño no las muestra: falta decidir dónde entran."
     ],
     "logica": [
-      "Filtros locales por deporte, categoría y búsqueda; Todas las fechas conserva los filtros al abrir competencias.",
+      "Filtros locales por deporte, género y edad (`NwtTagGroup`, la píldora se desliza); el género y la edad salen del texto de la categoría. Sin resultados, la hoja avisa. Tocar el encabezado de un día abre una hoja inferior con sus deportes; tocar una tarjeta abre esa competencia en ese día. El foco vuelve al día al cerrar la hoja. La búsqueda y las flechas del mes avisan «próximamente». Fechas y cantidades por día en `flujos.competencias[]` (`dias`, `cuenta`, `pruebas`) y, por regional, en `regionales.items[].agenda`. Atletismo de Villavicencio copia la web (26 y 27 de sept, 4 series por día, 16 pruebas); lo demás es de ejemplo. El mes y la fila de cada deporte salen de esas fechas, con el nombre del deporte («Atletismo») y el rango como la web («Del 26 al 27 de sept · 16 pruebas»).",
       "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
     ],
     "flutter": {
       "widgets": [
         "`NestedScrollView`",
-        "`TabBar`",
-        "`TabBarView`"
+        "`SegmentedButton`",
+        "`DataTable`"
       ],
       "tip": "Esquema de composición: adaptar los argumentos a los modelos de la app real. El HTML del prototipo no se migra a Flutter.",
       "codigo": "Navigator.of(context).push(MaterialPageRoute<void>(\n  builder: (_) => const RegionalDetailScreen()));"
@@ -496,13 +498,47 @@ Object.assign(window.LANDING_DEV, {
       "Push de 300 ms; sin transición con prefers-reduced-motion."
     ]
   },
+  "fl-deporte": {
+    "titulo": "Deporte por día",
+    "ui": [
+      "Cabecera violeta con el nombre del deporte y la franja de días en píldoras (la elegida en blanco; los días sin pruebas, atenuados). Debajo, la hoja blanca con las pruebas del día elegido."
+    ],
+    "logica": [
+      "Tocar una celda o un deporte del calendario entra aquí, con ese día seleccionado; los demás días se navegan desde la franja. Atletismo muestra sus pruebas (`eventos`, cada una en su mitad de los días); los demás deportes, una prueba con su cuenta del día.",
+      "Atletismo, dentro de una prueba (se llega desde su fila del calendario): el título de la vista anterior («Regional de atletismo») baja y se encoge hasta quedar como antetítulo, con la prueba grande, la sede y los días de la prueba en el morado. Los días llevan una flecha a cada lado. Abajo, fichas Series | Podio general (la de podio solo aparece si la prueba está finalizada). Cada enfrentamiento del día es una tarjeta: «Hit N · Ronda Clasificación» (5 competidores) y «Final Directa» (8); las pruebas de campo y las largas van solo con Final Directa. Lleva estado y flecha para contraer: la primera va abierta con sus tres primeros, las demás contraídas con la hora a la izquierda; uno sin correr no se abre y conserva «Ver más». «Ver más» abre el resultado del enfrentamiento. El podio muestra tres avatares (el primero con halo dorado que late) y la lista desde el puesto 4. Las pruebas, sus fechas (26 y 27 de septiembre, regional de Villavicencio) y la estructura de hits y final salen de la web oficial; los deportistas, departamentos y marcas son de ejemplo (`flujos.atletas`, `eventos[].marca`).",
+      "Tocar una prueba abre su competencia en ese día. Los días y la cuenta de la regional viajan en el estado (`st.ag`). Una sola pila en landing-vistas.js."
+    ],
+    "flutter": {
+      "widgets": [
+        "`SingleChildScrollView` horizontal de `ChoiceChip` para los días",
+        "`ListView` de tarjetas",
+        "`Navigator`"
+      ]
+    }
+  },
+  "fl-serie": {
+    "titulo": "Resultado de la serie",
+    "ui": [
+      "Cabecera violeta con la prueba y «Serie N · Eliminatorias». Debajo, «Resultado de la prueba» con el estado y la lista de todos los deportistas: puesto, nombre, institución, departamento, marca y el botón de perfil."
+    ],
+    "logica": [
+      "Se abre desde «Ver más» de una serie (solo atletismo). Si la prueba no se ha corrido, la marca va vacía. El botón de perfil aún no abre nada (pendiente de definir). Los datos de la serie se recalculan con `datosPrueba` a partir del día y la prueba del estado."
+    ],
+    "flutter": {
+      "widgets": [
+        "`ListView` de filas con `CircleAvatar`",
+        "`IconButton`",
+        "`Navigator`"
+      ]
+    }
+  },
   "fl-competencia": {
     "titulo": "Detalle de competencia",
     "ui": [
-      "Rondas, fechas, llaves, posiciones y sedes."
+      "Deportes de conjunto: cabecera violeta con la prueba («Baloncesto - Juvenil - Mujer») y los días con una flecha a cada lado; hoja blanca con las fichas Partidos | Grupos | Posiciones. «Grupos» lista los enfrentamientos de la prueba en todos los días, agrupados por día (como el selector «Todos» de la landing); los partidos se numeran de corrido en toda la prueba. Cada partido es una tarjeta como la serie de atletismo: la primera con marcador va abierta (escudos con sigla, marcador en baldosas, sede y «Ver más»); las demás, contraídas con la hora a la izquierda; una programada no se abre. Posiciones muestra la tabla de cada grupo con PJ, G, P, DIF y PTS. Resto de deportes: pestañas, filtro por llave y partidos (o series) del día."
     ],
     "logica": [
-      "Posiciones y Sedes abren pantallas; una ronda de equipo abre partido y una individual abre lista de salida.",
+      "«Ver más» de un partido de conjunto abre su detalle; una prueba individual abre lista de salida. Cada deporte de conjunto tiene dos pruebas (la categoría de la competencia y su pareja de sexo); la cuenta del día se reparte entre ellas. Voleibol de la regional Pacífico (sede Pasto) usa los datos reales de la web oficial: pre juvenil mujer, grupo A, seis partidos del 26 al 28 de octubre con marcador en sets, detalle de sets solo donde la web lo trae y posiciones con SG, SP, DIF y PTS (2-0 = 3 pts, 2-1 = 2, 1-2 = 1, 0-2 = 0); los equipos son instituciones reales. El resto de marcadores, parciales y posiciones es de ejemplo y sale del estado de la competencia (`estadoPartido`, `marcadorEq`, `tablaEq`).",
       "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
     ],
     "flutter": {
@@ -595,10 +631,10 @@ Object.assign(window.LANDING_DEV, {
   "fl-partido": {
     "titulo": "Detalle de partido",
     "ui": [
-      "Ronda, categoría, fecha, marcador y pestañas Cuartos / Equipos."
+      "Cabecera violeta con la prueba y «Partido N». Debajo: «Resultado del partido» con el estado y el marcador en baldosas, la tabla de Parciales por periodo (cuartos, tiempos o sets según el deporte) con las siglas y el total, y la Nómina de los dos equipos con dorsal, nombre y posición. En un partido programado los parciales aún no aparecen."
     ],
     "logica": [
-      "Parciales congelados y nóminas con perfil de deportista. No hay enlace real al perfil antiguo de partido ni a confrontaciones.",
+      "Parciales y nóminas son de ejemplo y salen de la competencia, la prueba y el partido elegidos en la vista anterior (`st.prueba`, `st.serie`). Las filas de la nómina no abren perfil por ahora.",
       "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
     ],
     "flutter": {

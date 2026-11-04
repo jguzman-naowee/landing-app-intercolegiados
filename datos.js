@@ -160,6 +160,7 @@ window.DATOS = {
     "app": {
       "salidas": false,
       "flujos": {
+        "_cuenta": "`cuenta` = partidos (o series) por día, alineado con `dias`. Atletismo (Orinoquía y Amazonía, Villavicencio) copia la web: 26 y 27 de sept, 4 series por día, 16 pruebas. Lo demás es DE EJEMPLO; `items[].agenda` de cada regional reemplaza `dias` y `cuenta` de una competencia.",
         "_ejemplo": "Todos los nombres, sedes, instituciones, marcas y resultados son ficticios. Estado congelado de ejemplo; no es información oficial.",
         "aviso": "Datos de ejemplo · Sin actualización en vivo",
         "ilustracionVacio": "assets/landing/sin-contenido.jpg",
@@ -172,10 +173,25 @@ window.DATOS = {
           {"nombre": "Pista Horizonte", "departamento": "Valle de los Vientos", "municipio": "Villa Aurora", "direccion": "Parque del Horizonte · ubicación de ejemplo", "zonas": ["Pista", "Zona de calentamiento"], "img": "assets/landing/galeria-c.jpg"}
         ],
         "competencias": [
-          {"id": "baloncesto", "deporte": "Baloncesto", "prueba": "Baloncesto 5 × 5", "categoria": "Juvenil · Femenino", "tipo": "equipo", "dias": ["2026-10-26", "2026-10-27"], "hora": "9:00 a. m.", "estado": "Finalizado", "sede": 0, "rondas": ["Fase de grupos"], "grupos": ["Grupo A", "Grupo B"]},
-          {"id": "atletismo", "deporte": "Atletismo", "prueba": "Combinada escolar", "categoria": "Juvenil · Masculino", "tipo": "individual", "dias": ["2026-10-26", "2026-10-27"], "hora": "10:00 a. m.", "estado": "Finalizado", "sede": 1, "rondas": ["Final"], "subpruebas": ["80 metros", "Salto largo"]},
-          {"id": "futbol-salon", "deporte": "Fútbol de salón", "prueba": "Campeonato de Fútbol de Salón", "categoria": "Juvenil · Mujer", "tipo": "equipo", "dias": ["2026-10-26", "2026-10-27"], "hora": "7:00 a. m.", "estado": "En curso", "sede": 0, "sedes": [0, 1], "rondas": ["Grupo A - Fecha 3"], "enCursoRondas": ["Grupo A - Fecha 3"], "grupos": ["Grupo A", "Grupo B"]}
+          {"id": "baloncesto", "deporte": "Baloncesto", "prueba": "Baloncesto 5 × 5", "categoria": "Juvenil · Femenino", "tipo": "equipo", "dias": ["2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19"], "cuenta": [2, 2, 2, 2, 2, 2], "pruebas": 1, "unidad": "partidos", "hora": "9:00 a. m.", "estado": "Finalizado", "sede": 0, "rondas": ["Fase de grupos"], "grupos": ["Grupo A", "Grupo B"]},
+          {"id": "atletismo", "deporte": "Atletismo", "prueba": "Combinada escolar", "categoria": "Juvenil · Femenino", "tipo": "individual", "dias": ["2026-09-26", "2026-09-27"], "cuenta": [4, 4], "pruebas": 13, "eventos": [{"nombre": "80 m planos", "marca": {"tipo": "tiempo", "base": 10.4, "paso": 0.14}, "mitad": 0, "hits": 2}, {"nombre": "100 m planos", "marca": {"tipo": "tiempo", "base": 12.4, "paso": 0.17}, "mitad": 0, "hits": 2}, {"nombre": "150 m planos", "marca": {"tipo": "tiempo", "base": 18.6, "paso": 0.22}, "mitad": 2, "hits": 2}, {"nombre": "200 m planos", "marca": {"tipo": "tiempo", "base": 25.4, "paso": 0.32}, "mitad": 2, "hits": 2}, {"nombre": "400 m planos", "marca": {"tipo": "tiempo", "base": 58.0, "paso": 0.7}, "mitad": 0, "hits": 2}, {"nombre": "800 m planos", "marca": {"tipo": "tiempo", "base": 140.0, "paso": 1.9}, "mitad": 1, "hits": 2}, {"nombre": "1.500 m planos", "marca": {"tipo": "tiempo", "base": 300.0, "paso": 3.4}, "mitad": 0, "hits": 0}, {"nombre": "2.000 m planos", "marca": {"tipo": "tiempo", "base": 430.0, "paso": 5.0}, "mitad": 0, "hits": 0}, {"nombre": "3.000 m planos", "marca": {"tipo": "tiempo", "base": 700.0, "paso": 7.5}, "estado": "Programado", "mitad": 1, "hits": 0}, {"nombre": "Impulso de bala", "marca": {"tipo": "distancia", "base": 9.6, "paso": 0.3}, "mitad": 2, "hits": 0}, {"nombre": "Lanzamiento de disco", "marca": {"tipo": "distancia", "base": 30.0, "paso": 1.3}, "estado": "Programado", "mitad": 2, "hits": 0}, {"nombre": "Lanzamiento de jabalina", "marca": {"tipo": "distancia", "base": 34.0, "paso": 1.4}, "mitad": 2, "hits": 0}, {"nombre": "Salto largo", "marca": {"tipo": "distancia", "base": 4.9, "paso": 0.12}, "estado": "En curso", "mitad": 2, "hits": 0}], "unidad": "enfrentamientos", "hora": "10:40 a. m.", "estado": "Finalizado", "sede": 1, "rondas": ["Final"], "subpruebas": ["80 metros", "Salto largo"]},
+          {"id": "baloncesto-3x3", "deporte": "Baloncesto 3x3", "prueba": "Baloncesto 3 × 3", "categoria": "Juvenil · Mixto", "tipo": "equipo", "dias": ["2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18"], "cuenta": [2, 2, 2, 2, 2], "pruebas": 1, "unidad": "partidos", "hora": "9:00 a. m.", "estado": "Programado", "sede": 0, "rondas": ["Fase de grupos"], "grupos": ["Grupo A", "Grupo B"]},
+          {"id": "futbol", "deporte": "Fútbol", "prueba": "Fútbol 11", "categoria": "Juvenil · Masculino", "tipo": "equipo", "dias": ["2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19"], "cuenta": [2, 2, 2, 2, 2, 2], "pruebas": 1, "unidad": "partidos", "hora": "9:00 a. m.", "estado": "Programado", "sede": 1, "rondas": ["Fase de grupos"], "grupos": ["Grupo A", "Grupo B"]},
+          {"id": "futbol-sala", "deporte": "Fútbol sala", "prueba": "Fútbol sala", "categoria": "Juvenil · Femenino", "tipo": "equipo", "dias": ["2026-10-14", "2026-10-15", "2026-10-16"], "cuenta": [2, 2, 2], "pruebas": 1, "unidad": "partidos", "hora": "9:00 a. m.", "estado": "Programado", "sede": 0, "rondas": ["Fase de grupos"], "grupos": ["Grupo A", "Grupo B"]},
+          {"id": "futbol-salon", "deporte": "Fútbol de Salón", "prueba": "Campeonato de Fútbol de Salón", "categoria": "Juvenil · Mujer", "tipo": "equipo", "dias": ["2026-10-17", "2026-10-18", "2026-10-19"], "cuenta": [3, 3, 3], "pruebas": 1, "unidad": "partidos", "hora": "7:00 a. m.", "estado": "En curso", "sede": 0, "sedes": [0, 1], "rondas": ["Grupo A - Fecha 3"], "enCursoRondas": ["Grupo A - Fecha 3"], "grupos": ["Grupo A", "Grupo B"]},
+          {"id": "voleibol", "deporte": "Voleibol", "prueba": "Voleibol", "categoria": "Prejuvenil · Femenino", "real": {"0": {"fuente": "juegosintercolegiados.com.co · Campeonato de voleibol pre juvenil mujer · Pacífico, sede Pasto (26 a 28 de oct de 2026)", "pruebas": {"0": {"grupo": "Grupo A", "sede": "Instituto Champagnat",
+            "equipos": [{"nombre": "Normal Juan Ladrilleros", "departamento": "Valle del Cauca"}, {"nombre": "Real Col San José", "departamento": "Cauca"}, {"nombre": "Colegio San Fco Javier", "departamento": "Nariño"}, {"nombre": "Institución Carrasquilla Industrial", "departamento": "Chocó"}],
+            "partidos": [
+              {"dia": "2026-10-26", "hora": "2:15 p. m.", "fecha": 1, "l": 3, "v": 0, "ls": 0, "vs": 2, "sets": [[7, 25], [8, 25]]},
+              {"dia": "2026-10-26", "hora": "3:15 p. m.", "fecha": 1, "l": 1, "v": 2, "ls": 2, "vs": 1, "sets": null},
+              {"dia": "2026-10-27", "hora": "10:58 a. m.", "fecha": 2, "l": 2, "v": 0, "ls": 0, "vs": 2, "sets": null},
+              {"dia": "2026-10-27", "hora": "12:01 p. m.", "fecha": 2, "l": 1, "v": 3, "ls": 2, "vs": 0, "sets": null},
+              {"dia": "2026-10-28", "hora": "8:25 a. m.", "fecha": 3, "l": 0, "v": 1, "ls": 2, "vs": 0, "sets": null},
+              {"dia": "2026-10-28", "hora": "10:50 a. m.", "fecha": 3, "l": 3, "v": 2, "ls": 0, "vs": 2, "sets": null}
+            ]}}}},  "tipo": "equipo", "dias": ["2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19"], "cuenta": [2, 2, 2, 2, 2, 2], "pruebas": 1, "unidad": "partidos", "hora": "9:00 a. m.", "estado": "Programado", "sede": 1, "rondas": ["Fase de grupos"], "grupos": ["Grupo A", "Grupo B"]}
         ],
+        /* VALORES DE EJEMPLO: deportistas para las series de atletismo (la web los trae del servicio de resultados). */
+        "atletas": [{"nombre": "Elian Brisaclara", "institucion": "Instituto Brisa Clara", "departamento": "Nariño"}, {"nombre": "Nicolás Senderoluz", "institucion": "Colegio Sendero Azul", "departamento": "Santander"}, {"nombre": "Darío Nubecalma", "institucion": "Liceo Horizonte Nuevo", "departamento": "Putumayo"}, {"nombre": "Mateo Riberaclara", "institucion": "Colegio Río Sereno", "departamento": "Antioquia"}, {"nombre": "Samuel Lomaviento", "institucion": "Instituto Loma Alta", "departamento": "Córdoba"}, {"nombre": "Tomás Arenaluz", "institucion": "Liceo Arena Dorada", "departamento": "Cauca"}, {"nombre": "Julián Cieloabierto", "institucion": "Colegio Cielo Abierto", "departamento": "Boyacá"}, {"nombre": "Andrés Brumaverde", "institucion": "Instituto Bruma Verde", "departamento": "Valle del Cauca"}, {"nombre": "Valeria Soltenue", "institucion": "Colegio Sol Tenue", "departamento": "Atlántico"}, {"nombre": "Camila Rocíoalto", "institucion": "Liceo Rocío Alto", "departamento": "Cundinamarca"}, {"nombre": "Lucía Mareclara", "institucion": "Instituto Mar Claro", "departamento": "Tolima"}, {"nombre": "Sofía Vientonuevo", "institucion": "Colegio Viento Nuevo", "departamento": "Huila"}, {"nombre": "Isabela Pradoazul", "institucion": "Liceo Prado Azul", "departamento": "Nariño"}, {"nombre": "Mariana Cumbreluz", "institucion": "Instituto Cumbre Luz", "departamento": "Santander"}, {"nombre": "Daniela Albaserena", "institucion": "Colegio Alba Serena", "departamento": "Putumayo"}, {"nombre": "Paula Orillaclara", "institucion": "Liceo Orilla Clara", "departamento": "Antioquia"}],
         "equipos": [
           {"nombre": "Instituto Brisa Clara", "departamento": "Valle de los Vientos", "grupo": "Grupo A", "pj": 2, "pg": 2, "pp": 0, "pf": 88, "pc": 70, "puntos": 4},
           {"nombre": "Colegio Sendero Azul", "departamento": "Sierra del Alba", "grupo": "Grupo A", "pj": 2, "pg": 1, "pp": 1, "pf": 76, "pc": 78, "puntos": 3},
@@ -402,27 +418,46 @@ window.DATOS = {
           {"nombre": "Elian Brisaclara", "deporte": "Atletismo", "prueba": "80 metros", "categoria": "Juvenil · Masculino", "ronda": "Final", "fase": "Regional", "estado": "Finalizado", "resultado": "10,80 s"}
         ]
       },
-      /* TEXTO DE EJEMPLO: las seis regionales de la captura de referencia (faltan las demás) y la final.
-         Fotos: no hay atletismo ni salto largo en assets/, van las más cercanas (`pos` = encuadre). */
+      /* Calendario de atletismo (web, noticia del 28 de septiembre): Villavicencio compite el 26 y 27 de sept; Montería, Sopó y Armenia,
+         simultáneos del 29 de sept al 2 de oct (cantidades por día DE EJEMPLO). Regionales y sedes de la web oficial (noticias del 4 de agosto y del 28 de septiembre de 2026).
+         CONJUNTOS: ocho regionales, una sede cada una, en el orden de los contadores de la landing
+         (Pacífico, Eje Cafetero, Centro Oriente, Centro Sur; Caribe 1, Caribe 2, Amazonía, Orinoquía).
+         INDIVIDUAL (atletismo): cuatro eventos, cada uno recibe dos regionales:
+         Montería (Caribe 1 y 2), Sopó (Pacífico y Centro Sur), Armenia (Eje Cafetero y Centro Oriente)
+         y Villavicencio (Orinoquía y Amazonía). La web solo publica este calendario para atletismo.
+         Las fotos son de EJEMPLO (no hay fotos propias de cada sede; `pos` = encuadre). */
       "regionales": {
-        "titulo": "Regional de conjuntos",
-        "subtitulo": "Sigue el minuto a minuto de los eventos de esta fase",
+        "subtitulo": ["Sigue el minuto a minuto de los", "eventos de esta fase"],
         "cambiar": "Cambiar",
-        /* Opciones y orden de «Regional de individuales» son de EJEMPLO (Jorge debe confirmar los reales).
-           `tarjetas` = índices de `items` en el orden de cada opción; `actual` es la inicial. */
-        "actual": "conjuntos",
-        "opciones": [
-          { "id": "conjuntos", "nombre": "Regional de conjuntos", "tarjetas": [0, 1, 2, 3, 4, 5] },
-          { "id": "individuales", "nombre": "Regional de individuales", "tarjetas": [5, 4, 3, 2, 1, 0] },
-          { "id": "final", "nombre": "Final nacional", "tarjetas": [6] }
+        /* Dos ejes (como «Eventos y fases» de la web): la FASE se elige en «Cambiar» y el TIPO en las pestañas.
+           `tarjetas[fase][tipo]` = índices de `items`; `actual` y `tipoActual` son los iniciales. */
+        "actual": "regional",
+        "tipoActual": "conjuntos",
+        "fases": [
+          { "id": "regional", "nombre": "Fase Regional" },
+          { "id": "final", "nombre": "Fase Final Nacional" }
         ],
+        "tipos": [
+          { "id": "individuales", "label": "Individual", "icono": "corredor", "titulo": "Regional de atletismo" },
+          { "id": "conjuntos", "label": "Conjuntos", "icono": "balon", "titulo": "Regional de conjuntos" }
+        ],
+        "tarjetas": {
+          "regional": { "conjuntos": [0, 1, 2, 3, 4, 5, 6, 7], "individuales": [8, 9, 10, 11] },
+          "final": { "conjuntos": [12], "individuales": [12] }
+        },
         "items": [
-          { "ciudad": "Pasto", "nombre": "Regional Pacífico", "img": "assets/landing/galeria-c.jpg", "pos": "50% 50%" },
-          { "ciudad": "Aguazul", "nombre": "Regional Orinoquia", "img": "assets/landing/novedad-principal.jpg", "pos": "50% 40%" },
+          { "ciudad": "Pasto", "nombre": "Regional Pacífico", "img": "assets/landing/galeria-c.jpg", "pos": "50% 50%", "agenda": { "baloncesto": { "dias": ["2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-10-31"], "cuenta": [2, 2, 2, 2, 2, 2] }, "baloncesto-3x3": { "dias": ["2026-10-26", "2026-10-27", "2026-10-29", "2026-10-30"], "cuenta": [2, 2, 2, 2] }, "futbol": { "dias": ["2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-10-31"], "cuenta": [2, 2, 2, 2, 2, 2] }, "futbol-sala": { "dias": ["2026-10-26", "2026-10-27", "2026-10-28"], "cuenta": [2, 2, 2] }, "futbol-salon": { "dias": ["2026-10-29", "2026-10-30", "2026-10-31"], "cuenta": [2, 2, 2] }, "voleibol": { "dias": ["2026-10-26", "2026-10-27", "2026-10-28"], "cuenta": [4, 4, 4] } } },
           { "ciudad": "Manizales", "nombre": "Regional Eje Cafetero", "img": "assets/landing/galeria-a.jpg", "pos": "50% 22%" },
-          { "ciudad": "Espinal", "nombre": "Regional Centro Sur", "img": "assets/landing/noticia-2.jpg", "pos": "46% 40%" },
           { "ciudad": "Floridablanca", "nombre": "Regional Centro Oriente", "img": "assets/landing/noticia-1.jpg", "pos": "40% 40%" },
-          { "ciudad": "Puerto Colombia", "nombre": "Regional Caribe 1", "img": "assets/landing/galeria-b.jpg", "pos": "50% 50%" },
+          { "ciudad": "El Espinal", "nombre": "Regional Centro Sur", "img": "assets/landing/noticia-2.jpg", "pos": "46% 40%" },
+          { "ciudad": "Puerto Colombia", "nombre": "Regional Caribe 1", "img": "assets/landing/galeria-b.jpg", "pos": "50% 50%" },
+          { "ciudad": "Cartagena", "nombre": "Regional Caribe 2", "img": "assets/landing/hero-tenis.jpg", "pos": "50% 30%" },
+          { "ciudad": "Mitú", "nombre": "Regional Amazonía", "img": "assets/landing/portada-2026.jpg", "pos": "50% 24%" },
+          { "ciudad": "Aguazul", "nombre": "Regional Orinoquía", "img": "assets/landing/novedad-principal.jpg", "pos": "50% 40%" },
+          { "ciudad": "Montería", "nombre": "Caribe 1 y Caribe 2", "img": "assets/landing/splash-deportistas.jpg", "pos": "50% 30%", "agenda": { "atletismo": { "dias": ["2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02"], "cuenta": [4, 4, 4, 4] } } },
+          { "ciudad": "Sopó", "nombre": "Pacífico y Centro Sur", "img": "assets/landing/galeria-c.jpg", "pos": "50% 50%", "agenda": { "atletismo": { "dias": ["2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02"], "cuenta": [4, 4, 4, 4] } } },
+          { "ciudad": "Armenia", "nombre": "Eje Cafetero y Centro Oriente", "img": "assets/landing/galeria-a.jpg", "pos": "50% 22%", "agenda": { "atletismo": { "dias": ["2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02"], "cuenta": [4, 4, 4, 4] } } },
+          { "ciudad": "Villavicencio", "nombre": "Orinoquía y Amazonía", "img": "assets/landing/noticia-2.jpg", "pos": "46% 40%" },
           /* Noticia de la web oficial (10-jun-2026): Bogotá será la sede de la final nacional. Foto del mosaico. */
           { "ciudad": "Bogotá", "nombre": "Final Nacional", "img": "assets/landing/galeria-b.jpg", "pos": "55% 30%" }
         ]
