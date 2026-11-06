@@ -406,7 +406,7 @@ Object.assign(window.LANDING_DEV, {
       "Fase en «Cambiar», tipo en pestañas Individual | Conjuntos y tarjetas de regional."
     ],
     "logica": [
-      "Las tarjetas de la fase regional abren su detalle. La Fase Final Nacional conserva proximamente().",
+      "Las tarjetas de ambas fases abren su calendario. La Fase Final Nacional usa el mismo motor que las regionales, con datos de prueba: 22 deportes, categorías y pruebas del archivo intercolegiados_2026_deportes_pruebas_a_nacional.xlsx y fechas de ejemplo del 10 al 30 de noviembre de 2026 (`fase: 'final'` en `competencias`, agenda en el ítem «Final Nacional»). Las pruebas individuales del catálogo se vuelven eventos de un día y usan las vistas de atletismo (prueba, enfrentamientos, «Ver más»), sin resultados por ser una fase futura.",
       "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
     ],
     "flutter": {
@@ -505,7 +505,7 @@ Object.assign(window.LANDING_DEV, {
     ],
     "logica": [
       "Tocar una celda o un deporte del calendario entra aquí, con ese día seleccionado; los demás días se navegan desde la franja. Atletismo muestra sus pruebas (`eventos`, cada una en su mitad de los días); los demás deportes, una prueba con su cuenta del día.",
-      "Atletismo, dentro de una prueba (se llega desde su fila del calendario): el título de la vista anterior («Regional de atletismo») baja y se encoge hasta quedar como antetítulo, con la prueba grande, la sede y los días de la prueba en el morado. Los días llevan una flecha a cada lado. Abajo, fichas Series | Podio general (la de podio solo aparece si la prueba está finalizada). Cada enfrentamiento del día es una tarjeta: «Hit N · Ronda Clasificación» (5 competidores) y «Final Directa» (8); las pruebas de campo y las largas van solo con Final Directa. Lleva estado y flecha para contraer: la primera va abierta con sus tres primeros, las demás contraídas con la hora a la izquierda; uno sin correr no se abre y conserva «Ver más». «Ver más» abre el resultado del enfrentamiento. El podio muestra tres avatares (el primero con halo dorado que late) y la lista desde el puesto 4. Las pruebas, sus fechas (26 y 27 de septiembre, regional de Villavicencio) y la estructura de hits y final salen de la web oficial; los deportistas, departamentos y marcas son de ejemplo (`flujos.atletas`, `eventos[].marca`).",
+      "Atletismo, dentro de una prueba (se llega desde su fila del calendario): el título de la vista anterior («Regional de atletismo») baja y se encoge hasta quedar como antetítulo, con la prueba grande, la sede y los días de la prueba en el morado. Los días llevan una flecha a cada lado. Abajo, fichas Series | Resultados (la de podio solo aparece si la prueba está finalizada). Cada enfrentamiento del día es una tarjeta: «Hit N · Ronda Clasificación» (5 competidores) y «Final Directa» (8); las pruebas de campo y las largas van solo con Final Directa. Lleva estado y flecha para contraer: la primera va abierta con sus tres primeros, las demás contraídas con la hora a la izquierda; uno sin correr no se abre y conserva «Ver más». «Ver más» abre el resultado del enfrentamiento. El podio muestra tres avatares (el primero con halo dorado que late) y la lista desde el puesto 4. Las pruebas, sus fechas (26 y 27 de septiembre, regional de Villavicencio) y la estructura de hits y final salen de la web oficial; los deportistas, departamentos y marcas son de ejemplo (`flujos.atletas`, `eventos[].marca`).",
       "Tocar una prueba abre su competencia en ese día. Los días y la cuenta de la regional viajan en el estado (`st.ag`). Una sola pila en landing-vistas.js."
     ],
     "flutter": {
@@ -607,15 +607,16 @@ Object.assign(window.LANDING_DEV, {
   "fl-deportista": {
     "titulo": "Perfil del deportista",
     "ui": [
-      "Inicial como placeholder, institución, departamento, municipio, categoría y participación."
+      "Hoja emergente (overlay) sobre la vista de origen: portada, foto con borde gris, nombre, institución en gris, tres datos (pruebas, deporte, sexo), departamento con bandera y «Ver pruebas».",
+      "Debajo, «Pruebas» con tarjetas plegables: sexo, categoría, regional, estado y la posición y marca de la persona del perfil (solo la suya)."
     ],
     "logica": [
-      "Ficha ficticia en diálogo con fondo inerte y foco contenido; volver o Escape devuelven el foco al control de origen.",
-      "Una sola pila en landing-vistas.js; volver y Escape recuperan el foco y conservan la pantalla anterior."
+      "Se abre desde el botón de perfil de las filas de una serie de atletismo (clave `a:índice:posición:marca`) o desde las listas de salida. Foto y portada son de ejemplo; la bandera es una aproximación por color.",
+      "Arrastrar el borde superior hacia arriba la expande a pantalla completa; hacia abajo la reduce o la cierra. También cierran la X, tocar fuera y Escape; con teclado, flechas arriba y abajo en la barra de agarre."
     ],
     "flutter": {
       "widgets": [
-        "`Dialog`",
+        "`showModalBottomSheet` con `DraggableScrollableSheet`",
         "`CircleAvatar`",
         "`Column`"
       ],

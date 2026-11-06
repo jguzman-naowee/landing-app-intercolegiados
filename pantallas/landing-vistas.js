@@ -90,8 +90,10 @@ window.LANDING_VISTAS = (function () {
       return S.h('ul', { class: S.cls('nws-lpvw__reg-lista', ks.length === 1 && 'nws-lpvw__reg-lista--una', entra && 'nws-lpvw__reg-lista--entra'), role: 'list' }, op.id === 'regional' ? S.h('li', { class: 'nws-lpvw__reg-sec' }, S.h('h2', { class: 'nws-lpvw__reg-sec-t' }, e(tipo.titulo))) : '', ks.map(function (k, i) {
         var x = G.items[k];
         return S.h('li', { style: '--nws-i:' + i },
-          S.h('button', { type: 'button', class: 'nws-lpvw__reg nws-ios-press', 'aria-label': x.nombre + ', sede ' + x.ciudad, 'data-flujo': op.id !== 'final' ? 'regional' : null, 'data-clave': tipo.id + ':' + k, 'data-toast': op.id === 'final' ? x.nombre : null },
-            S.h('span', { class: 'nws-lpvw__reg-foto' }, S.h('img', { src: x.img, alt: '', draggable: 'false', style: x.pos ? 'object-position:' + x.pos : null })),
+          S.h('button', { type: 'button', class: 'nws-lpvw__reg nws-ios-press', 'aria-label': x.nombre + ', sede ' + x.ciudad, 'data-flujo': 'regional', 'data-clave': tipo.id + ':' + k, 'data-toast': null },
+            S.h('span', { class: S.cls('nws-lpvw__reg-foto', x.capas && 'nws-lpvw__reg-foto--capas') }, x.capas
+              ? S.h('span', { class: 'nws-lpvw__escena nws-lpvw__escena--' + x.capas.id }, Object.keys(x.capas).filter(function (c) { return c !== 'id'; }).map(function (c) { return S.h('img', { class: 'nws-lpvw__capa nws-lpvw__capa--' + c, src: x.capas[c], alt: '', draggable: 'false' }); }).join(''))
+              : S.h('img', { src: x.img, alt: '', draggable: 'false', style: x.pos ? 'object-position:' + x.pos : null })),
             S.h('span', { class: 'nws-lpvw__reg-ciudad' }, 'Sede ' + e(x.ciudad)),
             S.h('span', { class: 'nws-lpvw__reg-fila' },
               S.h('span', { class: 'nws-lpvw__reg-nombre' }, e(x.nombre)),
@@ -233,6 +235,37 @@ window.LANDING_VISTAS = (function () {
       });
     }
 
+    /* Hoja del perfil: arrastrar el borde superior arriba expande, abajo reduce y, si se arrastra mucho, cierra; tocar fuera cierra. */
+    function gestosHoja(el) {
+      var top = el.querySelector('.nws-fl__sheet-top'), bloque = el.querySelector('.nws-lpvw__bloque'), y0 = 0, t0 = 0, h0 = 0, hN = 0, hE = 0, vivo = false, ex = false;
+      function fijar(v) { ex = v; el.classList.toggle('nws-fl--ex', v); }
+      top.addEventListener('pointerdown', function (ev) {
+        if (ev.target.closest('.nws-fl__modal-x')) { return; }
+        vivo = true; y0 = ev.clientY; t0 = ev.timeStamp; hE = el.clientHeight; hN = Math.round(hE * 0.88); h0 = ex ? hE : hN;
+        el.classList.add('nws-fl--arr'); top.setPointerCapture(ev.pointerId);
+      });
+      top.addEventListener('pointermove', function (ev) {
+        if (!vivo) { return; }
+        var raw = h0 - (ev.clientY - y0);
+        bloque.style.height = Math.min(hE, Math.max(hN, raw)) + 'px';
+        bloque.style.transform = raw < hN ? 'translateY(' + (hN - raw) + 'px)' : '';
+      });
+      function soltar(ev) {
+        if (!vivo) { return; }
+        vivo = false; el.classList.remove('nws-fl--arr');
+        var dy = ev.clientY - y0, vel = dy / Math.max(1, ev.timeStamp - t0);
+        bloque.style.height = ''; bloque.style.transform = '';
+        if (dy < -50 || vel < -0.5) { fijar(true); }
+        else if (dy > 50 || vel > 0.5) { if (ex && dy < 200 && vel < 1.2) { fijar(false); } else { cerrar(); } }
+      }
+      top.addEventListener('pointerup', soltar);
+      top.addEventListener('pointercancel', soltar);
+      top.querySelector('.nws-fl__sheet-asa').addEventListener('keydown', function (ev) {
+        if (ev.key === 'ArrowUp') { ev.preventDefault(); fijar(true); } else if (ev.key === 'ArrowDown') { ev.preventDefault(); if (ex) { fijar(false); } else { cerrar(); } }
+      });
+      el.addEventListener('click', function (ev) { if (ev.target === el) { cerrar(); } });
+    }
+
     /* ---------- cascarón común ---------- */
     function crear(id, clave, estado) {
       var contenido = flujos.vista(id, clave, estado);
@@ -246,6 +279,7 @@ window.LANDING_VISTAS = (function () {
       if (contenido) {
         el.classList.add('nws-fl');
         if (contenido.dialogo) { el.classList.add('nws-fl--dialogo'); }
+        if (contenido.sheet) { el.classList.add('nws-fl--sheet'); }
         if (contenido.violeta) { el.classList.add('nws-fl--violeta'); }
         if (contenido.zona || contenido.hoja) { el.classList.add('nws-fl--hoja'); }
         if (contenido.zonaLista || contenido.hoja) { el.classList.add('nws-fl--hoja-lista'); }
@@ -255,6 +289,8 @@ window.LANDING_VISTAS = (function () {
           ? S.h('header', { class: 'nws-fl__top-logo' }, S.h('img', { class: 'nws-fl__top-logo-img', src: window.JIC.logos.intercolegiados, alt: 'Juegos Intercolegiados' }), S.h('button', { type: 'button', class: 'nws-fl__hamb', 'data-toast': 'Menú', 'aria-label': 'Menú' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'))
           : contenido.naranja
           ? S.h('header', { class: 'nws-fl__top-naranja' }, S.iconButton({ icon: 'close', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Cerrar', cls: 'nws-fl__login-x', attrs: { 'data-vw-cerrar': true } }), S.h('h1', { class: 'nws-fl__top-naranja-t' }, e(contenido.titulo)))
+          : contenido.sheet
+          ? S.h('header', { class: 'nws-fl__sheet-top' }, S.h('button', { type: 'button', class: 'nws-fl__sheet-asa', 'aria-label': 'Arrastrar para expandir o reducir' }), S.iconButton({ icon: 'close', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Cerrar perfil', cls: 'nws-fl__modal-x', attrs: { 'data-vw-cerrar': true } }))
           : contenido.dialogo
           ? S.h('header', { class: 'nws-fl__modal-cab' }, S.h('h1', { class: 'nws-fl__modal-t' }, e(contenido.titulo)), S.iconButton({ icon: 'close', size: 'medium', variant: 'mute', theme: 'neutral', label: 'Cerrar', cls: 'nws-fl__modal-x', attrs: { 'data-vw-cerrar': true } }))
           : contenido.foto
@@ -394,10 +430,12 @@ window.LANDING_VISTAS = (function () {
         }
         var ir = t.closest('[data-flujo]');
         if (ir) { ev.stopPropagation(); estado.irPrueba = ir.getAttribute('data-prueba') || ''; estado.irSerie = ir.getAttribute('data-serie') || ''; if (ir.getAttribute('data-dia')) { estado.dia = ir.getAttribute('data-dia'); } var hjOp = el.querySelector('.nws-fl__hoja--abierta'); if (hjOp) { hjOp.classList.remove('nws-fl__hoja--abierta'); estado.hoja = false; } abrir(ir.getAttribute('data-flujo'), ir, ir.getAttribute('data-clave')); return; }
+        var irPv = t.closest('[data-fl-pv-ir]');
+        if (irPv) { ev.stopPropagation(); var dst = el.querySelector('.nws-fl__pv-pruebas'); if (dst) { dst.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'start' }); } return; }
         var chevSe = t.closest('[data-fl-se]');
         if (chevSe) { ev.stopPropagation(); var arSe = chevSe.closest('.nws-fl__se'), cerSe = arSe.classList.toggle('nws-fl__se--c'); chevSe.setAttribute('aria-expanded', cerSe ? 'false' : 'true'); return; }
         var dia = t.closest('[data-fl-dia]');
-        if (dia) { ev.stopPropagation(); estado.dia = dia.getAttribute('data-fl-dia'); repintar(el, id, clave, estado); el.querySelector('[data-fl-dia="' + estado.dia + '"]').focus({ preventScroll: true }); return; }
+        if (dia) { ev.stopPropagation(); var ordenD = Array.from(el.querySelectorAll('.nws-fl__dp-d[data-fl-dia]')).map(function (q) { return q.getAttribute('data-fl-dia'); }), nuevoD = dia.getAttribute('data-fl-dia'); estado._dir = Math.sign(ordenD.indexOf(nuevoD) - ordenD.indexOf(estado.dia)) || 0; estado.dia = nuevoD; repintar(el, id, clave, estado); el.querySelector('[data-fl-dia="' + estado.dia + '"]').focus({ preventScroll: true }); return; }
         var tab = t.closest('.nws-fl__tabs [data-tab]');
         if (tab) { ev.stopPropagation(); var destino = flujos.destinoTab(id, clave, tab.getAttribute('data-tab')); if (destino) { abrir(destino.id, tab, destino.clave); return; } estado.tab = tab.getAttribute('data-tab'); repintar(el, id, clave, estado); el.querySelector('[data-tab="' + estado.tab + '"]').focus({ preventScroll: true }); return; }
         var tp = t.closest('.nws-lpvw__reg-tipo [data-tab]');
@@ -458,7 +496,7 @@ window.LANDING_VISTAS = (function () {
         var pl0 = zd.querySelector('.nws-fl__dp-pil'), sc0 = pl0 ? pl0.scrollLeft : zd.scrollLeft; zd.outerHTML = v.zona;
         var zn = el.querySelector('[data-fl-dias]'), pl1 = zn.querySelector('.nws-fl__dp-pil'); (pl1 || zn).scrollLeft = sc0; zn.classList.add('nws-fl__dp--fija');
         /* con muchos días, el elegido queda a la vista dentro de la franja */
-        var sel = pl1 && pl1.querySelector('.nws-fl__dp-d--sel'); if (sel && (sel.offsetLeft < pl1.scrollLeft || sel.offsetLeft + sel.offsetWidth > pl1.scrollLeft + pl1.clientWidth)) { pl1.scrollLeft = sel.offsetLeft - (pl1.clientWidth - sel.offsetWidth) / 2; }
+        var sel = pl1 && pl1.querySelector('.nws-fl__dp-d--sel'); if (sel && (sel.offsetLeft < pl1.scrollLeft || sel.offsetLeft + sel.offsetWidth > pl1.scrollLeft + pl1.clientWidth)) { var dest = sel.offsetLeft - (pl1.clientWidth - sel.offsetWidth) / 2; if (reducido || !pl1.scrollTo) { pl1.scrollLeft = dest; } else { pl1.scrollTo({ left: dest, behavior: 'smooth' }); } }
       }
       /* En la prueba (día, Series o Podio) el contenido nuevo entra con un fundido suave. */
       var cn = el.querySelector('[data-fl-contenido]');
@@ -466,7 +504,14 @@ window.LANDING_VISTAS = (function () {
         /* solo se anima lo que está debajo de las pestañas o fichas; ellas y lo de arriba quedan quietos */
         var tb = cn.querySelector('.nws-fl__tabs'), objetivos = [];
         if (tb) { for (var sib = tb.nextElementSibling; sib; sib = sib.nextElementSibling) { objetivos.push(sib); } } else { objetivos.push(cn); }
-        objetivos.forEach(function (o2) { if (o2.animate) { o2.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)' }); } });
+        var dir = estado._dir || 0; estado._dir = 0;
+        if (dir) {
+          /* Cambio de día con las flechas o la franja: las tarjetas entran desde el lado al que se avanza, una tras otra. */
+          var tarjetas = []; objetivos.forEach(function (o2) { var hijas = o2.querySelectorAll(':scope > .nws-fl__fila, :scope > .nws-fl__se'); if (hijas.length) { hijas.forEach(function (c2) { tarjetas.push(c2); }); } else { tarjetas.push(o2); } });
+          tarjetas.forEach(function (c2, n) { if (c2.animate) { c2.animate([{ opacity: 0, transform: 'translateX(' + (dir * 36) + 'px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: Math.min(n, 6) * 55, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' }); } });
+        } else {
+          objetivos.forEach(function (o2) { if (o2.animate) { o2.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)' }); } });
+        }
       }
       medirIndicadores(el);
       if (o.posicionarIndicadores) { o.posicionarIndicadores(el); }
@@ -502,6 +547,16 @@ window.LANDING_VISTAS = (function () {
         if (!corre) { corre = true; requestAnimationFrame(paso); }
       }, { passive: true });
       medir(); pinta();
+      /* Si el contenido cabe sin desplazar, la cabecera no se pliega: se mide el contenido y se activa o no el margen para plegar. */
+      var dc = el.querySelector('[data-fl-contenido]'), activo = null;
+      function evalua() {
+        var ok = dc.offsetHeight + 56 > sc.clientHeight + 4;
+        if (ok === activo) { return; }
+        activo = ok; el.classList.toggle('nws-fl--colapsa', ok);
+        if (!ok) { meta = cur = 0; sc.scrollTop = 0; pinta(); }
+      }
+      evalua();
+      if (window.ResizeObserver) { new ResizeObserver(evalua).observe(dc); }
     }
     function abrir(id, origen, clave, alCerrar) {
       var estado = {}, contenido;
@@ -513,11 +568,15 @@ window.LANDING_VISTAS = (function () {
       if ((id === 'deporte' || id === 'competencia' || id === 'serie' || id === 'partido') && actual && actual.estado.regSub) { estado.regSub = actual.estado.regSub; estado.regTitulo = actual.estado.regTitulo; estado.regK = actual.estado.regK; }
       if ((id === 'serie' || id === 'partido') && actual) { estado.prueba = actual.estado.prueba; estado.serie = actual.estado.irSerie; }
       if (id === 'competencia' && actual && actual.estado.irPrueba != null) { estado.prueba = actual.estado.irPrueba; }
+      if (id === 'deportista' && actual) {
+        /* El perfil recuerda de dónde viene (día, regional, prueba) para que «Ver detalle de la prueba» abra la vista nueva con ese contexto. */
+        ['dia', 'dias', 'ag', 'regSub', 'regTitulo', 'regK', 'prueba', 'serie'].forEach(function (c) { if (actual.estado[c] != null) { estado[c] = actual.estado[c]; } });
+      }
       contenido = flujos.vista(id, clave, estado);
       if (!contenido && id !== 'regionales' && id !== 'calendario') {
         if (o.proximamente) { o.proximamente(id, origen); } return;
       }
-      if (actual && actual.id === id && actual.clave === clave) { return; }
+      if (actual && actual.id === id && actual.clave === clave && String(estado.prueba || '') === String(actual.estado.prueba || '')) { return; }   /* misma vista, otra prueba: sí se abre */
       if (actual) { ponerCambio(false, false); actual.el.inert = true; actual.el.setAttribute('aria-modal', 'false'); }
       var v = { id: id, clave: clave, estado: estado, origen: origen || document.activeElement, alCerrar: alCerrar };
       v.el = crear(id, clave, estado); vistas[id] = v;
@@ -525,6 +584,7 @@ window.LANDING_VISTAS = (function () {
       v.el.hidden = false;
       void v.el.offsetWidth;
       if (contenido && contenido.eyebrow) { colapsoPrueba(v.el); }
+      if (contenido && contenido.sheet) { gestosHoja(v.el); }
       medirIndicadores(v.el);
       v.el.classList.add('nws-lpvw--abierta');
       inerte(true); mob.classList.add('nws-lp--vista');

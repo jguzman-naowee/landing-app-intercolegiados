@@ -8,6 +8,19 @@ window.LANDING_FLUJOS = function (S, L) {
   'use strict';
   var F = L.app.flujos, e = S.esc, h = S.h;
   var ESCUDOS = ['#3A48A8', '#8055A3', '#646587', '#F05705', '#434CE4', '#293377'];
+  /* Final Nacional (datos de prueba): cada prueba del catálogo es un evento en su día, repartidas en orden según la agenda; todas las pruebas traen resultados salvo las del último día de cada deporte, que quedan programadas. */
+  F.competencias.forEach(function (c) {
+    if (!c.catalogo || c.eventos) { return; }
+    var todas = [], campo = /salto|lanzamiento|impulso|jabalina|disco|bala|martillo/i, i = 0;
+    Object.keys(c.catalogo).forEach(function (cat) { c.catalogo[cat].forEach(function (pr) { todas.push({ nombre: pr, cat: cat }); }); });
+    c.eventos = [];
+    c.dias.forEach(function (d, n) { var j; for (j = 0; j < c.cuenta[n] && i < todas.length; j++, i++) { var q = todas[i]; c.eventos.push({ nombre: q.nombre, cat: q.cat, clave: q.nombre + '|' + q.cat, dia: d, marca: campo.test(q.nombre) ? { tipo: 'distancia', base: 5, paso: 0.15 } : { tipo: 'tiempo', base: 12, paso: 0.2 }, mitad: 2, hits: 1, estado: n === c.dias.length - 1 && c.dias.length > 1 ? 'Programado' : 'Finalizado' }); } });
+  });
+  F.competencias.forEach(function (c) {
+    if (c.fase === 'final' && c.tipo === 'equipo') { c.estado = 'Finalizado'; }
+  });
+  /* Días de un evento: uno propio (`dia`) o la mitad de la agenda en que se corre. */
+  function diasDeEv(ev, dias) { if (ev.dia) { return dias.filter(function (d) { return d === ev.dia; }); } var corte = Math.ceil(dias.length / 2); return dias.filter(function (_, i) { return ev.mitad === 2 || (ev.mitad === 0 ? i < corte : i >= corte); }); }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function texto(t) { return h('p', null, e(t)); }
   function titulo(t) { return h('h2', null, e(t)); }
@@ -17,8 +30,8 @@ window.LANDING_FLUJOS = function (S, L) {
   }
   function pendiente(label) { return S.button({ label: label, theme: 'neutral', variant: 'quiet', cls: 'nws-fl__accion', attrs: { 'data-toast': label } }); }
   /* Fila que abre otra vista: toda la tarjeta es el botón (como en la app). */
-  function enlace(id, clave, contenido, cls) {
-    return h('button', { type: 'button', class: 'nws-fl__fila ' + (cls || ''), 'data-flujo': id, 'data-clave': clave == null ? '' : String(clave) }, contenido);
+  function enlace(id, clave, contenido, cls, extra) {
+    return h('button', Object.assign({ type: 'button', class: 'nws-fl__fila ' + (cls || ''), 'data-flujo': id, 'data-clave': clave == null ? '' : String(clave) }, extra || {}), contenido);
   }
   function ir() { return S.icon('chevron-right', 'nws-fl__ir'); }
   function tabs(labels, st, vivo) {
@@ -56,8 +69,10 @@ window.LANDING_FLUJOS = function (S, L) {
   function sede(k) { return F.sedes[+k || 0]; }
   function competencia(k) { return F.competencias.filter(function (c) { return c.id === k; })[0] || F.competencias[0]; }
   function regional(k) { return L.app.regionales.items[+String(k || '').split(':').pop() || 0]; }
-  function deRegional(c, k) { return c.tipo === (String(k || '').indexOf('individuales:') === 0 ? 'individual' : 'equipo'); }
-  function eje(c, k) { return deRegional(c, 'individuales:0') && String(k).indexOf('individuales:') === 0 ? c.prueba : c.deporte; }
+  /* Las competencias de la Final Nacional (`fase: 'final'`) solo salen en su tarjeta; las regionales, en las demás. */
+  function esFinal(k) { var it = regional(k); return !!(it && it.fase === 'final'); }
+  function deRegional(c, k) { return c.tipo === (String(k || '').indexOf('individuales:') === 0 ? 'individual' : 'equipo') && (c.fase === 'final') === esFinal(k); }
+  function eje(c, k) { return c.fase !== 'final' && deRegional(c, 'individuales:0') && String(k).indexOf('individuales:') === 0 ? c.prueba : c.deporte; }
   function deportesRegional(k) { return F.competencias.filter(function (c) { return deRegional(c, k); }).map(function (c) { return eje(c, k); }); }
   function categoriasRegional(k) { return F.competencias.filter(function (c) { return deRegional(c, k); }).map(function (c) { return c.categoria; }); }
   function datoFila(label, valor) {
@@ -66,7 +81,7 @@ window.LANDING_FLUJOS = function (S, L) {
   function vista(id, k, st) {
     var eyebrow = null, t, sub = null, violeta = false, b, x, foto = null, naranja = false, barraLogo = false, pie = null, zona = null, resumen = null, zonaLista = false;
     if (id === 'regional') {
-      x = regional(k); t = String(k).indexOf('individuales:') === 0 ? 'Regional de atletismo' : 'Regional de conjuntos'; sub = x.nombre.replace(/^Regional /, '') + ' - Sede ' + x.ciudad; violeta = true; st.regSub = sub; st.regK = k; st.regTitulo = t;
+      x = regional(k); t = x.fase === 'final' ? (String(k).indexOf('individuales:') === 0 ? 'Final nacional individual' : 'Final nacional de conjuntos') : String(k).indexOf('individuales:') === 0 ? 'Regional de atletismo' : 'Regional de conjuntos'; sub = x.nombre.replace(/^Regional /, '') + ' - Sede ' + x.ciudad; violeta = true; st.regSub = sub; st.regK = k; st.regTitulo = t;
       b = +st.tab ? tabs(F.regionalTabs, st) : '';
       if (+st.tab === 1) {
         b += h('p', { class: 'nws-fl__intro' }, e('Explora las sedes donde se realizarán las competencias.')) + select('Departamento', 'departamento', [sede(0).departamento], st);
@@ -237,34 +252,74 @@ window.LANDING_FLUJOS = function (S, L) {
       /* Nivel deporte: se entra al deporte y, por día, se ven sus pruebas; cada prueba abre su competencia. */
       x = competencia(k); t = x.deporte; violeta = true; sub = st.regSub || null;
       var fechasD = st.dias || F.dias, stD = st;
+      /* La franja muestra solo los días en que se juega este deporte, aunque la competencia completa sea más larga. */
+      var diasDep = agDe(x, st).dias; if (diasDep && diasDep.length) { fechasD = diasDep; }
       /* Si se entra desde una prueba (atletismo), el título es la prueba y la franja trae solo sus días. */
       if (st.prueba && x.eventos) {
-        var evD = x.eventos.filter(function (q) { return q.nombre === st.prueba; })[0], agD = agDe(x, st);
+        var evD = x.eventos.filter(function (q) { return (q.clave || q.nombre) === st.prueba; })[0], agD = agDe(x, st);
         if (evD) {
-          var corteD = Math.ceil(agD.dias.length / 2), diasP = agD.dias.filter(function (_, i) { return evD.mitad === 2 || (evD.mitad === 0 ? i < corteD : i >= corteD); });
+          var diasP = diasDeEv(evD, agD.dias);
           t = tituloPrueba(evD, x); fechasD = diasP; stD = Object.assign({}, st); stD.ag = Object.assign({}, st.ag || {}); stD.ag[x.id] = { dias: diasP, cuenta: diasP.map(function () { return (evD.hits || 0) + 1; }) };
         }
       }
       if (st.prueba && x.eventos && evD) {
-        /* Dentro de la prueba (atletismo): morado con la regional, la prueba, la sede y los días; abajo Series y, si ya hay, Podio general. */
+        /* Dentro de la prueba (atletismo): morado con la regional, la prueba, la sede y los días; abajo Series y, si ya hay, Resultados. */
+        if (tablaDe(x, evD)) {
+          var td = tablaDatos(x, evD), finT = x.fase === 'final', tipoT = td.tipo, iTT = +st.tab || 0;
+          zona = diasZona(fechasD, fechasD[0], x, stD, true); zonaLista = true; eyebrow = st.regTitulo || null;
+          var vistaRondas = h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, tipoT === 'grupos' ? 'Fase de grupos' : tipoT === 'rr' ? 'Jornadas' : 'Rondas'), estadoPill(td.estado))
+            + (td.hecho ? td.rondas : td.rondas.slice(0, 1)).map(function (r) { return h('h3', { class: 'nws-fl__ll-h nws-fl__mesa-h' }, e(r.t)) + h('div', { class: 'nws-fl__filas' }, r.p.map(partidoLinea).join('')); }).join('');
+          var vistaPos = h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, tipoT === 'rondas' ? 'Resultados acumulados' : tipoT === 'grupos' ? 'Posiciones por grupo' : 'Posiciones'), estadoPill(td.estado))
+            + td.tablas.map(function (g) {
+              return (g.t ? h('h3', { class: 'nws-fl__ll-h nws-fl__mesa-h' }, e(g.t)) : '') + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja' }, g.f.map(function (r, q) {
+                return filaRes({ nombre: r.a.nombre, marca: td.fmt(r.pts) + ' pts' }, q + 1, [r.a.departamento, r.pj + ' PJ · ' + r.pg + ' PG'], true, false);
+              }).join(''));
+            }).join('');
+          var vistaCuadroT = h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, 'Cuadro final'), estadoPill(td.estado)) + (td.cuadro ? llaveBloque(td.cuadro) + h('p', { class: 'nws-fl__ll-nota' }, 'Pasan los dos primeros de cada grupo. Los dos que pierden en semifinal reciben bronce.') : '');
+          var nomT = tipoT === 'grupos' ? ['Grupos', 'Llaves', finT ? 'Medallero' : 'Resultados'] : [tipoT === 'rondas' ? 'Rondas' : 'Jornadas', 'Posiciones', finT ? 'Medallero' : 'Resultados'];
+          iTT = Math.min(iTT, 2);
+          var cuerpoT = iTT === 0 ? vistaRondas : iTT === 1 ? (tipoT === 'grupos' ? vistaPos + vistaCuadroT : vistaPos) : medalleroHtml(td.general, finT, td.estado, { deporte: x.deporte, cat: evD.cat, prueba: evD.nombre });
+          return { titulo: t, sub: sub, violeta: true, eyebrow: eyebrow, html: fichasPrueba(nomT, iTT, td.hecho, true) + cuerpoT, zona: zona, zonaLista: true, sinTitulo: true, dev: 'fl-deporte' };
+        }
+        if (llaveDe(x, evD)) {
+          var ld = llavesDatos(x, evD), finL = x.fase === 'final', tituloR = finL ? 'Medallero' : 'Resultados', iT = Math.min(+st.tab || 0, 1);
+          zona = diasZona(fechasD, fechasD[0], x, stD, true); zonaLista = true; eyebrow = st.regTitulo || null;
+          var vistaCuadro = h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, ld.doble ? 'Llave de ganadores' : ld.repe ? 'Cuadro principal' : 'Cuadro de eliminación'), estadoPill(ld.estado))
+            + llaveBloque(ld.rondas)
+            + (ld.repe || ld.doble ? h('h2', { class: 'nws-fl__explora' }, ld.doble ? 'Llave de perdedores y final' : 'Repechaje') + llaveBloque(ld.extra) : '')
+            + h('p', { class: 'nws-fl__ll-nota' }, ld.doble ? 'Solo sale quien pierde dos veces. Quien pierde la última ronda de la llave de perdedores recibe el bronce.' : ld.repe ? 'Los deportistas eliminados por cada finalista pasan al repechaje y disputan el bronce.' : 'Los dos deportistas que pierden en semifinal reciben bronce.');
+          var vistaMed = medalleroHtml(ld.general.map(function (a, q) { return Object.assign({ pos: q < 3 ? q + 1 : 3 }, a); }), finL, ld.estado, { deporte: x.deporte, cat: evD.cat, prueba: evD.nombre });
+          var fichasL = ld.hecho ? h('div', { class: 'nws-fl__tabs nws-fl__ch', role: 'group', 'aria-label': 'Ver' },
+            h('button', { type: 'button', class: S.cls('nws-fl__ch-b', iT === 0 && 'nws-fl__ch-b--on'), 'data-tab': '0', 'aria-pressed': iT === 0 ? 'true' : 'false' }, 'Llaves'),
+            h('button', { type: 'button', class: S.cls('nws-fl__ch-b', iT === 1 && 'nws-fl__ch-b--on'), 'data-tab': '1', 'aria-pressed': iT === 1 ? 'true' : 'false' }, finL ? '' : ICO_COPA, tituloR)) : '';
+          return { titulo: t, sub: sub, violeta: true, eyebrow: eyebrow, html: fichasL + (ld.hecho && iT === 1 ? vistaMed : vistaCuadro), zona: zona, zonaLista: true, sinTitulo: true, dev: 'fl-deporte' };
+        }
         var rp = datosPrueba(x, evD, fechasD), diaP = fechasD.indexOf(st.dia) >= 0 ? st.dia : fechasD[0], hayPodio = rp.estado === 'Finalizado';
         zona = diasZona(fechasD, diaP, x, stD, true); zonaLista = true; eyebrow = st.regTitulo || null;
         var seriesDia = rp.porDia[diaP] || [];
-        var vistaSeries = h('h2', { class: 'nws-fl__explora' }, 'Enfrentamientos del día')
+        var vistaSeries = h('h2', { class: 'nws-fl__explora' }, sistemaDe(x.deporte).serie === 'Enfrentamientos' ? 'Enfrentamientos del día' : sistemaDe(x.deporte).serie + ' del día')
           + h('div', { class: 'nws-fl__se-l' }, seriesDia.map(function (q, i) { return serieTarjeta(q, i, rp.estado, x); }).join(''));
+        /* Medallas solo en la fase final; en la regional «Resultados» deja el número, sin medalla. */
+        var fin = x.fase === 'final', sis = sistemaDe(x.deporte), conFinal = fin && sis.serie === 'Series';
         var pod = function (n) {
           var a = rp.general[n - 1];
           return h('div', { class: 'nws-fl__pd nws-fl__pd--' + n },
-            h('span', { class: 'nws-fl__pd-av' }, h('i', null, ICO_USR), h('span', { class: 'nws-fl__pd-m' }, n)),
+            fin ? h('span', { class: 'nws-fl__pd-av nws-fl__pd-av--med' }, h('img', { class: 'nws-fl__pd-m', src: MEDALLA[n], alt: ['Oro', 'Plata', 'Bronce'][n - 1] })) : h('span', { class: 'nws-fl__pd-av' }, h('i', null, ICO_USR), h('span', { class: 'nws-fl__pd-m' }, n)),
             h('b', null, e(a.nombre)), h('small', null, e(a.departamento)), h('span', { class: 'nws-fl__pd-v' }, e(a.marca)));
         };
-        var vistaPodio = h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, 'Podio general'), estadoPill(rp.estado))
-          + h('div', { class: 'nws-fl__pdio', role: 'group', 'aria-label': 'Podio general' }, pod(2) + pod(1) + pod(3))
-          + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja nws-fl__rf-l--sep' }, rp.general.slice(3, 8).map(function (a, i) { return filaRes(a, i + 4, [a.departamento], true); }).join(''));
-        var fichas = hayPodio ? h('div', { class: 'nws-fl__tabs nws-fl__ch', role: 'group', 'aria-label': 'Ver' },
-          h('button', { type: 'button', class: S.cls('nws-fl__ch-b', +st.tab !== 1 && 'nws-fl__ch-b--on'), 'data-tab': '0', 'aria-pressed': +st.tab !== 1 ? 'true' : 'false' }, 'Enfrentamientos'),
-          h('button', { type: 'button', class: S.cls('nws-fl__ch-b', +st.tab === 1 && 'nws-fl__ch-b--on'), 'data-tab': '1', 'aria-pressed': +st.tab === 1 ? 'true' : 'false' }, ICO_COPA, 'Podio general')) : '';
-        b = fichas + (hayPodio && +st.tab === 1 ? vistaPodio : vistaSeries);
+        var tituloRes = fin ? 'Medallero' : 'Resultados';
+        var vistaPodio = fin ? medalleroHtml(rp.general.slice(0, 8), true, rp.estado, { deporte: x.deporte, cat: evD.cat, prueba: evD.nombre }) : h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, tituloRes), estadoPill(rp.estado))
+          + h('div', { class: 'nws-fl__pdio', role: 'group', 'aria-label': tituloRes }, pod(2) + pod(1) + pod(3))
+          + (fin ? '' : h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja nws-fl__rf-l--sep' }, rp.general.slice(3, 8).map(function (a, i) { return filaRes(a, i + 4, [a.departamento], true); }).join('')));
+        /* La final de una prueba con series (clasificación → final directa) lista a los clasificados con su marca. */
+        var vistaFinal = h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, 'Final'), estadoPill(rp.estado))
+          + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja' }, rp.general.slice(0, 8).map(function (a, i) { return filaRes(a, i + 1, [a.departamento], true); }).join(''));
+        var nombresTab = conFinal ? [sis.serie, 'Final', 'Medallero'] : [sis.serie, tituloRes], iTab = Math.min(+st.tab || 0, nombresTab.length - 1);
+        var ultimo = nombresTab.length - 1;
+        var fichas = hayPodio ? h('div', { class: 'nws-fl__tabs nws-fl__ch', role: 'group', 'aria-label': 'Ver' }, nombresTab.map(function (nm, q) {
+          return h('button', { type: 'button', class: S.cls('nws-fl__ch-b', iTab === q && 'nws-fl__ch-b--on'), 'data-tab': String(q), 'aria-pressed': iTab === q ? 'true' : 'false' }, q === ultimo && nm !== 'Medallero' ? ICO_COPA : '', nm);
+        }).join('')) : '';
+        b = fichas + (hayPodio && iTab === ultimo ? vistaPodio : hayPodio && conFinal && iTab === 1 ? vistaFinal : vistaSeries);
         return { titulo: t, sub: sub, violeta: true, eyebrow: eyebrow, html: b, zona: zona, zonaLista: true, sinTitulo: true, dev: 'fl-deporte' };
       }
       if (x.tipo === 'equipo') {
@@ -280,21 +335,21 @@ window.LANDING_FLUJOS = function (S, L) {
         }).join(''));
         return { titulo: t, sub: sub, violeta: true, eyebrow: eyebrow, html: b, zona: zona, zonaLista: true, sinTitulo: true, dev: 'fl-deporte' };
       }
-      var icoD = ICONO_DEPORTE[x.deporte] || ICONO_PIN, diaD = fechasD.indexOf(st.dia) >= 0 ? st.dia : agDe(x, stD).dias[0], pruebasD = pruebasDelDia(x, diaD, stD).filter(function (pr) { return !st.prueba || pr.nombre === st.prueba; });
-      zona = diasZona(fechasD, diaD, x, stD); zonaLista = true;
+      var icoD = ICONO_DEPORTE[x.deporte] || ICONO_PIN, diaD = fechasD.indexOf(st.dia) >= 0 ? st.dia : agDe(x, stD).dias[0], pruebasD = pruebasDelDia(x, diaD, stD).filter(function (pr) { return !st.prueba || (pr.clave || pr.nombre) === st.prueba; });
+      zona = diasZona(fechasD, diaD, x, stD, true); zonaLista = true; eyebrow = st.regTitulo || null;
       b = pruebasD.length
         ? h('h2', { class: 'nws-fl__explora' }, pruebasD.length === 1 ? '1 prueba' : pruebasD.length + ' pruebas') + h('div', { class: 'nws-fl__filas' }, pruebasD.map(function (pr) {
-          return enlace('competencia', x.id,
+          return enlace(pr.clave ? 'deporte' : 'competencia', x.id,
             h('span', { class: 'nws-fl__cuadro' }, h('img', { class: 'nws-fl__cuadro-img', src: icoD, alt: '' }))
-            + h('span', { class: 'nws-fl__fila-cuerpo' }, h('span', { class: 'nws-fl__fila-t' }, e(pr.nombre)), h('span', { class: 'nws-fl__fila-m' }, e(pr.n + ' ' + (pr.n === 1 ? pr.unidad.replace(/s$/, '') : pr.unidad))))
-            + ir(), 'nws-fl__fila--tarjeta');
+            + h('span', { class: 'nws-fl__fila-cuerpo' }, h('span', { class: 'nws-fl__fila-t' }, e(pr.nombre)), h('span', { class: 'nws-fl__fila-m' }, e(pr.sub || (pr.n + ' ' + (pr.n === 1 ? pr.unidad.replace(/s$/, '') : pr.unidad)))))
+            + ir(), 'nws-fl__fila--tarjeta', pr.clave ? { 'data-prueba': pr.clave, 'data-dia': diaD } : null);
         }).join(''))
         : texto('No hay pruebas este día.');
     } else if (id === 'serie') {
       /* «Ver más» de una serie (atletismo): todos los deportistas con institución, departamento y el botón del perfil; sin marca si no se ha corrido. */
       x = competencia(k); violeta = true;
-      var evS = (x.eventos || []).filter(function (q) { return q.nombre === st.prueba; })[0] || (x.eventos || [])[0], agS = agDe(x, st);
-      var corteS = Math.ceil(agS.dias.length / 2), diasS = agS.dias.filter(function (_, i) { return evS.mitad === 2 || (evS.mitad === 0 ? i < corteS : i >= corteS); });
+      var evS = (x.eventos || []).filter(function (q) { return (q.clave || q.nombre) === st.prueba; })[0] || (x.eventos || [])[0], agS = agDe(x, st);
+      var diasS = diasDeEv(evS, agS.dias);
       var rs = datosPrueba(x, evS, diasS), qs = rs.todas.filter(function (q) { return q.n === +st.serie; })[0] || rs.todas[0], hechoS = rs.estado === 'Finalizado';
       b = h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, 'Resultado de la prueba'), estadoPill(rs.estado))
         + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja nws-fl__rf-l--det' }, qs.filas.map(function (f, i) { return filaRes(f, i + 1, [f.institucion, f.departamento], hechoS, true); }).join(''));
@@ -306,8 +361,12 @@ window.LANDING_FLUJOS = function (S, L) {
       var psQ = partidosEq(x, pe.i, diaQ, st), tabQ = +st.tab || 0, todosQ = [];
       agC.dias.forEach(function (d) { partidosEq(x, pe.i, d, st).forEach(function (m) { todosQ.push(m); }); });
       var ficha = function (n, txt, cuenta) { return h('button', { type: 'button', class: S.cls('nws-fl__ch-b', tabQ === n && 'nws-fl__ch-b--on'), 'data-tab': String(n), 'aria-pressed': tabQ === n ? 'true' : 'false' }, txt, cuenta != null ? h('span', { class: 'nws-fl__ch-n' }, cuenta) : ''); };
-      var fichasQ = h('div', { class: 'nws-fl__tabs nws-fl__ch', role: 'group', 'aria-label': 'Ver' }, ficha(0, 'Partidos'), ficha(1, 'Grupos'), ficha(2, 'Posiciones'));
-      if (tabQ === 2) {
+      var fichasQ = h('div', { class: 'nws-fl__tabs nws-fl__ch', role: 'group', 'aria-label': 'Ver' }, ficha(0, 'Partidos'), ficha(1, 'Grupos'), ficha(2, 'Posiciones'), x.fase === 'final' ? ficha(3, 'Medallero') : '');
+      if (tabQ === 3 && x.fase === 'final') {
+        /* Medallero de conjuntos: los tres mejores equipos de la tabla general de la prueba, con todas las posiciones. */
+        var tm = tablaEq(x, pe.i, st), todosEq = [].concat.apply([], Object.keys(tm).map(function (g) { return tm[g]; })).sort(function (p1, p2) { return p2.pts - p1.pts || (p2.pf - p2.pc) - (p1.pf - p1.pc); });
+        b = fichasQ + medalleroHtml(todosEq.slice(0, 8).map(function (r, i) { return { nombre: r.q.nombre, departamento: r.q.departamento, marca: r.pts + ' pts', pos: i + 1 }; }), true, 'Finalizado', false);
+      } else if (tabQ === 2) {
         var tq = tablaEq(x, pe.i, st);
         b = fichasQ + Object.keys(tq).sort().map(function (g) {
           return h('h2', { class: 'nws-fl__explora' }, e(g)) + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja nws-fl__pos-t' + (tq[g][0].sets ? ' nws-fl__pos-t--sets' : '') }, h('div', { class: 'nws-fl__pos-h' }, '<span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>P</span>' + (tq[g][0].sets ? '<span>SG</span><span>SP</span>' : '') + '<span>DIF</span><span>PTS</span>')
@@ -392,18 +451,49 @@ window.LANDING_FLUJOS = function (S, L) {
           + ir(), 'nws-fl__fila--tarjeta');
       }).join('');
     } else if (id === 'deportista') {
-      x = F.deportistas[+k || 0]; t = 'Perfil del deportista';
-      var celda = function (label, valor) { return h('div', { class: 'nws-fl__celda' }, h('span', { class: 'nws-fl__celda-l' }, e(label)), h('span', { class: 'nws-fl__celda-v' }, e(valor))); };
-      var icono = ICONO_DEPORTE[x.deporte] || ICONO_PIN;
-      var comp = competencia(x.deporte === 'Atletismo' ? 'atletismo' : 'baloncesto');
-      b = h('div', { class: 'nws-fl__perfil-fila' }, h('span', { class: 'nws-fl__foto-ini', 'aria-hidden': 'true' }, e(x.nombre.charAt(0))),
-          h('div', { class: 'nws-fl__perfil-tx' }, h('p', { class: 'nws-fl__perfil-n' }, e(x.nombre)), h('p', { class: 'nws-fl__perfil-i' }, e(x.institucion))))
-        + tarjeta('nws-fl__datos', h('div', { class: 'nws-fl__grid' }, celda('Departamento', x.departamento), celda('Municipio', x.municipio),
-          h('div', { class: 'nws-fl__celda' }, h('span', { class: 'nws-fl__celda-l' }, 'Deporte'), h('span', { class: 'nws-fl__chip-dep' }, h('img', { src: icono, alt: '' }), e(x.deporte))),
-          celda('Categoría', x.categoria)))
-        + titulo('Competencias')
-        + tarjeta('nws-fl__comp-card', h('span', { class: 'nws-fl__cuadro', 'aria-hidden': 'true' }, h('img', { class: 'nws-fl__cuadro-img', src: icono, alt: '' }))
-          + h('span', { class: 'nws-fl__fila-cuerpo' }, h('span', { class: 'nws-fl__comp-t' }, e(comp.prueba)), h('span', { class: 'nws-fl__fila-m' }, e(comp.categoria))));
+      /* Perfil como hoja emergente (versión «overlay»): portada, foto, datos clave y sus pruebas con su posición. */
+      var kd = String(k || '').split(':'), posA = 0;
+      if (kd[0] === 'a' && F.atletas[+kd[1]]) {
+        /* Desde una serie de atletismo: el deportista de la fila, con su posición y su marca. */
+        x = Object.assign({ categoria: 'Juvenil · Femenino', deporte: 'Atletismo', municipio: '' }, F.atletas[+kd[1]], { marcas: [kd[3] || ''] }); posA = +kd[2] || 0;
+      } else if (String(k).indexOf('p|') === 0) {
+        /* Desde un medallero: el deportista con su posición, su marca y la prueba de la que viene. */
+        var kq = String(k).split('|');
+        x = { nombre: kq[1], institucion: kq[2], departamento: kq[3], municipio: '', deporte: kq[4], categoria: kq[5], marcas: [kq[7]], _prueba: kq[8], _fin: kq[9] === '1' }; posA = +kq[6] || 0;
+      } else if (String(k).indexOf('j|') === 0) {
+        /* Desde la nómina de un partido de conjunto: el jugador, con su equipo, su departamento y su deporte. */
+        var kj = String(k).split('|'), cJ = competencia(kj[4]);
+        x = { nombre: kj[1], institucion: kj[2], departamento: kj[3], municipio: '', deporte: cJ.dep || cJ.deporte, categoria: String(cJ.categoria || 'Juvenil').split(' · ')[0] + ' · ' + (kj[5] === 'Mujer' ? 'Femenino' : 'Masculino'), marcas: [''], _comp: cJ };
+      } else { x = F.deportistas[+k || 0]; }
+      t = 'Perfil del deportista';
+      var icono = ICONO_DEPORTE[x.deporte] || ICONO_PIN, esAtl = x.deporte === 'Atletismo' || !!x._prueba, comp = x._comp || competencia(esAtl ? 'atletismo' : 'baloncesto');
+      var cat = String(x.categoria).split(' · '), sexoP = /Fem/.test(cat[1] || '') ? 'Mujer' : 'Hombre';
+      var posX = posA || F.deportistas.filter(function (a) { return a.deporte === x.deporte; }).indexOf(x) + 1;
+      var hashD = 0, iD; for (iD = 0; iD < x.departamento.length; iD++) { hashD += x.departamento.charCodeAt(iD); }
+      var bandera = h('span', { class: 'nws-fl__pv-flag', style: 'background:linear-gradient(' + ESCUDOS[hashD % ESCUDOS.length] + ' 50%, ' + ESCUDOS[(hashD + 3) % ESCUDOS.length] + ' 50%)', role: 'img', 'aria-label': 'Bandera de ' + x.departamento }, '');
+      /* Deportes de conjunto: el marcador del partido desde el que se abrió el perfil. */
+      var marcPerfil = '', mPf = null;
+      if (!esAtl) {
+        try { var pPf = pruebasEq(comp)[+st.prueba || 0], kPf = String(st.serie || '').split('|'), lPf = partidosEq(comp, pPf.i, kPf[0] || agDe(comp, st).dias[0], st); mPf = lPf[+kPf[1] || 0] || lPf[0]; } catch (_) { mPf = null; }
+        /* El marcador va directo dentro de la tarjeta de la prueba, sin una segunda caja con borde. */
+        marcPerfil = mPf ? h('div', { class: 'nws-fl__cj-det' }, marcadorHtml(mPf)) : '';
+      }
+      var dato = function (v, l) { return h('div', null, h('b', null, e(v)), h('span', null, e(l))); };
+      b = h('section', { class: 'nws-fl__pv' },
+        h('div', { class: 'nws-fl__pv-cov' }, h('img', { src: 'assets/landing/perfil-portada.jpg', alt: '' }), h('span', { class: 'nws-fl__pv-fase' }, ICO_COPA + (x._fin ? 'Final nacional' : 'Regional'))),
+        h('div', { class: 'nws-fl__pv-t' }, h('span', { class: 'nws-fl__pv-av' }, h('img', { src: 'assets/landing/perfil-foto.jpg', alt: 'Foto de ' + x.nombre })),
+          h('h2', { class: 'nws-fl__pv-n' }, e(x.nombre)), h('p', { class: 'nws-fl__pv-i' }, e(x.institucion))),
+        h('div', { class: 'nws-fl__pv-st' }, dato('01', 'Prueba'), dato(x.deporte, 'Deporte'), dato(sexoP, 'Sexo')),
+        h('div', { class: 'nws-fl__pv-ic' }, h('span', null, bandera, e(x.departamento)), h('button', { type: 'button', 'data-fl-pv-ir': true }, ICO_LISTA + 'Ver pruebas')))
+        + h('div', { class: 'nws-fl__pv-pruebas' }, h('h2', { class: 'nws-fl__pv-h' }, 'Pruebas'), h('p', { class: 'nws-fl__pv-s' }, 'Resultados de sus pruebas en esta fase'))
+        + h('article', { class: 'nws-fl__se' },
+          h('div', { class: 'nws-fl__se-h' },
+            h('span', { class: 'nws-fl__se-tx' }, h('b', null, e(x._prueba ? x._prueba : esAtl && st.prueba ? st.prueba : x._comp ? comp.deporte : comp.prueba)), h('span', { class: 'nws-fl__pv-chips' }, h('span', null, e(sexoP)), h('span', null, e(cat[0]))), h('small', null, (x._fin ? 'Final nacional ' : 'Regional ') + e(x.departamento))),
+            h('span', { class: 'nws-fl__se-der' }, estadoPill(mPf ? mPf.est : 'Finalizado'), h('button', { type: 'button', class: 'nws-fl__se-chev', 'data-fl-se': true, 'aria-expanded': 'true', 'aria-label': 'Mostrar u ocultar la prueba' }, ICO_CHEV))),
+          h('div', { class: 'nws-fl__se-w' }, h('div', { class: 'nws-fl__se-in' }, h('div', { class: 'nws-fl__se-pad' }, h('div', { class: 'nws-fl__se-c' },
+            esAtl ? h('div', { class: 'nws-fl__rf-l' }, filaRes({ nombre: x.nombre, marca: x.marcas[0] }, posX, [x.institucion], true))
+              : marcPerfil)))));
+      return { titulo: t, html: b, sheet: true, sinAviso: true, dev: 'fl-deportista' };
     } else if (id === 'partido') {
       /* «Ver más» de un partido de conjunto: marcador, parciales por periodo y nómina de los dos equipos. */
       var cP = competencia(k), pP = pruebasEq(cP)[+st.prueba || 0], kk = String(st.serie || '').split('|'), lP = partidosEq(cP, pP.i, kk[0] || (agDe(cP, st).dias[0]), st), mP = lP[+kk[1] || 0] || lP[0];
@@ -431,7 +521,7 @@ window.LANDING_FLUJOS = function (S, L) {
         return tarjeta('nws-fl__resultado', h('details', { name: 'jin-resultados' }, h('summary', null, e(r.nombre)), texto(r.categoria + ' · ' + r.ronda + ' · ' + r.fase) + tabla(['Competencia', 'Estado', 'Resultados'], [[r.prueba, r.estado, r.resultado]])));
       }).join('') + texto('Página 1 de 1');
     } else { return null; }
-    return { titulo: t, sub: sub, violeta: violeta, foto: foto, naranja: naranja, barraLogo: barraLogo, pie: pie, sinTitulo: id === 'competencias' || id === 'deporte' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia' || id === 'login' || id === 'perfil' || id === 'inscritos' || id === 'equipo', html: b, zona: zona, zonaLista: zonaLista, resumen: resumen, dev: 'fl-' + id, dialogo: id === 'deportista' || id === 'sedes' };
+    return { titulo: t, sub: sub, violeta: violeta, foto: foto, naranja: naranja, barraLogo: barraLogo, pie: pie, sinTitulo: id === 'competencias' || id === 'deporte' || id === 'competencia' || id === 'sede' || id === 'posiciones' || id === 'noticias' || id === 'noticia' || id === 'login' || id === 'perfil' || id === 'inscritos' || id === 'equipo', html: b, zona: zona, zonaLista: zonaLista, resumen: resumen, eyebrow: eyebrow, dev: 'fl-' + id, dialogo: id === 'sedes' };
   }
   /* Tabla genérica: cada celda es texto o { html } ya armado. */
   function celda(c) { return c && typeof c === 'object' ? c.html : e(String(c)); }
@@ -453,7 +543,7 @@ window.LANDING_FLUJOS = function (S, L) {
   function pruebasDelDia(c, dia, st) {
     var a = agDe(c, st), n = a.dias.indexOf(dia), corte = Math.ceil(a.dias.length / 2), out = [];
     if (n < 0) { return out; }
-    if (c.eventos) { c.eventos.forEach(function (x) { if (x.mitad === 2 || (x.mitad === 0 ? n < corte : n >= corte)) { out.push({ nombre: x.nombre, n: (x.hits || 0) + 1, unidad: 'enfrentamientos' }); } }); return out; }
+    if (c.eventos) { c.eventos.forEach(function (x) { if (x.dia ? x.dia === dia : (x.mitad === 2 || (x.mitad === 0 ? n < corte : n >= corte))) { out.push({ nombre: x.nombre, sub: x.cat, clave: x.clave, n: (x.hits || 0) + 1, unidad: 'enfrentamientos' }); } }); return out; }
     out.push({ nombre: c.prueba + ' ' + c.categoria.replace(' · ', ' '), n: a.cuenta[n], unidad: c.unidad });
     return out;
   }
@@ -473,6 +563,7 @@ window.LANDING_FLUJOS = function (S, L) {
   }
   /* Las dos pruebas de un deporte de conjunto: la categoría de la competencia y su pareja (el otro sexo; si es mixta, la otra edad). */
   function pruebasEq(c) {
+    if (c.cats) { return c.cats.map(function (q, i) { return { i: i, sexo: q[1], edad: q[0], rotulo: q[1] + ' · ' + q[0], titulo: c.deporte + ' - ' + q[0] + ' - ' + q[1] }; }); }
     var p = String(c.categoria).split(' · '), ed = p[0], sx = { 'Masculino': 'Hombre', 'Femenino': 'Mujer', 'Mujer': 'Mujer', 'Hombre': 'Hombre' }[p[1]] || p[1];
     var otra = sx === 'Hombre' ? ['Mujer', ed] : sx === 'Mujer' ? ['Hombre', ed] : [sx, ed === 'Juvenil' ? 'Prejuvenil' : 'Juvenil'];
     return [{ i: 0, sexo: sx, edad: ed }, { i: 1, sexo: otra[0], edad: otra[1] }].map(function (q) { q.rotulo = q.sexo + ' · ' + q.edad; q.titulo = c.deporte + ' - ' + q.edad + ' - ' + q.sexo; return q; });
@@ -499,7 +590,7 @@ window.LANDING_FLUJOS = function (S, L) {
     if (realEq(c, pi, st)) { return partidosReales(c, pi, dia, st); }
     var a = agDe(c, st), n = a.dias.indexOf(dia), out = [], i, tot, mio, ne = F.equipos.length;
     if (n < 0) { return out; }
-    var cuota = function (q) { return pi === 0 ? Math.ceil(q / 2) : Math.floor(q / 2); }, previos = 0;
+    var np = pruebasEq(c).length, cuota = function (q) { return Math.floor(q / np) + (pi < q % np ? 1 : 0); }, previos = 0;
     a.cuenta.slice(0, n).forEach(function (q) { previos += cuota(q); });
     tot = a.cuenta[n]; mio = cuota(tot);
     for (i = 0; i < mio; i++) {
@@ -589,8 +680,9 @@ window.LANDING_FLUJOS = function (S, L) {
   function nominaHtml(c, q, sexo, off) {
     var base = (F.equipos.indexOf(q) >= 0 ? F.equipos.indexOf(q) : q.nombre.length) * 5, fem = sexo === 'Mujer', roles = ROLES_EQ[c.deporte] || ROLES_FUTBOL, i;
     var filas = []; for (i = 0; i < 8; i++) {
-      filas.push(h('div', { class: 'nws-fl__nm-r' }, h('span', { class: 'nws-fl__nm-d' }, 4 + i + (base % 7)),
-        h('span', null, h('b', null, e(NOMBRES_EQ[(fem ? 12 : 0) + ((base + off + i * 5) % 12)])), h('small', null, roles[i % roles.length])), i === 0 ? h('span', { class: 'nws-fl__nm-cap' }, 'Capitán') : '<span></span>'));
+      var nomJ = NOMBRES_EQ[(fem ? 12 : 0) + ((base + off + i * 5) % 12)];
+      filas.push(h('button', { type: 'button', class: 'nws-fl__nm-r', 'data-flujo': 'deportista', 'data-clave': ['j', nomJ, q.nombre, q.departamento, c.id, sexo].join('|'), 'aria-label': 'Ver perfil de ' + nomJ }, h('span', { class: 'nws-fl__nm-d' }, 4 + i + (base % 7)),
+        h('span', null, h('b', null, e(nomJ)), h('small', null, roles[i % roles.length])), i === 0 ? h('span', { class: 'nws-fl__nm-cap' }, 'Capitán') : '<span></span>', h('span', { class: 'nws-fl__rf-perfil', 'aria-hidden': 'true' }, ICO_USR)));
     }
     return h('h3', { class: 'nws-fl__nm-t' }, e(q.nombre)) + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja nws-fl__nm-l' }, filas.join(''));
   }
@@ -598,17 +690,19 @@ window.LANDING_FLUJOS = function (S, L) {
   var ICO_USR = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.8 21c0-4.4 3.6-7 8.2-7s8.2 2.6 8.2 7z"/></svg>';
   var ICO_COPA = '<svg class="nws-fl__ch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>';
   var ICO_ZAP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 16.5v-4.2l3.2-.8 2.3-3.5 2.2 2.4 5.1 1.5c2.6.8 4.2 1.6 4.2 3.6v1z"/><path d="M2.5 16.5h19M10.5 10.3l1.3 1.7M13 11l1.2 1.6"/></svg>';
+  var ICO_LISTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>';
+  var ICO_LISTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>';
   var ICO_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>';
   /* Título de la prueba con categoría y sexo: «100 m planos - Juvenil - Hombre». */
   function tituloPrueba(ev, c) {
-    var p = String(c.categoria || '').split(' · '), sexo = { 'Masculino': 'Hombre', 'Femenino': 'Mujer' }[p[1]] || p[1];
+    var p = String(ev.cat || c.categoria || '').split(' · '), sexo = { 'Masculino': 'Hombre', 'Femenino': 'Mujer' }[p[1]] || p[1];
     return [ev.nombre, p[0], sexo].filter(Boolean).join(' - ');
   }
   function filaRes(f, pos, lineas, conMarca, perfil) {
     return h('div', { class: 'nws-fl__rf' }, h('span', { class: 'nws-fl__rf-p' }, pos),
       h('span', { class: 'nws-fl__rf-n' }, h('b', null, e(f.nombre)), lineas.filter(Boolean).map(function (l) { return h('small', null, e(l)); }).join('')),
       h('span', { class: 'nws-fl__rf-m' }, conMarca ? e(f.marca) : ''),
-      perfil ? h('button', { type: 'button', class: 'nws-fl__rf-perfil', 'data-toast': 'Perfil de ' + f.nombre, 'aria-label': 'Ver perfil de ' + f.nombre }, ICO_USR) : '');
+      perfil ? h('button', { type: 'button', class: 'nws-fl__rf-perfil', 'data-flujo': 'deportista', 'data-clave': typeof perfil === 'string' ? perfil : 'a:' + F.atletas.map(function (n) { return n.nombre; }).indexOf(f.nombre) + ':' + pos + ':' + (f.marca || ''), 'aria-label': 'Ver perfil de ' + f.nombre }, ICO_USR) : '');
   }
   /* Tarjeta de serie: la primera con resultados va abierta; las demás, contraídas con la hora a la izquierda; una serie sin correr no se abre pero conserva «Ver más». */
   function serieTarjeta(q, i, estado, c) {
@@ -617,7 +711,7 @@ window.LANDING_FLUJOS = function (S, L) {
       h('button', { type: 'button', class: 'nws-fl__serie-mas', 'data-flujo': 'serie', 'data-clave': c.id, 'data-serie': q.n }, 'Ver más'));
     return h('article', { class: S.cls('nws-fl__se', !abierta && 'nws-fl__se--c') },
       h('div', { class: 'nws-fl__se-h' },
-        h('div', { class: 'nws-fl__se-hb', 'aria-hidden': 'true' }, h('div', null, ICO_ZAP, h('span', null, e(hora[0]), '<br>', e(hora[1] || '')))),
+        h('div', { class: 'nws-fl__se-hb', 'aria-hidden': 'true' }, h('div', null, h('img', { src: ICONO_DEPORTE[c.deporte] || ICONO_PIN, alt: '' }), h('span', null, e(hora[0]), '<br>', e(hora[1] || '')))),
         h('span', { class: 'nws-fl__se-tx' }, h('b', null, q.fin ? 'Final Directa' : 'Hit ' + q.hit), h('small', null, (q.fin ? '' : 'Ronda Clasificación - ') + q.filas.length + ' competidores')),
         h('span', { class: 'nws-fl__se-der' }, estadoPill(estado), hecho ? h('button', { type: 'button', class: 'nws-fl__se-chev', 'data-fl-se': true, 'aria-expanded': abierta ? 'true' : 'false', 'aria-label': 'Mostrar u ocultar ' + (q.fin ? 'la final directa' : 'el hit ' + q.hit) }, ICO_CHEV) : '')),
       hecho ? h('div', { class: 'nws-fl__se-w' }, h('div', { class: 'nws-fl__se-in' }, h('div', { class: 'nws-fl__se-pad' }, h('div', { class: 'nws-fl__se-c' },
@@ -651,6 +745,128 @@ window.LANDING_FLUJOS = function (S, L) {
     var general = [].concat.apply([], todas.map(function (q) { return q.filas; })).sort(function (p, q) { return dist ? q.v - p.v : p.v - q.v; });
     var vistos = {}; general = general.filter(function (f) { if (vistos[f.nombre]) { return false; } vistos[f.nombre] = 1; return true; });   /* cada deportista una vez, con su mejor marca */
     return { porDia: porDia, todas: todas, general: general, estado: ev.estado || 'Finalizado' };
+  }
+  /* Deportes de combate que se juegan en llaves; las pruebas de kata y poomsae (por puntaje) siguen como final directa. */
+  var LLAVES = { 'Taekwondo': 'elim', 'Boxeo': 'elim', 'Karate Do': 'elim', 'Judo': 'repe', 'Bádminton': 'doble' };
+  function llaveDe(c, ev) { return LLAVES[c.deporte] && !/kata|poomsae/i.test(ev.nombre) ? LLAVES[c.deporte] : null; }
+  /* Cuadro de ocho: cuartos, semifinal y final; con repechaje (judo) los eliminados por cada finalista vuelven por el bronce. Datos de ejemplo deterministas. */
+  function llavesDatos(c, ev) {
+    var pool = F.atletas, sem = 0, i, hecho = ev.estado === 'Finalizado';
+    for (i = 0; i < ev.clave.length; i++) { sem = (sem * 31 + ev.clave.charCodeAt(i)) % 9973; }
+    var gente = []; for (i = 0; i < 8; i++) { gente.push(pool[(sem + i * 3) % pool.length]); }
+    var marcador = { 'Taekwondo': ['2 – 0', '2 – 1'], 'Boxeo': ['3 – 0', '2 – 1'], 'Karate Do': ['5 – 2', '4 – 3'], 'Judo': ['Ippon', 'Waza-ari'], 'Bádminton': ['21 – 15', '21 – 18'] }[c.deporte] || ['2 – 0', '2 – 1'], nj = 0;
+    var jug = function (a, b, ronda) {
+      if (!a || !b) { return { a: a, b: b, ronda: ronda }; }
+      if (!hecho) { return { a: a, b: b, ronda: ronda }; }
+      var gana = ((sem + nj++) % 3 === 0) ? b : a, perd = gana === a ? b : a, m = marcador[(sem + nj) % 2];
+      return { a: a, b: b, g: gana, p: perd, m: m, ronda: ronda };
+    };
+    if (LLAVES[c.deporte] === 'doble') {
+      /* Doble eliminación: solo sale quien pierde dos veces; la final enfrenta al mejor de ganadores con el de perdedores. */
+      var g1 = [jug(gente[0], gente[1], 'Ganadores 1'), jug(gente[2], gente[3], 'Ganadores 1'), jug(gente[4], gente[5], 'Ganadores 1'), jug(gente[6], gente[7], 'Ganadores 1')];
+      var g2a = jug(g1[0].g, g1[1].g, 'Ganadores 2'), g2b = jug(g1[2].g, g1[3].g, 'Ganadores 2'), wf = jug(g2a.g, g2b.g, 'Final de ganadores');
+      var p1a = jug(g1[0].p, g1[1].p, 'Perdedores 1'), p1b = jug(g1[2].p, g1[3].p, 'Perdedores 1'), p2a = jug(p1a.g, g2b.p, 'Perdedores 2'), p2b = jug(p1b.g, g2a.p, 'Perdedores 2');
+      var p3 = jug(p2a.g, p2b.g, 'Perdedores 3'), gf = jug(wf.g, p3.g, 'Gran final');
+      return { doble: true, rondas: [{ t: 'Ganadores 1', p: g1 }, { t: 'Ganadores 2', p: [g2a, g2b] }, { t: 'Final de ganadores', p: [wf] }],
+        extra: [{ t: 'Perdedores 1', p: [p1a, p1b] }, { t: 'Perdedores 2', p: [p2a, p2b] }, { t: 'Perdedores 3', p: [p3] }, { t: 'Gran final', p: [gf] }],
+        general: hecho ? [gf.g, gf.p, p3.p].map(function (a, n) { return { nombre: a.nombre, departamento: a.departamento, marca: n === 0 ? gf.m : '', pos: n + 1 }; }) : [], estado: ev.estado || 'Programado', hecho: hecho };
+    }
+    var q = [jug(gente[0], gente[1], 'Cuartos'), jug(gente[2], gente[3], 'Cuartos'), jug(gente[4], gente[5], 'Cuartos'), jug(gente[6], gente[7], 'Cuartos')];
+    var s1 = jug(q[0].g, q[1].g, 'Semifinal'), s2 = jug(q[2].g, q[3].g, 'Semifinal'), fin = jug(s1.g, s2.g, 'Final'), rondas = [{ t: 'Cuartos', p: q }, { t: 'Semifinal', p: [s1, s2] }, { t: 'Final', p: [fin] }], extra = [];
+    var oro = fin.g, plata = fin.p, bronces;
+    if (LLAVES[c.deporte] === 'repe') {
+      var r1 = jug(q[0].p, q[1].p, 'Repechaje'), r2 = jug(q[2].p, q[3].p, 'Repechaje'), b1 = jug(s1.p, r1.g, 'Bronce'), b2 = jug(s2.p, r2.g, 'Bronce');
+      extra = [{ t: 'Repechaje', p: [r1, r2] }, { t: 'Combates por el bronce', p: [b1, b2] }]; bronces = [b1.g, b2.g];
+    } else { bronces = [s1.p, s2.p]; }
+    var rot = ['Final ' + (fin.m || ''), 'Subcampeón', 'Bronce', 'Bronce'];
+    var general = hecho ? [oro, plata, bronces[0], bronces[1]].map(function (a, n) { return { nombre: a.nombre, departamento: a.departamento, marca: n === 0 ? fin.m : '' }; }) : [];
+    return { rondas: rondas, extra: extra, general: general, estado: ev.estado || 'Programado', hecho: hecho, repe: LLAVES[c.deporte] === 'repe' };
+  }
+  function llavePartido(m) {
+    var fila = function (a, g, s) {
+      return h('span', { class: S.cls('nws-fl__ll-j', g && 'nws-fl__ll-j--g', !a && 'nws-fl__ll-j--por') },
+        h('span', { class: 'nws-fl__ll-n' }, a ? e(a.nombre) : 'Por definir'), a ? h('small', null, e(a.departamento)) : '', h('b', null, s || ''));
+    };
+    return h('div', { class: 'nws-fl__ll-p' }, fila(m.a, m.g && m.g === m.a, m.g ? (m.g === m.a ? m.m : '') : ''), fila(m.b, m.g && m.g === m.b, m.g ? (m.g === m.b ? m.m : '') : ''));
+  }
+  function llaveBloque(rondas) {
+    return h('div', { class: 'nws-fl__ll' }, rondas.map(function (r) {
+      return h('div', { class: 'nws-fl__ll-c' }, h('h3', { class: 'nws-fl__ll-h' }, e(r.t)), h('div', { class: 'nws-fl__ll-ps' }, r.p.map(llavePartido).join('')));
+    }).join(''));
+  }
+  /* Deportes por tabla: ajedrez por rondas, boccia todos contra todos y tenis de mesa con grupos y llaves. */
+  var TABLAS = { 'Ajedrez Integrado': 'rondas', 'Boccia': 'rr', 'Tenis de Mesa': 'grupos' };
+  function tablaDe(c, ev) { return TABLAS[c.deporte] || null; }
+  function semilla(s) { var i, n = 0; for (i = 0; i < s.length; i++) { n = (n * 31 + s.charCodeAt(i)) % 9973; } return n; }
+  /* Todos contra todos por el método del círculo: n-1 jornadas con n/2 partidos. */
+  function jornadas(g) {
+    var a = g.slice(), n = a.length, out = [], r, i;
+    for (r = 0; r < n - 1; r++) { out.push([]); for (i = 0; i < n / 2; i++) { out[r].push([a[i], a[n - 1 - i]]); } a.splice(1, 0, a.pop()); }
+    return out;
+  }
+  /* Datos de ejemplo deterministas: jornadas con resultado, tabla de posiciones y, en tenis de mesa, el cuadro de semifinal y final. */
+  function tablaDatos(c, ev) {
+    var tipo = tablaDe(c, ev), pool = F.atletas, sem = semilla(ev.clave), hecho = ev.estado === 'Finalizado', n = tipo === 'rr' ? 6 : 8, gente = [], i, k = 0;
+    for (i = 0; i < n; i++) { gente.push(pool[(sem + i * 3) % pool.length]); }
+    var punt = { 'rondas': ['1 – 0', '½ – ½', '0 – 1'], 'rr': ['4 – 2', '3 – 3', '1 – 5'], 'grupos': ['3 – 1', '3 – 2', '1 – 3'] }[tipo];
+    var ptsG = tipo === 'rondas' ? [1, 0.5, 0] : [2, 0, 0], ptsP = tipo === 'rondas' ? [0, 0.5, 1] : [0, 0, 2];
+    var tot = {}; gente.forEach(function (a) { tot[a.nombre] = { a: a, pj: 0, pg: 0, pts: 0 }; });
+    var jugar = function (a, b) {
+      if (!hecho) { return { a: a, b: b }; }
+      var w = (sem + k++) % 5, r = tipo === 'rondas' ? (w === 0 ? 1 : w < 3 ? 0 : 2) : (w === 0 && tipo === 'rr' ? 1 : w < 3 ? 0 : 2);
+      if (tipo === 'grupos' && r === 1) { r = 0; }
+      tot[a.nombre].pj++; tot[b.nombre].pj++; tot[a.nombre].pts += ptsG[r]; tot[b.nombre].pts += ptsP[r];
+      if (r === 0) { tot[a.nombre].pg++; } else if (r === 2) { tot[b.nombre].pg++; }
+      return { a: a, b: b, m: punt[r], g: r === 0 ? a : r === 2 ? b : null };
+    };
+    var grupos = tipo === 'grupos' ? [gente.slice(0, 4), gente.slice(4)] : [gente];
+    var rondas = [];
+    grupos.forEach(function (g, gi) { jornadas(g).forEach(function (j, ji) { rondas.push({ t: (tipo === 'grupos' ? 'Grupo ' + 'AB'[gi] + ' · ' : '') + (tipo === 'rondas' ? 'Ronda ' : 'Jornada ') + (ji + 1), p: j.map(function (q) { return jugar(q[0], q[1]); }) }); }); });
+    var orden = function (g) { return g.map(function (a) { return tot[a.nombre]; }).sort(function (x, y) { return y.pts - x.pts || y.pg - x.pg || gente.indexOf(x.a) - gente.indexOf(y.a); }); };
+    var tablas = grupos.map(function (g, gi) { return { t: tipo === 'grupos' ? 'Grupo ' + 'AB'[gi] : '', f: hecho ? orden(g) : [] }; });
+    var general = [], cuadro = null;
+    var fmt = function (x) { return String(x).replace('.', ','); };
+    if (tipo === 'grupos' && hecho) {
+      var A = tablas[0].f, B = tablas[1].f, jf = function (a, b, ronda) { var w = (sem + k++) % 3 === 0 ? b : a; return { a: a, b: b, g: w, p: w === a ? b : a, m: (sem + k) % 2 ? '3 – 1' : '3 – 0', ronda: ronda }; };
+      var s1 = jf(A[0].a, B[1].a, 'Semifinal'), s2 = jf(B[0].a, A[1].a, 'Semifinal'), fi = jf(s1.g, s2.g, 'Final');
+      cuadro = [{ t: 'Semifinal', p: [s1, s2] }, { t: 'Final', p: [fi] }];
+      general = [fi.g, fi.p, s1.p, s2.p].map(function (a, q) { return { nombre: a.nombre, departamento: a.departamento, marca: q === 0 ? fi.m : '', pos: q < 3 ? q + 1 : 3 }; });
+    } else if (hecho) {
+      general = orden(gente).map(function (x, q) { return { nombre: x.a.nombre, departamento: x.a.departamento, marca: fmt(x.pts) + ' pts', pos: q + 1 }; });
+    }
+    return { tipo: tipo, rondas: rondas, tablas: tablas, cuadro: cuadro, general: general, hecho: hecho, estado: ev.estado || 'Programado', fmt: fmt };
+  }
+  function partidoLinea(q) {
+    return h('div', { class: 'nws-fl__ms' }, h('span', { class: 'nws-fl__ms-c' },
+      h('span', { class: S.cls('nws-fl__ms-a', q.g === q.a && 'nws-fl__ms-g') }, e(q.a.nombre)), h('span', { class: S.cls('nws-fl__ms-b', q.g === q.b && 'nws-fl__ms-g') }, 'vs ' + e(q.b.nombre))),
+      h('span', { class: 'nws-fl__ms-r' }, q.m ? e(q.m) : 'Programado'));
+  }
+  /* Medallero: el podio con los tres ganadores y, debajo, la tabla con todas las posiciones. */
+  /* Clave del perfil abierto desde un medallero: p|nombre|institución|departamento|deporte|sexo y edad|posición|marca|prueba|fase. */
+  function sexoPerfil(cat) { var s = String(cat).split(' · '); return s[0] + ' · ' + ({ 'Hombre': 'Masculino', 'Mujer': 'Femenino' }[s[1]] || s[1]); }
+  function claveMed(a, pos, ctx, fin) {
+    var at = F.atletas.filter(function (q) { return q.nombre === a.nombre; })[0] || {};
+    return ['p', a.nombre, a.institucion || at.institucion || '', a.departamento, ctx.deporte, sexoPerfil(ctx.cat), pos, a.marca || '', ctx.prueba, fin ? '1' : '0'].join('|');
+  }
+  function medalleroHtml(gen, fin, estado, ctx) {
+    var tit = fin ? 'Medallero' : 'Resultados';
+    var pd = function (n) {
+      var a = gen[n - 1];
+      return h(ctx ? 'button' : 'div', Object.assign({ class: 'nws-fl__pd nws-fl__pd--' + n }, ctx ? { type: 'button', 'data-flujo': 'deportista', 'data-clave': claveMed(a, n, ctx, fin), 'aria-label': 'Ver perfil de ' + a.nombre } : {}),
+        fin ? h('span', { class: 'nws-fl__pd-av nws-fl__pd-av--med' }, h('img', { class: 'nws-fl__pd-m', src: MEDALLA[n], alt: ['Oro', 'Plata', 'Bronce'][n - 1] })) : h('span', { class: 'nws-fl__pd-av' }, h('i', null, ICO_USR), h('span', { class: 'nws-fl__pd-m' }, n)),
+        h('b', null, e(a.nombre)), h('small', null, e(a.departamento)), a.marca ? h('span', { class: 'nws-fl__pd-v' }, e(a.marca)) : '');
+    };
+    return h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, tit), estadoPill(estado))
+      + h('div', { class: 'nws-fl__pdio', role: 'group', 'aria-label': tit }, pd(2) + pd(1) + pd(3))
+      + h('h2', { class: 'nws-fl__explora' }, 'Posiciones')
+      + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja' }, gen.map(function (a, i) { return filaRes(a, a.pos || i + 1, [a.departamento], true, ctx ? claveMed(a, a.pos || i + 1, ctx, fin) : false); }).join(''));
+  }
+  /* Pestañas de una prueba: la última es el medallero (o «Resultados» en la regional) y solo aparece con la prueba finalizada. */
+  function fichasPrueba(nombres, i, hecho, trofeo) {
+    if (!hecho) { return ''; }
+    return h('div', { class: 'nws-fl__tabs nws-fl__ch', role: 'group', 'aria-label': 'Ver' }, nombres.map(function (nm, q) {
+      return h('button', { type: 'button', class: S.cls('nws-fl__ch-b', i === q && 'nws-fl__ch-b--on'), 'data-tab': String(q), 'aria-pressed': i === q ? 'true' : 'false' }, q === nombres.length - 1 && trofeo && nm !== 'Medallero' ? ICO_COPA : '', nm);
+    }).join(''));
   }
   function fechaCorta(iso) { var d = new Date(iso + 'T12:00:00'); return DOWL[d.getDay()].slice(0, 3) + ', ' + d.getDate() + ' de ' + MESS[d.getMonth()]; }
   function horaMas(s, n) {
@@ -717,9 +933,20 @@ window.LANDING_FLUJOS = function (S, L) {
   var PINCHIP = '<svg class="nws-fl__chip-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="11" r="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
   var FLECHA_GRUPO = '<svg class="nws-fl__grupo-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ICONO_BARRAS = '<svg class="nws-fl__leyenda-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
-  var ICONO_DEPORTE = { 'Baloncesto': 'assets/landing/icons/baloncesto.svg', 'Baloncesto 3x3': 'assets/landing/icons/baloncesto.svg', 'Fútbol': 'assets/landing/icons/futbol-salon.svg', 'Fútbol sala': 'assets/landing/icons/futbol-salon.svg', 'Voleibol': 'assets/landing/icons/voleibol.svg', 'Atletismo': 'assets/landing/icons/atletismo.svg', 'Fútbol de Salón': 'assets/landing/icons/futbol-salon.svg' };
-  var TINTE = { 'Atletismo': 'atl', 'Baloncesto': 'bal', 'Baloncesto 3x3': 'bal', 'Fútbol': 'fut', 'Fútbol sala': 'fut', 'Fútbol de Salón': 'fut', 'Voleibol': 'vol' };
-  var ICONO_PIN = 'assets/landing/icons/pin.svg';
+  /* Íconos de deportes: los de la landing pública (juegosintercolegiados.com.co/images/svgs), en el naranja de la app; sin ícono propio, el genérico. */
+  var ICONO_DEPORTE = { 'Atletismo': 'assets/landing/icons/atletismo.svg', 'Para Atletismo': 'assets/landing/icons/atletismo.svg', 'Baloncesto': 'assets/landing/icons/baloncesto.svg', 'Baloncesto 3x3': 'assets/landing/icons/baloncesto-x3.svg', 'Fútbol': 'assets/landing/icons/futbol.svg', 'Fútbol sala': 'assets/landing/icons/futbol-sala.svg', 'Fútbol de Salón': 'assets/landing/icons/futbol-sala.svg', 'Voleibol': 'assets/landing/icons/voleibol.svg', 'Ajedrez Integrado': 'assets/landing/icons/ajedrez.svg', 'Bádminton': 'assets/landing/icons/badminton.svg', 'Balonmano': 'assets/landing/icons/balonmano.svg', 'Boccia': 'assets/landing/icons/boccia.svg', 'Boxeo': 'assets/landing/icons/boxeo.svg', 'Ciclismo Ruta': 'assets/landing/icons/ciclismo.svg', 'Judo': 'assets/landing/icons/judo.svg', 'Karate Do': 'assets/landing/icons/karate.svg', 'Levantamiento de pesas': 'assets/landing/icons/pesas.svg', 'Natación': 'assets/landing/icons/natacion.svg', 'Para Natación': 'assets/landing/icons/natacion.svg', 'Patinaje': 'assets/landing/icons/patinaje.svg', 'Taekwondo': 'assets/landing/icons/taekwondo.svg', 'Tenis de Mesa': 'assets/landing/icons/tenis-de-mesa.svg' };
+  var TINTE = { 'Atletismo': 'atl', 'Para Atletismo': 'atl', 'Baloncesto': 'bal', 'Baloncesto 3x3': 'bal', 'Fútbol': 'fut', 'Fútbol sala': 'fut', 'Fútbol de Salón': 'fut', 'Voleibol': 'vol' };
+  /* Medallas del SDK (nwt-award, edición Colombia) para el podio de Resultados. */
+  var MEDALLA = { 1: 'assets/landing/icons/medalla-oro-anim.svg', 2: 'assets/landing/icons/medalla-plata-anim.svg', 3: 'assets/landing/icons/medalla-bronce-anim.svg' };
+  /* Sistema de competencia por deporte individual: fases en orden y nombre de la primera pestaña de la prueba. */
+  var SISTEMA = {
+    'Natación': { fases: 'Ronda de clasificación → Final directa', serie: 'Series' }, 'Para Natación': { fases: 'Ronda de clasificación → Final directa', serie: 'Series' },
+    'Atletismo': { fases: 'Ronda de clasificación → Final directa', serie: 'Series' }, 'Para Atletismo': { fases: 'Ronda de clasificación → Final directa', serie: 'Series' },
+    'Patinaje': { fases: 'Ronda de clasificación → Final directa', serie: 'Series' },
+    'Levantamiento de pesas': { fases: 'Final directa', serie: 'Final' }, 'Ciclismo Ruta': { fases: 'Final directa', serie: 'Final' }
+  };
+  function sistemaDe(dep) { return SISTEMA[dep] || { fases: 'Final directa', serie: 'Enfrentamientos' }; }
+  var ICONO_PIN = 'assets/landing/icons/deporte-generico.svg';
   var PERSONA = '<svg class="nws-fl__persona" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   function capital(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
   var IZQ = '<svg class="nws-fl__mes-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -737,8 +964,8 @@ window.LANDING_FLUJOS = function (S, L) {
   var DOWL = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
   function isoDe(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   /* Género y edad salen del texto de la categoría («Juvenil · Femenino»). */
-  function generoOk(c, g) { if (!g || g === 'Todos') { return true; } return g === 'Hombre' ? /Masculino|Hombre/.test(c.categoria) : g === 'Mujer' ? /Femenino|Mujer/.test(c.categoria) : /Mixto/.test(c.categoria); }
-  function edadOk(c, v) { return !v || v === 'Todas' || c.categoria.indexOf(v) >= 0; }
+  function generoOk(c, g) { if (!g || g === 'Todos') { return true; } if (c.cats) { return c.cats.some(function (q) { return q[1] === g; }); } return g === 'Hombre' ? /Masculino|Hombre/.test(c.categoria) : g === 'Mujer' ? /Femenino|Mujer/.test(c.categoria) : /Mixto/.test(c.categoria); }
+  function edadOk(c, v) { return !v || v === 'Todas' || (c.cats ? c.cats.some(function (q) { return q[0] === v; }) : c.categoria.indexOf(v) >= 0); }
   function filtradas(st, k) { return F.competencias.filter(function (c) { return deRegional(c, k) && (unDeporte(k) || !st.sel || !st.sel.length || st.sel.indexOf(c.deporte) >= 0) && generoOk(c, st.genero) && edadOk(c, st.edad); }); }
   /* Filas del calendario: una por deporte; si la regional tiene un solo deporte (atletismo), una por prueba.
      `mitad` dice en qué mitad de los días de la regional se corre la prueba. */
@@ -752,7 +979,7 @@ window.LANDING_FLUJOS = function (S, L) {
       var corte = Math.ceil(ag.dias.length / 2);
       c.eventos.forEach(function (x) {
         if (st.sel && st.sel.length && st.sel.indexOf(x.nombre) < 0) { return; }
-        var dias = ag.dias.filter(function (_, i) { return x.mitad === 2 || (x.mitad === 0 ? i < corte : i >= corte); });
+        var dias = diasDeEv(x, ag.dias);
         out.push(Object.assign({}, c, { deporte: x.nombre, dep: c.deporte, _ag: { dias: dias, cuenta: dias.map(function () { return (x.hits || 0) + 1; }) } }));
       });
     });
@@ -832,7 +1059,8 @@ window.LANDING_FLUJOS = function (S, L) {
     /* Doce días desde la víspera del inicio: el día de inicio y el final quedan a la vista sin desplazar. */
     var d0 = new Date(ini + 'T12:00:00'), cols = [], i;
     d0.setDate(d0.getDate() - 1);
-    for (i = 0; i < 12; i++) { var d = new Date(d0.getTime()); d.setDate(d0.getDate() + i); cols.push(d); }
+    var nCols = Math.max(12, Math.round((new Date(fin + 'T12:00:00') - d0) / 864e5) + 2);
+    for (i = 0; i < nCols; i++) { var d = new Date(d0.getTime()); d.setDate(d0.getDate() + i); cols.push(d); }
     var cab = h('div', { class: 'nws-fl__cal-c0 nws-fl__cal-esq' }, h('span', null, unDeporte(k) ? 'Pruebas' : 'Deportes'), h('button', { type: 'button', class: 'nws-fl__cal-min', 'data-fl-min': true, 'aria-expanded': st.min ? 'false' : 'true', 'aria-label': st.min ? 'Mostrar nombres de deportes' : 'Ocultar nombres de deportes' }, IZQ)) + cols.map(function (d) {
       var iso = isoDe(d), con = deportesDe(iso).length > 0, esSel = con && iso === sel, enRango = con || (iso > ini && iso < fin);
       var clases = S.cls('nws-fl__cal-hd', !enRango && 'nws-fl__cal-hd--vacio', enRango && 'nws-fl__cal-hd--rango', iso === ini && 'nws-fl__cal-hd--ini', iso === fin && iso !== ini && 'nws-fl__cal-hd--fin', esSel && 'nws-fl__cal-col--sel nws-fl__cal-col--ini');
@@ -841,7 +1069,7 @@ window.LANDING_FLUJOS = function (S, L) {
     }).join('');
     var filas = lista.map(function (c, r) {
       var ag = c._ag, total = ag.cuenta.reduce(function (a, n) { return a + n; }, 0), ultima = r === lista.length - 1;
-      return h('div', { class: S.cls('nws-fl__cal-c0 nws-fl__cal-lab', r === 0 && 'nws-fl__cal-lab--p') }, h('img', { src: ICONO_DEPORTE[c.dep] || ICONO_PIN, alt: c.deporte }), h('b', { title: rangoFechas(ag.dias) + ' · ' + (ag.pruebas ? ag.pruebas + (ag.pruebas === 1 ? ' prueba' : ' pruebas') : total + ' ' + c.unidad) }, e(c.deporte)))
+      return h('div', { class: S.cls('nws-fl__cal-c0 nws-fl__cal-lab', r === 0 && 'nws-fl__cal-lab--p') }, h('img', { src: ICONO_DEPORTE[c.dep] || ICONO_PIN, alt: c.deporte }), h('b', { class: Math.max.apply(null, String(c.deporte).split(' ').map(function (w) { return w.length; })) >= 11 ? 'nws-fl__cal-lab-largo' : '', title: rangoFechas(ag.dias) + ' · ' + (ag.pruebas ? ag.pruebas + (ag.pruebas === 1 ? ' prueba' : ' pruebas') : total + ' ' + c.unidad) }, e(c.deporte)))
         + cols.map(function (d) {
           var iso = isoDe(d), n = ag.dias.indexOf(iso), esSel = iso === sel && deportesDe(iso).length > 0;
           var clases = S.cls('nws-fl__cal-ce', esSel && 'nws-fl__cal-col--sel', esSel && ultima && 'nws-fl__cal-col--fin');
