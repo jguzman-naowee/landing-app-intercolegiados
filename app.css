@@ -2521,7 +2521,7 @@ button.nws-fl__insc-fila--btn { width: 100%; text-align: left; border: 0; border
 .nws-fl__se-h { display: flex; align-items: center; padding: 14px; }
 .nws-fl__se-hb { flex: none; width: 0; height: 0; margin-right: 0; opacity: 0; overflow: hidden; transition: height .6s cubic-bezier(.4, 0, .2, 1), width .6s cubic-bezier(.4, 0, .2, 1), margin .6s cubic-bezier(.4, 0, .2, 1), opacity .45s ease; }
 .nws-fl__se-hb > div { width: 60px; height: 72px; border-radius: 14px; background: #ffedc7; color: #d74009; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; font-size: 14px; line-height: 16px; font-weight: 700; }
-.nws-fl__se-hb svg { width: 22px; height: 22px; }
+.nws-fl__se-hb svg, .nws-fl__se-hb img { width: 22px; height: 22px; }
 .nws-fl__se--c .nws-fl__se-hb { width: 60px; height: 72px; margin-right: 12px; opacity: 1; transition-delay: 0s, 0s, 0s, .12s; }
 .nws-fl__se-tx { flex: 1; min-width: 0; display: grid; gap: 2px; }
 .nws-fl__se-tx b { font-size: 17px; line-height: 22px; }
@@ -2633,7 +2633,9 @@ button.nws-fl__insc-fila--btn { width: 100%; text-align: left; border: 0; border
 .nws-fl__top--prueba .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-sub { overflow: hidden; }
 .nws-fl__top--prueba .nws-fl__top-t { transform-origin: 0 0; }
 .nws-fl__top-mini { flex: 1; min-width: 0; margin-left: 12px; font-size: 17px; line-height: 22px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; pointer-events: none; }
-.nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__contenido { box-sizing: border-box; min-height: calc(100% + 120px); }
+.nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__contenido { box-sizing: border-box; }
+/* Solo hay margen extra para plegar la cabecera cuando el contenido ya necesita scroll. */
+.nws-fl--colapsa .nws-fl__top--prueba ~ .nws-lpvw__scroll .nws-fl__contenido { min-height: calc(100% + 120px); }
 .nws-fl__top--prueba .nws-fl__top-eb, .nws-fl__top--prueba .nws-fl__top-t, .nws-fl__top--prueba .nws-fl__top-sub, .nws-fl__top-mini { transition: none !important; }
 /* El título pequeño mide lo mismo que «Serie 1» (17 px dentro del zoom 1.1444) y su mismo grosor. */
 .nws-fl__top-mini { font-size: calc(17px * 1.1444); line-height: calc(23.8px * 1.1444); font-weight: 700; }
@@ -2726,3 +2728,137 @@ button.nws-fl__insc-fila--btn { width: 100%; text-align: left; border: 0; border
 .nws-fl__cp-caja { background: #f6f5fb; border: 1px solid #ebe8f3; border-radius: 14px; padding: 10px 12px; display: grid; gap: 6px; }
 .nws-fl__cp-tit { font-size: 12px; line-height: 16px; font-weight: 700; color: var(--nws-jic-violeta-900); }
 .nws-fl__cp-caja .nws-fl__cp-par { justify-content: flex-start; padding-top: 0; }
+
+/* Perfil del deportista como hoja emergente (versión «overlay»): sube sobre la vista de origen, se expande o cierra arrastrando el borde. */
+.nws-lpvw.nws-fl--sheet { transform: none; box-shadow: none; background: transparent; visibility: hidden; transition: background 440ms ease, visibility 0s 440ms; }
+.nws-lpvw.nws-fl--sheet.nws-lpvw--abierta { background: rgb(40 18 59 / .5); visibility: visible; transition: background 440ms ease; }
+.nws-fl--sheet .nws-lpvw__estado { display: none; }
+.nws-fl--sheet .nws-lpvw__bloque { inset: auto 0 0 0; height: 88%; background: #fff; border-radius: 28px 28px 0 0; overflow: hidden; transform: translateY(100%); transition: transform 440ms cubic-bezier(.32, .72, 0, 1), height 440ms cubic-bezier(.32, .72, 0, 1), border-radius 440ms; box-shadow: 0 -8px 30px rgb(40 18 59 / .25); }
+.nws-fl--sheet.nws-lpvw--abierta .nws-lpvw__bloque { transform: none; }
+.nws-fl--sheet.nws-fl--ex .nws-lpvw__bloque { height: 100%; border-radius: 0; }
+.nws-fl--sheet.nws-fl--arr .nws-lpvw__bloque { transition: none; }
+.nws-fl__sheet-top { flex: none; position: relative; display: grid; place-items: center; height: 56px; touch-action: none; cursor: grab; user-select: none; }
+.nws-fl--sheet.nws-fl--ex .nws-fl__sheet-top { height: 64px; }
+.nws-fl__sheet-asa { width: 40px; height: 5px; padding: 0; border: 0; border-block: 12px solid transparent; border-radius: 3px; background: #cfcce0 content-box; box-sizing: content-box; background-clip: content-box; cursor: inherit; }
+.nws-fl__sheet-top .nws-fl__modal-x { position: absolute; right: 12px; top: 8px; }
+.nws-fl--sheet.nws-fl--ex .nws-fl__sheet-top .nws-fl__modal-x { top: 14px; right: 16px; }
+.nws-fl--sheet .nws-fl__contenido { padding: 0 16px 32px; }
+@media (prefers-reduced-motion: reduce) { .nws-lpvw.nws-fl--sheet, .nws-fl--sheet .nws-lpvw__bloque { transition: none !important; } }
+.nws-fl__pv { overflow: hidden; border: 1px solid #e6e3f0; border-radius: 28px; background: #fff; }
+.nws-fl__pv-cov { position: relative; height: 112px; margin: 8px 8px 0; border-radius: 22px; overflow: hidden; background: #7f2486; }
+.nws-fl__pv-cov img { width: 100%; height: 100%; object-fit: cover; object-position: left center; display: block; }
+.nws-fl__pv-fase { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 999px; background: #fff; color: #000; font-size: 14px; font-weight: 700; box-shadow: 0 2px 8px rgb(40 18 59 / .12); }
+.nws-fl__pv-fase svg { width: 18px; height: 18px; color: #000; }
+.nws-fl__pv-t { padding: 0 18px 16px; text-align: center; }
+.nws-fl__pv-av { display: block; width: 96px; height: 96px; margin: -48px auto 0; position: relative; border: 4px solid #d3d1de; border-radius: 50%; background: #efedf4; overflow: hidden; }
+.nws-fl__pv-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nws-fl__contenido .nws-fl__pv-n { margin: 12px 0 0; font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -.01em; color: #28123b; }
+.nws-fl__pv-i { margin: 4px 0 0; font-size: 14px; line-height: 18px; font-weight: 500; color: #646587; }
+.nws-fl__pv-st { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 14px; border: 1px solid #ebe8f3; border-radius: 20px; background: #f6f5fb; text-align: center; }
+.nws-fl__pv-st > div { display: grid; gap: 2px; padding: 14px 6px; }
+.nws-fl__pv-st b { font-size: 20px; line-height: 26px; font-weight: 700; color: #28123b; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.nws-fl__pv-st span { font-size: 13px; line-height: 17px; color: #646587; }
+.nws-fl__pv-ic { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 14px 8px; }
+.nws-fl__pv-ic > * { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 10px; border: 1px solid #e3e0ee; border-radius: 999px; background: #fff; color: #3c3f66; font: 600 11.5px Inter, system-ui, sans-serif; white-space: nowrap; }
+.nws-fl__pv-ic button { cursor: pointer; }
+.nws-fl__pv-ic svg { width: 18px; height: 18px; color: #691886; }
+.nws-fl__pv-flag { display: inline-block; flex: none; width: 24px; height: 17px; border: 1px solid #d9d6e4; border-radius: 4px; }
+.nws-fl__pv-pruebas { margin: 20px 0 10px; }
+.nws-fl__contenido .nws-fl__pv-h { margin: 0 0 2px; font-size: 20px; line-height: 26px; font-weight: 700; color: #28123b; }
+.nws-fl__pv-s { margin: 0; font-size: 13px; line-height: 18px; color: #8d8ca6; }
+.nws-fl__pv-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.nws-fl__pv-chips span { padding: 2px 10px; border: 1px solid #e3e0ee; border-radius: 999px; font-size: 12px; line-height: 18px; color: #3c3f66; }
+
+/* Nómina del partido: cada jugador abre su perfil. */
+button.nws-fl__nm-r { grid-template-columns: 28px minmax(0, 1fr) auto 36px; width: 100%; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.nws-fl__nm-l button.nws-fl__nm-r:nth-child(even) { background: #f6f5fb; }
+button.nws-fl__nm-r .nws-fl__rf-perfil { cursor: inherit; }
+
+/* Franja de días con flechas: los días pasan por debajo de las flechas y se difuminan en los bordes (efecto vidrio). */
+.nws-fl__dp--nav { position: relative; }
+.nws-fl__dp--nav .nws-fl__dp-nav { position: relative; z-index: 2; border: 1px solid rgb(255 255 255 / .22); background: rgb(255 255 255 / .14); -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3); }
+.nws-fl__dp--nav .nws-fl__dp-pil { z-index: 1; margin-inline: -30px; padding-inline: 30px; scroll-padding-inline: 44px; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%); mask-image: linear-gradient(to right, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%); }
+
+/* Flechas de la franja de días: al presionar se hunden con un rebote suave y se aclara el vidrio; al soltar vuelven con un resorte corto. */
+.nws-fl__dp--nav .nws-fl__dp-nav { transition: transform 420ms cubic-bezier(.34, 1.56, .64, 1), background-color 220ms ease, opacity 220ms ease; -webkit-tap-highlight-color: transparent; }
+.nws-fl__dp--nav .nws-fl__dp-nav:not(:disabled):active { transform: scale(.86); background-color: rgb(255 255 255 / .3); transition-duration: 110ms, 110ms, 220ms; transition-timing-function: cubic-bezier(.33, .1, .2, 1), ease, ease; }
+@media (hover: hover) { .nws-fl__dp--nav .nws-fl__dp-nav:not(:disabled):hover { background-color: rgb(255 255 255 / .22); } }
+@media (prefers-reduced-motion: reduce) { .nws-fl__dp--nav .nws-fl__dp-nav, .nws-fl__dp--nav .nws-fl__dp-nav:not(:disabled):active { transition: none; transform: none; } }
+
+/* Podio de Resultados: la medalla del SDK reemplaza la insignia con el número. */
+.nws-fl__pd-av img.nws-fl__pd-m { width: 46px; height: auto; background: none; border-radius: 0; bottom: -40px; }
+.nws-fl__pd--1 .nws-fl__pd-av img.nws-fl__pd-m { width: 58px; bottom: -48px; }
+
+/* Cuadro de eliminación (llaves): columnas por ronda con scroll horizontal, partido de dos filas, ganador resaltado. */
+.nws-fl__ll { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 12px; margin: 0 -2px; scroll-snap-type: x proximity; }
+.nws-fl__ll-c { flex: 0 0 76%; max-width: 280px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 8px; }
+.nws-fl__ll-h { margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #646587; }
+.nws-fl__ll-ps { display: flex; flex-direction: column; justify-content: space-around; gap: 10px; flex: 1; }
+.nws-fl__ll-p { border: 1px solid #d6d3e0; border-radius: 14px; background: #fff; overflow: hidden; }
+.nws-fl__ll-j { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; align-items: center; padding: 8px 12px; font-size: 14px; line-height: 18px; color: #1d1b30; }
+.nws-fl__ll-j + .nws-fl__ll-j { border-top: 1px solid #ebe9f2; }
+.nws-fl__ll-j small { grid-column: 1; font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__ll-j b { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 13px; font-weight: 700; color: #b8340a; font-variant-numeric: tabular-nums; }
+.nws-fl__ll-n { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nws-fl__ll-j--g { background: #ffedc7; }
+.nws-fl__ll-j--g .nws-fl__ll-n { font-weight: 700; }
+.nws-fl__ll-j--por .nws-fl__ll-n { color: #9b9aae; font-weight: 400; }
+.nws-fl__ll-nota { margin: 4px 0 0; font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__ll-b { display: flex; align-items: center; gap: 12px; padding: 10px 14px; }
+.nws-fl__ll-b img { width: 28px; height: auto; flex: 0 0 auto; }
+.nws-fl__ll-bn { width: 28px; height: 28px; border-radius: 50%; background: #efe8f7; color: #5a2a85; display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: 0 0 auto; }
+.nws-fl__ll-b b { display: block; font-size: 14px; font-weight: 500; }
+.nws-fl__ll-b small { display: block; font-size: 12px; color: #646587; }
+
+/* Partidos de una ronda o jornada (ajedrez, boccia, grupos): dos nombres y el marcador a la derecha. */
+.nws-fl__mesa-h { margin: 14px 0 6px; }
+.nws-fl__ms { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 14px; margin-bottom: 8px; border: 1px solid #d6d3e0; border-radius: 14px; background: #fff; }
+.nws-fl__ms-c { display: flex; flex-direction: column; min-width: 0; }
+.nws-fl__ms-a, .nws-fl__ms-b { font-size: 14px; line-height: 18px; color: #1d1b30; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nws-fl__ms-b { font-size: 12px; line-height: 16px; color: #646587; }
+.nws-fl__ms-g { font-weight: 700; color: #5a2a85; }
+.nws-fl__ms-r { font-size: 13px; font-weight: 700; color: #5a2a85; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Foto de la fase final: mismo zoom lento de entrada y salida que el atleta del inicio (nws-lpfx-zoom). */
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto img { transform-origin: 50% 60%; animation: nws-lpfx-zoom 10s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .nws-lpvw__reg-lista--una .nws-lpvw__reg-foto img { animation: none; } }
+
+/* Nombre de deporte con una palabra larga (Levantamiento): letra menor para que quepa en la columna fija sin salirse. */
+.nws-fl__cal-lab b { overflow-wrap: anywhere; }
+.nws-fl__cal-lab b.nws-fl__cal-lab-largo { font-size: 11px; line-height: 14px; }
+
+/* Medallero de la fase final: solo las medallas (sin foto), como en la landing; el primero más grande. */
+.nws-fl__pd-av--med { margin-bottom: 8px; border-radius: 0; }
+.nws-fl__pd-av--med::before { display: none; }
+.nws-fl__pd-av--med img.nws-fl__pd-m { position: static; transform: none; display: block; width: 76px; height: auto; border-radius: 0; background: none; }
+.nws-fl__pd--1 .nws-fl__pd-av--med { width: auto; height: auto; }
+.nws-fl__pd--1 .nws-fl__pd-av--med img.nws-fl__pd-m { width: 104px; }
+.nws-fl__pd--2:has(.nws-fl__pd-av--med) { padding-top: 22px; } .nws-fl__pd--3:has(.nws-fl__pd-av--med) { padding-top: 34px; }
+
+/* Tarjeta con capas (fase final de conjuntos): una escena con la proporción del diseño (2487×2749) que cubre la tarjeta, alineada a la derecha.
+   Fondo y personajes ocupan toda la escena; el círculo y los aros van por porcentaje y pueden salirse sin cortarse. */
+.nws-lpvw__reg-foto--capas { background: #5a2a85; container-type: size; }
+.nws-lpvw__escena { position: absolute; display: block; width: max(100cqw, 100cqh * 0.9046); height: max(100cqh, 100cqw / 0.9046); top: 0; left: calc((100cqw - max(100cqw, 100cqh * 0.9046)) * .8); }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__capa { position: absolute; inset: auto; width: 100%; height: 100%; object-fit: fill; animation: none; transform: none; will-change: transform; pointer-events: none; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__capa--fondo { left: 0; top: 0; animation: nws-lpfx-zoom 14s ease-in-out infinite; transform-origin: 50% 50%; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--conj .nws-lpvw__capa--circulo { left: 4.38%; top: 58.06%; width: 58.14%; height: auto; aspect-ratio: 1; animation: nws-lpvw-forma-izq 9s ease-in-out infinite; transform-origin: 50% 50%; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__capa--aros { height: auto; aspect-ratio: 1; width: 43.43%; animation: nws-lpvw-crece 6s ease-in-out infinite; transform-origin: 50% 50%; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--conj .nws-lpvw__capa--aros { left: 66.03%; top: 33.61%; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--nat .nws-lpvw__capa--aros { left: 48.7%; top: 25.8%; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__capa--personajes { left: 0; top: 0; animation: nws-lpfx-zoom 10s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes nws-lpvw-forma-izq { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(8px, -10px, 0) scale(1.07); } }
+/* Los aros no giran: crecen y vuelven a su tamaño desde su centro. */
+@keyframes nws-lpvw-crece { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+@media (prefers-reduced-motion: reduce) { .nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__capa { animation: none; } }
+
+/* En el medallero el podio es un botón que abre el perfil: se quita el aspecto de botón. */
+button.nws-fl__pd { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button.nws-fl__pd:focus-visible { outline: 2px solid #5a2a85; outline-offset: 4px; border-radius: 16px; }
+
+/* Escena de individuales (natación): fondo de piscina, aros, cinta de carril y nadadora; la nadadora hace zoom como el atleta del inicio. */
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--nat .nws-lpvw__capa--cinta { left: 0; top: 62.67%; width: 100%; height: auto; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--nat .nws-lpvw__capa--nadador { left: 0; top: 33.87%; width: 93.65%; height: auto; animation: nws-lpfx-zoom 10s ease-in-out infinite; transform-origin: 60% 60%; }
+
+/* Llaves: se desliza con el dedo, sin barra de desplazamiento visible. */
+.nws-fl__ll { scrollbar-width: none; -ms-overflow-style: none; }
+.nws-fl__ll::-webkit-scrollbar { display: none; }
