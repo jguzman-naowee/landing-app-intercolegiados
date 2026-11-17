@@ -15,6 +15,17 @@ window.LANDING_VISTAS = (function () {
   function diaSemana(a, m, d) { return new Date(a, m - 1, d).getDay(); }
   function larga(f) { var p = partes(f); return DIAS[diaSemana(p.a, p.m, p.d)] + ' ' + p.d + ' de ' + MESES[p.m - 1]; }
   function corta(f) { var p = partes(f); return p.d + ' ' + MESES[p.m - 1].slice(0, 3); }
+  function tituloEnDosLineas(texto, esc) {
+    var palabras = texto.split(/\s+/);
+    if (palabras.length === 1) { return esc(texto); }
+    var mejorCorte = 1, mejorMax = Infinity;
+    for (var i = 1; i < palabras.length; i++) {
+      var l1 = palabras.slice(0, i).join(' '), l2 = palabras.slice(i).join(' ');
+      var max = Math.max(l1.length, l2.length);
+      if (max < mejorMax || (max === mejorMax && i < mejorCorte)) { mejorMax = max; mejorCorte = i; }
+    }
+    return esc(palabras.slice(0, mejorCorte).join(' ')) + '<br>' + esc(palabras.slice(mejorCorte).join(' '));
+  }
 
   function montar(S, L, mob, o) {
     var C = L.app.calendario, G = L.app.regionales, e = S.esc;
@@ -127,7 +138,7 @@ window.LANDING_VISTAS = (function () {
       return S.h('header', { class: 'nws-lpvw__top nws-lpvw__top--reg' },
         S.h('div', { class: 'nws-lpvw__cab-nav' }, volver),
         S.h('div', { class: 'nws-lpvw__cab-tit' },
-          S.h('h1', { class: 'nws-lpvw__reg-t' }, e(regActual().nombre)),
+          S.h('h1', { class: 'nws-lpvw__reg-t' }, tituloEnDosLineas(regActual().nombre, e)),
           S.button({ label: G.cambiar, size: 'medium', theme: 'neutral', cls: 'nws-lpvw__cambiar', attrs: { 'data-reg-cambiar': true, 'aria-label': 'Cambiar fase', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': 'nws-reg-cambio' } })),
         S.h('p', { class: 'nws-lpvw__reg-sub' }, G.subtitulo.map(e).join('<br>')),
         cambioHtml(),
@@ -165,7 +176,7 @@ window.LANDING_VISTAS = (function () {
       var v = vistas.regionales, op = opcionDe(id); if (!v || !op) { return; }
       elegida = id;
       v.el.setAttribute('aria-label', op.nombre);
-      v.el.querySelector('.nws-lpvw__reg-t').textContent = op.nombre;
+      v.el.querySelector('.nws-lpvw__reg-t').innerHTML = tituloEnDosLineas(op.nombre, e);
       v.el.querySelectorAll('[data-reg-op]').forEach(function (b) {
         var s = b.getAttribute('data-reg-op') === id, ok = b.querySelector('.nws-lpvw__reg-op-ok');
         b.setAttribute('aria-selected', s ? 'true' : 'false');
