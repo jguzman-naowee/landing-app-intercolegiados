@@ -79,14 +79,18 @@ window.LANDING_VISTAS = (function () {
     /* ---------- Fase regional / final: cuadrícula de 2 columnas (una sola tarjeta: a pantalla llena) ----------
        Dos ejes: la FASE (panel de «Cambiar») y el TIPO (pestañas Individual | Conjuntos). */
     var ICONO_TIPO = {
+      paradeportes: '<svg class="nws-lpvw__reg-tipo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="4.2" r="1.7"/><path d="M10 7.6v6.2h5.4l2.6 5.2M10 10.6h4.6"/><path d="M7.6 11.6a5.2 5.2 0 1 0 7.2 6.6"/></svg>',
       individuales: '<svg class="nws-lpvw__reg-tipo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15.5" cy="4.6" r="1.7"/><path d="M14.2 8.4l-2.8 5.2 3.4 2.6 1 4.6M11.4 13.6L8 15.2l-1.4 3.2M13.6 9.6l3.6 1.8 1.6-2.6M9.8 9.2l2.4-.8"/></svg>',
       conjuntos: '<svg class="nws-lpvw__reg-tipo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></svg>'
     };
     function opcionDe(id) { return G.fases.filter(function (x) { return x.id === id; })[0]; }
     function regActual() { return opcionDe(elegida) || opcionDe(G.actual) || G.fases[0]; }
-    function tipoActual() { return G.tipos.filter(function (x) { return x.id === tipoElegido; })[0] || G.tipos.filter(function (x) { return x.id === G.tipoActual; })[0] || G.tipos[0]; }
+    /* Los tipos con `fase` (Paradeportes: solo Final Nacional) aparecen únicamente en esa fase. */
+    function tiposDe(faseId) { return G.tipos.filter(function (x) { return !x.fase || x.fase === faseId; }); }
+    function tipoActual() { var l = tiposDe(regActual().id); return l.filter(function (x) { return x.id === tipoElegido; })[0] || l.filter(function (x) { return x.id === G.tipoActual; })[0] || l[0]; }
     function regionalesHtml(entra) {
-      var op = regActual(), tipo = tipoActual(), ks = G.tarjetas[op.id][tipo.id];
+      var op = regActual(), tipo = tipoActual(), ks = (G.tarjetas[op.id] || {})[tipo.id] || [];
+      if (!ks.length) { return S.h('div', { class: S.cls('nws-lpvw__reg-vacio', entra && 'nws-lpvw__reg-lista--entra') }, ICONO_TIPO[tipo.id] || '', S.h('p', { class: 'nws-lpvw__reg-vacio-t' }, 'Aún no hay eventos de ' + e(tipo.label.toLowerCase()) + ' en esta fase.')); }
       return S.h('ul', { class: S.cls('nws-lpvw__reg-lista', ks.length === 1 && 'nws-lpvw__reg-lista--una', entra && 'nws-lpvw__reg-lista--entra'), role: 'list' }, op.id === 'regional' ? S.h('li', { class: 'nws-lpvw__reg-sec' }, S.h('h2', { class: 'nws-lpvw__reg-sec-t' }, e(tipo.titulo))) : '', ks.map(function (k, i) {
         var x = G.items[k];
         return S.h('li', { style: '--nws-i:' + i },
@@ -113,7 +117,10 @@ window.LANDING_VISTAS = (function () {
     }
     /* Pestañas Individual | Conjuntos: NwtTabs en píldora (el indicador y el divisor se ocultan por CSS). */
     function tiposHtml() {
-      return S.h('div', { class: 'nws-lpvw__reg-tipo' }, S.tabs({ theme: 'primary', fullWidth: true, value: tipoActual().id, items: G.tipos.map(function (x) { return { value: x.id, label: x.label, iconHtml: ICONO_TIPO[x.id] }; }) }));
+      return S.h('div', { class: 'nws-lpvw__reg-tipo' }, tabsTipo());
+    }
+    function tabsTipo() {
+      return (S.tabs({ theme: 'primary', fullWidth: true, value: tipoActual().id, items: tiposDe(regActual().id).map(function (x) { return { value: x.id, label: x.label, iconHtml: ICONO_TIPO[x.id] }; }) }));
     }
     /* Filas: volver; título y «Cambiar»; subtítulo; panel de fases (colapsado); pestañas de tipo. */
     function cabeceraRegionales(volver) {
@@ -170,7 +177,7 @@ window.LANDING_VISTAS = (function () {
     }
     /* Pestaña de tipo: la activa cambia al instante y las tarjetas reentran como al cambiar de fase. */
     function elegirTipo(id) {
-      var v = vistas.regionales; if (!v || id === tipoActual().id || !G.tipos.some(function (x) { return x.id === id; })) { return; }
+      var v = vistas.regionales; if (!v || id === tipoActual().id || !tiposDe(regActual().id).some(function (x) { return x.id === id; })) { return; }
       tipoElegido = id;
       ponerCambio(false, false);
       v.el.querySelectorAll('.nws-lpvw__reg-tipo [data-tab]').forEach(function (b) {
@@ -183,6 +190,8 @@ window.LANDING_VISTAS = (function () {
     }
     function pintarRegionales(el, op) {
       ponerCambio(false, true);
+      var tt = el.querySelector('.nws-lpvw__reg-tipo');   /* las pestañas dependen de la fase (Paradeportes solo en la Final) */
+      if (tt && tt.querySelectorAll('[data-tab]').length !== tiposDe(op.id).length) { tt.innerHTML = tabsTipo(); if (o.posicionarIndicadores) { o.posicionarIndicadores(el); } }
       var sc = el.querySelector('.nws-lpvw__scroll');
       sc.innerHTML = regionalesHtml(!reducido);
       sc.scrollTop = 0;
@@ -266,6 +275,95 @@ window.LANDING_VISTAS = (function () {
       el.addEventListener('click', function (ev) { if (ev.target === el) { cerrar(); } });
     }
 
+    /* ---------- medallería: podio en carrusel + contadores que suben ---------- */
+    function contar(raiz) {
+      raiz.querySelectorAll('[data-n]').forEach(function (b) {
+        var fin = +b.getAttribute('data-n'); if (reducido || !b.animate && !window.requestAnimationFrame) { b.textContent = fin; return; }
+        var t0 = null, dur = 900 + Math.min(fin, 600) * 0.6;
+        b.textContent = '0';
+        (function paso(t) { if (t0 == null) { t0 = t; } var k = Math.min(1, (t - t0) / dur); b.textContent = Math.round(fin * (1 - Math.pow(1 - k, 3))); if (k < 1) { requestAnimationFrame(paso); } })(performance.now());
+      });
+    }
+    function montarPodio(el) {
+      var stage = el.querySelector('[data-md-stage]'); if (!stage) { return; }
+      var pods = [].slice.call(stage.querySelectorAll('[data-md-pod]')), activo = 1, x0 = null, movido = false;
+      function ir(i) {
+        var n = pods.length; i = (i + n) % n; if (i === activo) { return; }
+        activo = i;
+        pods.forEach(function (p, j) {
+          var pos = j === activo ? 'c' : j === (activo + n - 1) % n ? 'l' : 'r';
+          p.setAttribute('data-pos', pos); p.setAttribute('aria-pressed', j === activo ? 'true' : 'false');
+        });
+        var a = pods[activo]; contar(a);
+        if (a.animate && !reducido) { var m = a.querySelector('.nws-md__pod-m'); if (m) { m.animate([{ transform: 'scale(.94)' }, { transform: 'scale(1.07)', offset: .55 }, { transform: 'scale(1)' }], { duration: 620, easing: 'cubic-bezier(.34,1.4,.64,1)' }); } }
+      }
+      stage.addEventListener('click', function (ev) {
+        if (movido) { movido = false; return; }
+        var b = ev.target.closest('[data-md-pod]'); if (b) { ir(+b.getAttribute('data-md-pod')); }
+      });
+      stage.addEventListener('pointerdown', function (ev) { x0 = ev.clientX; movido = false; });
+      stage.addEventListener('pointerup', function (ev) {
+        if (x0 == null) { return; }
+        var dx = ev.clientX - x0; x0 = null;
+        if (Math.abs(dx) > 36) { movido = true; ir(activo + (dx < 0 ? 1 : -1)); }
+      });
+      stage.addEventListener('pointercancel', function () { x0 = null; });
+      stage.addEventListener('keydown', function (ev) {
+        if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') { return; }
+        ev.preventDefault(); ir(activo + (ev.key === 'ArrowRight' ? 1 : -1)); pods[activo].focus({ preventScroll: true });
+      });
+      setTimeout(function () { contar(el.querySelector('.nws-md')); }, 380);   /* cuando la vista ya entró */
+    }
+
+    /* Medallería en dos paneles: arriba el podio (que se pliega) y el resumen fijo; debajo, la lista, que se desplaza en su propio panel y nunca pasa por debajo del resumen.
+       El gesto (rueda o arrastre) primero pliega el podio y, cuando ya no queda nada que plegar, desplaza la lista; al volver, al revés. */
+    function colapsoMedalleria(el) {
+      var root = el.querySelector('.nws-md'), hero = el.querySelector('.nws-md__hero'), inn = el.querySelector('.nws-md__hero-in'), lista = el.querySelector('.nws-md__lista'),
+          big = el.querySelector('.nws-md__t'), sub = el.querySelector('.nws-md__h--hero'), mini = el.querySelector('.nws-lpvw__titulo');
+      if (!root || !hero || !inn || !lista) { return; }
+      var H = 0, c = 0, vel = 0, raf = 0, g = null, movido = false;
+      function pinta() {
+        var p = H ? c / H : 0;
+        if (H) { hero.style.height = (H - c) + 'px'; }
+        inn.style.transform = 'translateY(' + (-c * .3).toFixed(1) + 'px)'; inn.style.opacity = Math.max(0, 1 - p * 1.15).toFixed(3);
+        root.style.setProperty('--md-p', p.toFixed(3));
+        if (big) { big.style.opacity = Math.max(0, 1 - p * 4).toFixed(3); big.style.transform = 'scale(' + (1 - .3 * Math.min(1, p * 4)).toFixed(3) + ')'; }
+        if (sub) { sub.style.opacity = Math.max(0, 1 - p * 5).toFixed(3); }
+        if (mini) { var q = Math.max(0, Math.min(1, (p - .1) / .2)); mini.style.opacity = q.toFixed(3); mini.style.transform = 'translateY(' + ((1 - q) * 8).toFixed(1) + 'px)'; }
+      }
+      function desplaza(dy) {
+        if (dy > 0) {
+          var u = Math.min(dy, H - c); c += u; dy -= u;
+          lista.scrollTop = Math.min(lista.scrollHeight - lista.clientHeight, lista.scrollTop + dy);
+        } else if (dy < 0) {
+          var t = Math.min(-dy, lista.scrollTop); lista.scrollTop -= t; dy += t;
+          if (dy < 0) { c = Math.max(0, c + dy); }
+        }
+        pinta();
+      }
+      function medir() { var h = inn.offsetHeight; if (h && Math.abs(h - H) > 1) { H = h; c = Math.min(c, H); pinta(); } }
+      if (window.ResizeObserver) { new ResizeObserver(medir).observe(inn); }
+      root.addEventListener('wheel', function (ev) { ev.preventDefault(); desplaza(ev.deltaY); }, { passive: false });
+      root.addEventListener('pointerdown', function (ev) { cancelAnimationFrame(raf); g = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, ly: ev.clientY, modo: null, t: ev.timeStamp }; vel = 0; movido = false; });
+      root.addEventListener('pointermove', function (ev) {
+        if (!g || ev.pointerId !== g.id) { return; }
+        if (!g.modo && (Math.abs(ev.clientY - g.y) > 6 || Math.abs(ev.clientX - g.x) > 6)) {
+          g.modo = Math.abs(ev.clientY - g.y) > Math.abs(ev.clientX - g.x) ? 'v' : 'h';
+          if (g.modo === 'v') { try { root.setPointerCapture(ev.pointerId); } catch (x) { /* sin captura */ } }
+        }
+        if (g.modo === 'v') { var d = g.ly - ev.clientY; g.ly = ev.clientY; vel = d; movido = true; desplaza(d); }
+      });
+      function suelta() {
+        if (!g) { return; }
+        var v = g.modo === 'v' ? vel : 0; g = null;
+        if (reducido || Math.abs(v) < 2) { return; }
+        (function inercia() { v *= .93; desplaza(v); if (Math.abs(v) > .4) { raf = requestAnimationFrame(inercia); } })();
+      }
+      root.addEventListener('pointerup', suelta); root.addEventListener('pointercancel', suelta);
+      root.addEventListener('click', function (ev) { if (movido) { ev.stopPropagation(); ev.preventDefault(); movido = false; } }, true);
+      medir(); pinta();
+    }
+
     /* ---------- cascarón común ---------- */
     function crear(id, clave, estado) {
       var contenido = flujos.vista(id, clave, estado);
@@ -311,6 +409,7 @@ window.LANDING_VISTAS = (function () {
         S.h('div', { class: 'nws-lpvw__estado' }, o.barraEstado(S, L.hora)), cabecera, cuerpo + (contenido && contenido.pie ? S.h('nav', { class: 'nws-fl__pie', 'aria-label': 'Navegación' }, contenido.pie) : ''),
         id === 'regionales' ? S.h('p', { class: 'nws-lpvw__sr', 'aria-live': 'polite', 'data-reg-aviso': true }) : '');
       mob.appendChild(el);
+      if (id === 'medalleria') { montarPodio(el); colapsoMedalleria(el); }
       if (id === 'regionales' && o.proximamente) {
         /* El rótulo del aviso es el data-toast tal cual: el global de app.js prefiere el aria-label. */
         el.addEventListener('click', function (ev) {
@@ -427,6 +526,36 @@ window.LANDING_VISTAS = (function () {
           grupo.querySelectorAll('[data-seg]').forEach(function (b) { var s = b === sg; b.classList.toggle('nwt-tag-group__tag--active', s); b.setAttribute('aria-selected', s ? 'true' : 'false'); });
           if (o.posicionarIndicadores) { o.posicionarIndicadores(grupo); }
           repintar(el, id, clave, estado); return;
+        }
+        /* Barra inferior de las vistas que son pestañas (Medallas, Certificados): la propia pestaña no hace nada, «Juegos» cierra la vista y la otra pestaña se abre encima. */
+        var tabMd = t.closest('.nws-lpx__tabbar [data-tab]'), propia = el.classList.contains('nws-lpvw--medalleria') ? 'medallas' : el.classList.contains('nws-lpvw--certificados') ? 'certificados' : null;
+        if (tabMd && propia) {
+          var destino = tabMd.getAttribute('data-tab');
+          if (destino === propia || destino === 'inicio') { ev.stopPropagation(); if (destino === 'inicio') { cerrar(); } return; }
+        }
+        var mdD = t.closest('[data-md-dep]');
+        if (mdD) {   /* un deporte de la delegación: muestra u oculta sus pruebas */
+          ev.stopPropagation();
+          var panelD = mdD.parentNode.querySelector('.nws-md__dep-p'), abreD = mdD.getAttribute('aria-expanded') !== 'true';
+          if (abreD && !panelD.firstChild) { panelD.innerHTML = flujos.medalleriaPruebas(mdD.closest('[data-md-det]').getAttribute('data-md-det'), mdD.getAttribute('data-md-dep')); }
+          panelD.hidden = !abreD; mdD.setAttribute('aria-expanded', abreD ? 'true' : 'false'); mdD.parentNode.classList.toggle('nws-md__dep--abierto', abreD);
+          return;
+        }
+        var mdF = t.closest('[data-md-fila]'), mdT = t.closest('[data-md-todo]');
+        if (mdF || mdT) {
+          ev.stopPropagation();
+          var abrirMd = function (f, abrir) {   /* el detalle de cada delegación se pinta la primera vez que se abre */
+            var panel = f.parentNode.querySelector('.nws-md__det');
+            if (abrir && !panel.firstChild) { panel.innerHTML = flujos.medalleriaDetalle(f.getAttribute('data-md-fila')); }
+            panel.hidden = !abrir; f.setAttribute('aria-expanded', abrir ? 'true' : 'false'); f.parentNode.classList.toggle('nws-md__item--abierto', abrir);
+          };
+          if (mdF) { abrirMd(mdF, mdF.getAttribute('aria-expanded') !== 'true'); }
+          else {
+            var filasMd = [].slice.call(el.querySelectorAll('[data-md-fila]')), abrirTodo = mdT.getAttribute('data-md-todo') !== 'abierto';
+            filasMd.forEach(function (f) { abrirMd(f, abrirTodo); });
+            mdT.setAttribute('data-md-todo', abrirTodo ? 'abierto' : 'true'); mdT.classList.toggle('nws-md__todo--abierto', abrirTodo); mdT.setAttribute('aria-label', abrirTodo ? 'Contraer todo' : 'Expandir todo'); mdT.title = abrirTodo ? 'Contraer todo' : 'Expandir todo';
+          }
+          return;
         }
         var ir = t.closest('[data-flujo]');
         if (ir) { ev.stopPropagation(); estado.irPrueba = ir.getAttribute('data-prueba') || ''; estado.irSerie = ir.getAttribute('data-serie') || ''; if (ir.getAttribute('data-dia')) { estado.dia = ir.getAttribute('data-dia'); } var hjOp = el.querySelector('.nws-fl__hoja--abierta'); if (hjOp) { hjOp.classList.remove('nws-fl__hoja--abierta'); estado.hoja = false; } abrir(ir.getAttribute('data-flujo'), ir, ir.getAttribute('data-clave')); return; }

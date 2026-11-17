@@ -1550,6 +1550,29 @@ body.nws-modo-plano .nws-lpvw { position: fixed; inset: 0 auto 0 50%; width: 428
 .nws-lpvw__reg-tipo .nwt-tabs__tab--active, .nws-lpvw__reg-tipo .nwt-tabs__tab--active:hover { background: rgb(255 255 255 / .3); }
 .nws-lpvw__reg-tipo .nwt-tabs__tab:focus-visible { outline: 2px solid var(--naotech-app-background); outline-offset: -2px; box-shadow: none; }
 .nws-lpvw__reg-tipo .nwt-tabs__label, .nws-lpvw__reg-tipo .nwt-tabs__tab--active .nwt-tabs__label { gap: var(--naotech-sizing-8); color: var(--naotech-app-background); font-size: 18px; line-height: 22px; font-weight: var(--naotech-font-weight-medium); }
+.nws-lpvw__reg-vacio { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-12); padding: var(--naotech-sizing-48) var(--naotech-sizing-24); text-align: center; color: var(--naotech-text-secondary, #5b6172); }
+.nws-lpvw__reg-vacio /* Con tres pestañas (Final Nacional): cada una mide según su contenido y reparte el resto, con aire a los lados
+   (no quedan al borde). Tipografía, íconos y relleno escalan con el ancho del contenedor (cqw, 16 px como tope),
+   así la proporción es la misma en cualquier teléfono y «Paradeportes» nunca se sale. El .nwt-icon (24 px) se ajusta al SVG. */
+.nws-lpvw__reg-tipo { container-type: inline-size; }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-tabs__tab { flex: 1 1 auto; min-width: 0; padding: 0 min(26px, 5cqw); }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-tabs__label { gap: .5em; font-size: min(16px, 3.3cqw); line-height: 1.25; white-space: nowrap; }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-icon { --naotech-icon-dimension: 1.15em; display: flex; align-items: center; justify-content: center; }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nws-lpvw__reg-tipo-ico { width: 1.15em; height: 1.15em; }
+.nws-lpvw__reg-vacio { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-12); padding: var(--naotech-sizing-48) var(--naotech-sizing-24); text-align: center; color: var(--naotech-text-secondary, #5b6172); }
+.nws-lpvw__reg-vacio /* Con tres pestañas (Final Nacional) se reparten el ancho por igual y se compactan para que quepa «Paradeportes».
+   El contenedor del ícono (.nwt-icon, 24 px por defecto) se ajusta al SVG para que quede pegado al texto y centrado. */
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-tabs__tab { flex: 1 1 0; min-width: 0; padding: 0 var(--naotech-sizing-4); overflow: hidden; }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-tabs__label { gap: var(--naotech-sizing-4); font-size: 15px; line-height: 20px; white-space: nowrap; }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-icon { --naotech-icon-dimension: 20px; display: flex; align-items: center; justify-content: center; }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nws-lpvw__reg-tipo-ico { width: 20px; height: 20px; }
+.nws-lpvw__reg-vacio { display: flex; flex-direction: column; align-items: center; gap: var(--naotech-sizing-12); padding: var(--naotech-sizing-48) var(--naotech-sizing-24); text-align: center; color: var(--naotech-text-secondary, #5b6172); }
+.nws-lpvw__reg-vacio /* Con tres pestañas (Final Nacional) se reparten el ancho por igual y se compactan para que quepa «Paradeportes». */
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-tabs__tab { flex: 1 1 0; min-width: 0; padding: 0 var(--naotech-sizing-8); }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nwt-tabs__label { gap: var(--naotech-sizing-4); font-size: 14px; line-height: 18px; white-space: nowrap; }
+.nws-lpvw__reg-tipo .nwt-tabs__list:has(> .nwt-tabs__tab:nth-of-type(3)) .nws-lpvw__reg-tipo-ico { width: 18px; height: 18px; }
+.nws-lpvw__reg-tipo-ico { width: 40px; height: 40px; }
+.nws-lpvw__reg-vacio-t { margin: 0; font-size: 16px; line-height: 22px; }
 .nws-lpvw__reg-tipo-ico { display: block; width: 22px; height: 22px; flex: none; }
 .nws-lpvw__reg-lista { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--naotech-sizing-12); margin: 0; padding: var(--naotech-sizing-20) var(--naotech-sizing-16) var(--naotech-sizing-32); list-style: none; }
 .nws-lpvw__reg-lista > li { display: flex; min-width: 0; }
@@ -2859,6 +2882,206 @@ button.nws-fl__pd:focus-visible { outline: 2px solid #5a2a85; outline-offset: 4p
 .nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--nat .nws-lpvw__capa--cinta { left: 0; top: 62.67%; width: 100%; height: auto; }
 .nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--nat .nws-lpvw__capa--nadador { left: 0; top: 33.87%; width: 93.65%; height: auto; animation: nws-lpfx-zoom 10s ease-in-out infinite; transform-origin: 60% 60%; }
 
+/* Escena de paradeportes (boccia): cancha de fondo, círculo, aros sobre la bola y el deportista; posiciones en % de la escena (2487×2749). */
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--para .nws-lpvw__capa--circulo { left: 46%; top: 44%; width: 78%; height: auto; aspect-ratio: 1; animation: nws-lpvw-forma-izq 9s ease-in-out infinite; transform-origin: 50% 50%; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--para .nws-lpvw__capa--aros { left: -4.4%; top: 44.2%; width: 42%; }
+.nws-lpvw__reg-lista--una .nws-lpvw__reg-foto .nws-lpvw__escena--para .nws-lpvw__capa--deportista { left: 13%; top: 16.5%; width: 74%; height: auto; animation: nws-lpfx-zoom 10s ease-in-out infinite; transform-origin: 20% 60%; }
+
+/* Podio de combate con dos bronces: cuatro puestos (Plata · Oro · Bronce · Bronce); medallas y textos se compactan para caber en el ancho. */
+.nws-fl__pdio--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; }
+.nws-fl__pdio--4 .nws-fl__pd-av--med img.nws-fl__pd-m { width: 58px; }
+.nws-fl__pdio--4 .nws-fl__pd--1 .nws-fl__pd-av--med img.nws-fl__pd-m { width: 80px; }
+.nws-fl__pdio--4 .nws-fl__pd b { font-size: 12px; line-height: 15px; overflow-wrap: anywhere; }
+.nws-fl__pdio--4 .nws-fl__pd--1 b { font-size: 13px; }
+.nws-fl__pdio--4 .nws-fl__pd small { font-size: 11px; line-height: 14px; }
+
+/* Medallería inmersiva: el mismo fondo violeta de la vista de regionales (también bajo la barra de estado), solo el botón de volver arriba y el podio sobre el violeta;
+   debajo, una hoja blanca de esquinas redondeadas con el resumen y la tabla. */
+.nws-lpvw--medalleria { background: radial-gradient(120% 40% at 100% 62%, rgb(240 126 140 / .2), transparent 70%), radial-gradient(90% 36% at 0% 100%, rgb(176 92 204 / .22), transparent 70%), linear-gradient(180deg, var(--nws-jic-violeta-700) 0%, var(--nws-jic-violeta-titular) 70%, var(--nws-jic-violeta-pie) 100%); color: var(--naotech-app-background); }
+.nws-lpvw--medalleria .nws-mob__status { color: var(--naotech-app-background); }
+.nws-lp .nws-lpvw--medalleria .nws-lpvw__volver { flex: none; --pvt-button-font-color: var(--naotech-app-background); --pvt-button-background: rgb(255 255 255 / .18); --pvt-button-background-hover: rgb(255 255 255 / .28); --pvt-button-background-active: rgb(255 255 255 / .28); }
+.nws-lp .nws-lpvw--medalleria .nwt-icon-button__content { border-radius: var(--naotech-radius-circle); }
+.nws-lpvw--medalleria .nws-lpvw__scroll { overflow: hidden; }
+.nws-lpvw--medalleria .nws-fl__contenido { padding: 0; box-sizing: border-box; height: 100%; display: flex; flex-direction: column; }
+.nws-lpvw--medalleria .nws-fl__contenido > [data-fl-contenido] { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.nws-lpvw--medalleria .nws-fl__aviso { display: none; }
+.nws-fl.nws-lpvw--medalleria .nws-lpvw__volver .nwt-icon-button__content { background: rgb(255 255 255 / .2); border-radius: 50%; }
+.nws-fl__contenido .nws-md__h--hero { color: rgb(255 255 255 / .92); }
+.nws-md__hero .nws-md__t, .nws-fl__contenido .nws-md__h--hero { text-align: center; }
+.nws-md__hero .nws-md__t { margin-bottom: 0; }
+.nws-fl__contenido .nws-md__h--hero { margin: 0 0 8px; }
+.nws-md { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0; touch-action: none; user-select: none; -webkit-user-select: none; }
+.nws-md__hero { position: relative; flex: none; overflow: hidden; color: var(--naotech-app-background); }
+.nws-md__hero-in { position: relative; padding: 0 20px 52px; will-change: transform, opacity; }
+.nws-md__hero-in > * { position: relative; z-index: 1; }
+.nws-md__hero-in > .nws-md__deco { position: absolute; z-index: 0; max-width: none; pointer-events: none; user-select: none; }
+.nws-md__deco--circulo { width: 300px; height: auto; right: -120px; top: 150px; opacity: .5; animation: nws-lpvw-forma-izq 9s ease-in-out infinite; }
+.nws-md__deco--aros { width: 230px; height: auto; left: -84px; top: 330px; opacity: .85; animation: nws-lpvw-crece 6s ease-in-out infinite; }
+.nws-md__hero .nws-md__t { color: var(--naotech-app-background); margin-top: 0; }
+.nws-md__h--hero { color: rgb(255 255 255 / .92); margin-top: 8px; }
+.nws-md__hero .nws-md__pod-n b { color: var(--naotech-app-background); }
+.nws-md__hero .nws-md__pod-t { color: rgb(255 255 255 / .82); } .nws-md__hero .nws-md__pod-t b { color: var(--naotech-app-background); }
+.nws-md__hero .nws-md__ban { box-shadow: 0 0 0 1.5px rgb(255 255 255 / .55); }
+.nws-md__hero .nws-md__pod:focus-visible { outline-color: var(--naotech-app-background); }
+.nws-md__hoja { position: relative; z-index: 2; flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: calc(-28px * (1 - var(--md-p, 0))); padding: 0; border-radius: 28px 28px 0 0; background: var(--naotech-app-background); color: var(--naotech-color-gray-900); }
+@media (prefers-reduced-motion: reduce) { .nws-md__deco { animation: none; } }
+/* Barra de resumen fija (título + «Expandir todo», columnas y totales alineados con las columnas de la tabla). */
+.nws-md__resumen { flex: none; padding: 22px 20px 16px; border-bottom: 1px solid #e7e9f3; border-radius: 28px 28px 0 0; background: var(--naotech-app-background); }
+.nws-md__res-fila { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.nws-fl__contenido .nws-md__h--res { margin: 0; min-width: 0; font-size: 18px; line-height: 22px; }
+.nws-md__item:first-child { border-top: 0; }
+/* Título pequeño junto al botón de volver: nace invisible y lo enciende el plegado (colapsoMedalleria). */
+.nws-lpvw--medalleria .nws-lpvw__titulo { color: var(--naotech-app-background); opacity: 0; will-change: opacity, transform; }
+.nws-md__t, .nws-md__h--hero { will-change: opacity, transform; transform-origin: 50% 0; }
+/* Medallería: la barra inferior es la misma del inicio (.nws-lpx__tabbar + indicador); el pie genérico de las vistas solo la aloja. */
+.nws-lpvw--medalleria .nws-fl__pie { display: block; padding: 0; gap: 0; border-top: .5px solid rgb(from var(--naotech-color-gray-900) r g b / .14); background: var(--naotech-app-background); }
+/* ---------- Medallería (Final Nacional): podio de delegaciones, resumen total y tabla expandible por delegación ---------- */
+.nws-md { color: var(--naotech-color-gray-900); }
+.nws-md__t { margin: 8px 0 12px; font-size: var(--naotech-sizing-32); line-height: 38px; font-weight: var(--naotech-font-weight-bold); letter-spacing: -.02em; color: var(--nws-jic-violeta-titular); }
+.nws-md__h { margin: 24px 0 12px; font-size: var(--naotech-sizing-24); line-height: var(--naotech-sizing-32); font-weight: var(--naotech-font-weight-bold); letter-spacing: -0.01em; color: var(--naotech-color-gray-900); }
+.nws-md__sep { margin: 22px 0 0; border: 0; border-top: 1px solid #e7e9f3; }
+.nws-md__pt { display: inline-block; flex: none; width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .12); }
+.nws-md__pt--1 { background: radial-gradient(circle at 35% 30%, #ffe88a, #e2a900); }
+.nws-md__pt--2 { background: radial-gradient(circle at 35% 30%, #ffffff, #98a2b3); }
+.nws-md__pt--3 { background: radial-gradient(circle at 35% 30%, #f7b583, #b25a1d); }
+.nws-md__cnt { display: inline-flex; align-items: center; border: 1px solid #e3e0ee; border-radius: var(--naotech-radius-pill); background: var(--naotech-app-background); font-variant-numeric: tabular-nums; color: var(--nws-jic-violeta-900); }
+.nws-md__cn { display: inline-flex; align-items: center; gap: 5px; padding: 0 8px; font-size: 14px; font-weight: 600; line-height: 24px; }
+.nws-md__cn + .nws-md__cn { border-left: 1px solid #e7e9f3; }
+.nws-md__ban { display: block; flex: none; width: 32px; height: 18px; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 1px rgb(31 32 51 / .16); background: #fff; }
+.nws-md__pod .nws-md__ban { width: 44px; height: 25px; border-radius: 4px; }
+/* Podio en carrusel (coverflow): la delegación activa al centro y grande; las otras dos detrás, más chicas y apagadas. */
+.nws-md__stage { display: grid; overflow: hidden; margin: 0 -4px; padding: 10px 0 6px; user-select: none; -webkit-user-select: none; }
+.nws-md__pod { --tx: 0px; --s: 1; --o: 1; grid-area: 1 / 1; justify-self: center; position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 214px; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  opacity: var(--o); transform: translateX(var(--tx)) scale(var(--s)); transform-origin: 50% 36%;
+  transition: transform 560ms cubic-bezier(.32, .72, 0, 1), opacity 420ms ease, filter 420ms ease; animation: nws-md-entra 820ms cubic-bezier(.34, 1.35, .64, 1) backwards; }
+.nws-md__pod[data-pos="c"] { z-index: 3; }
+.nws-md__pod[data-pos="l"], .nws-md__pod[data-pos="r"] { --s: .6; --o: .55; z-index: 1; filter: saturate(.7); }
+.nws-md__pod[data-pos="l"] { --tx: -128px; } .nws-md__pod[data-pos="r"] { --tx: 128px; }
+.nws-md__pod[data-pos="c"] { animation-delay: 60ms; } .nws-md__pod[data-pos="l"] { animation-delay: 260ms; } .nws-md__pod[data-pos="r"] { animation-delay: 340ms; }
+@keyframes nws-md-entra { from { opacity: 0; transform: translateX(0) translateY(56px) scale(.3); } }
+.nws-md__pod:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 4px; border-radius: 20px; }
+/* Halo detrás de la medalla activa (oro, plata o bronce) que respira. */
+.nws-md__pod-brillo { position: absolute; left: 50%; top: 0; width: 210px; height: 210px; margin-left: -105px; border-radius: 50%; opacity: 0; pointer-events: none; transition: opacity 420ms ease; }
+.nws-md__pod--1 .nws-md__pod-brillo { background: radial-gradient(circle, rgb(242 197 61 / .45), rgb(242 197 61 / 0) 68%); }
+.nws-md__pod--2 .nws-md__pod-brillo { background: radial-gradient(circle, rgb(166 176 196 / .5), rgb(166 176 196 / 0) 68%); }
+.nws-md__pod--3 .nws-md__pod-brillo { background: radial-gradient(circle, rgb(205 127 72 / .45), rgb(205 127 72 / 0) 68%); }
+.nws-md__pod[data-pos="c"] .nws-md__pod-brillo { opacity: 1; animation: nws-md-respira 3.4s ease-in-out infinite; }
+@keyframes nws-md-respira { 0%, 100% { transform: scale(.92); } 50% { transform: scale(1.12); } }
+.nws-md__pod-m { position: relative; display: block; width: 168px; height: auto; }
+.nws-md__pod[data-pos="c"] .nws-md__pod-m { animation: nws-md-flota 3.6s ease-in-out infinite; }
+@keyframes nws-md-flota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.nws-md__pod-n { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.nws-md__pod-n b { font-size: 17px; line-height: 20px; font-weight: 700; overflow-wrap: anywhere; }
+.nws-md__pod .nws-md__ban { width: 48px; height: 27px; border-radius: 4px; }
+.nws-md__cnt--pod .nws-md__cn { padding: 0 8px; gap: 5px; font-size: 14px; line-height: 26px; } .nws-md__cnt--pod .nws-md__pt { width: 13px; height: 13px; }
+.nws-md__pod-t { font-size: 13px; color: #646587; } .nws-md__pod-t b { font-weight: 700; color: var(--naotech-color-gray-900); }
+.nws-md__v { font-weight: inherit; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .nws-md__pod { animation: none; transition-duration: 1ms; } .nws-md__pod-brillo, .nws-md__pod-m { animation: none !important; } }
+/* Resumen total */
+.nws-md__fila:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+/* Tabla en columnas (como la referencia): # · delegación · oro · plata · bronce · total · flecha. Todo en blanco, filas planas separadas por líneas finas;
+   los deportes y las pruebas del detalle usan las mismas columnas, sin tarjetas dentro de tarjetas. */
+.nws-md__cols { display: grid; grid-template-columns: 38px minmax(0, 1fr) 32px 32px 32px 42px 16px; align-items: center; column-gap: 4px; }
+.nws-md__cab { margin-top: 14px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #646587; }
+.nws-md__cab .nws-md__pt { justify-self: center; width: 16px; height: 16px; } .nws-md__cab-t { text-align: right; }
+.nws-md__lista { flex: 1; min-height: 0; overflow: hidden; padding: 0 8px 20px; background: var(--naotech-app-background); }
+.nws-md__item { border-top: 1px solid #e7e9f3; }
+.nws-md__item:first-child { border-top: 0; }
+.nws-md__fila { position: sticky; top: 0; z-index: 3; box-sizing: border-box; width: 100%; height: 64px; padding: 10px 12px; border: 0; background: var(--naotech-app-background); font: inherit; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nws-md__pos { display: grid; place-items: center; justify-self: start; width: 28px; height: 28px; border: 1px solid #dcd9e8; border-radius: 50%; background: var(--naotech-app-background); font-size: 13px; font-weight: 600; color: #3a3b55; }
+.nws-md__nom { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.nws-md__nom b { font-size: 15px; line-height: 18px; font-weight: 600; overflow-wrap: anywhere; }
+.nws-md__n { text-align: center; font-size: 15px; font-variant-numeric: tabular-nums; } .nws-md__n--t { font-weight: 700; text-align: right; }
+.nws-md__n--cero { color: #b3b5c8; }
+.nws-md__chev { width: 16px; height: 16px; color: #646587; transition: transform 180ms ease; } .nws-md__item--abierto > .nws-md__fila .nws-md__chev, .nws-md__dep--abierto > .nws-md__dep-b .nws-md__chev { transform: rotate(180deg); }
+/* Detalle de la delegación: deportes (filas desplegables) y, dentro, pruebas; nada de fondos ni bordes de tarjeta. */
+.nws-md__det { padding: 0 0 6px; background: var(--naotech-app-background); }
+.nws-md__dep { border-top: 1px solid #eef0f7; }
+.nws-md__dep-b { position: sticky; top: 64px; z-index: 2; box-sizing: border-box; width: 100%; height: 56px; padding: 6px 12px 6px 34px; border: 0; background: var(--naotech-app-background); font: inherit; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nws-md__dep-b:focus-visible, .nws-md__fila:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: -3px; }
+.nws-md__dep-ico { justify-self: center; width: 22px; height: 22px; }
+.nws-md__dep-n { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.nws-md__dep-n b { font-size: 14px; line-height: 18px; font-weight: 700; color: var(--naotech-color-gray-900); overflow-wrap: anywhere; }
+.nws-md__dep-n small { font-size: 12px; line-height: 15px; color: #646587; }
+.nws-md__dep .nws-md__n { font-size: 14px; } .nws-md__dep .nws-md__n--t { font-size: 14px; }
+.nws-md__dep-p { padding-bottom: 4px; }
+.nws-md__pr { padding: 10px 12px 10px 34px; align-items: center; }
+.nws-md__pr-t { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.nws-md__pr-n { min-width: 0; font-size: 14px; line-height: 18px; font-weight: 500; color: var(--naotech-color-gray-900); overflow-wrap: anywhere; }
+.nws-md__pr .nws-md__n { font-size: 15px; font-weight: 400; } .nws-md__pr .nws-md__n--t { font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .nws-md__chev { transition: none; } }
+
 /* Llaves: se desliza con el dedo, sin barra de desplazamiento visible. */
 .nws-fl__ll { scrollbar-width: none; -ms-overflow-style: none; }
 .nws-fl__ll::-webkit-scrollbar { display: none; }
+
+/* Totales: cuatro casillas iguales (oro, plata, bronce y total general). */
+.nws-md__tot4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.nws-md__t4 { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px 7px; border: 1px solid #e3e0ee; border-radius: 14px; background: var(--naotech-app-background); }
+.nws-md__t4 b { font-size: 22px; line-height: 26px; font-weight: 700; color: var(--naotech-color-gray-900); font-variant-numeric: tabular-nums; }
+.nws-md__t4-l { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; line-height: 14px; color: #646587; } .nws-md__t4-l .nws-md__pt { width: 10px; height: 10px; }
+.nws-md__t4--total { border-color: var(--nws-jic-violeta-titular); background: var(--naotech-app-background); }
+.nws-md__t4--total b, .nws-md__t4--total .nws-md__t4-l { color: var(--nws-jic-violeta-titular); }
+.nws-md__t4--total .nws-md__t4-l { font-weight: 700; }
+
+/* Expandir / contraer todo: solo ícono, a la derecha del título del resumen; las flechas giran al contraer. */
+.nws-md__todo { display: grid; place-items: center; flex: none; width: 40px; height: 32px; padding: 0; border: 1px solid #e3e0ee; border-radius: var(--naotech-radius-pill); background: var(--naotech-app-background); color: var(--nws-jic-violeta-900); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nws-md__todo svg { width: 20px; height: 20px; transition: transform 260ms cubic-bezier(.32, .72, 0, 1); }
+.nws-md__todo--abierto svg { transform: rotate(180deg); }
+.nws-md__todo:active { background: #f1e6f6; border-color: var(--nws-jic-violeta-titular); color: var(--nws-jic-violeta-titular); }
+.nws-md__todo:focus-visible { outline: 3px solid var(--nws-jic-violeta-titular); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .nws-md__todo svg { transition: none; } }
+
+/* Jerarquía al desplazar: la delegación abierta y, debajo, el deporte abierto se quedan fijos arriba de la lista; las pruebas pasan por debajo de ellos.
+   Una línea fina marca el borde cuando están pegados, y una barra violeta a la izquierda agrupa todo lo que pertenece a la delegación. */
+.nws-md__item--abierto > .nws-md__fila { box-shadow: 0 1px 0 #e7e9f3; }
+.nws-md__dep--abierto > .nws-md__dep-b { box-shadow: 0 1px 0 #e7e9f3; }
+
+/* Prueba por categoría (referencia): nombre arriba y, debajo, pastillas con sexo y edad; filas alternadas. */
+.nws-md__cats { display: flex; flex-wrap: wrap; gap: 6px; }
+.nws-md__cat { display: inline-flex; align-items: center; height: 24px; padding: 0 11px; border: 1px solid #dcd9e8; border-radius: var(--naotech-radius-pill); background: var(--naotech-app-background); font-size: 12px; line-height: 1; color: #3a3b55; }
+.nws-md__dep-p .nws-md__pr:nth-child(even) { background: #f6f5fb; }
+/* Resaltado de lo seleccionado: la delegación abierta (franja lila con barra violeta) y, debajo, el deporte abierto. */
+.nws-md__item--abierto > .nws-md__fila { box-shadow: 0 1px 0 #e7e9f3; }
+.nws-md__dep--abierto > .nws-md__dep-b { background: #efeff7; box-shadow: inset 3px 0 0 var(--nws-jic-violeta-titular), 0 1px 0 #e3e0ee; }
+.nws-md__dep-p { position: relative; }
+.nws-md__dep--abierto > .nws-md__dep-p::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; z-index: 1; background: var(--nws-jic-violeta-titular); pointer-events: none; }
+.nws-md__dep--abierto > .nws-md__dep-b .nws-md__dep-n b { color: var(--nws-jic-violeta-titular); }
+
+/* Patrón zebra en toda la tabla: delegaciones, deportes y pruebas alternan blanco y gris claro. La fila abierta (delegación fija o deporte resaltado) conserva su propio color. */
+.nws-md__item:nth-child(even) > .nws-md__fila { background: #f6f5fb; }
+.nws-md__dep:nth-child(even) > .nws-md__dep-b { background: #f6f5fb; }
+.nws-md__dep.nws-md__dep--abierto > .nws-md__dep-b { background: #efeff7; }
+
+/* Separación clara entre bloques de delegación: la fila de cada delegación es un gris un poco más marcado que el de sus deportes, una línea más fuerte
+   las divide y la delegación abierta deja un espacio en blanco antes de la siguiente. */
+.nws-md__item { border-top: 1px solid #d9d5e8; }
+.nws-md__item:nth-child(even) > .nws-md__fila { background: #efeef7; }
+.nws-md__item--abierto { margin-bottom: 14px; }
+.nws-md__item--abierto + .nws-md__item { border-top: 2px solid #cdc8de; }
+.nws-md__item--abierto > .nws-md__fila { box-shadow: 0 1px 0 #cdc8de; }
+
+/* ---------- Certificados: escáner del QR de la acreditación (demo) ---------- */
+.nws-lpvw--certificados { background: radial-gradient(120% 40% at 100% 62%, rgb(240 126 140 / .2), transparent 70%), radial-gradient(90% 36% at 0% 100%, rgb(176 92 204 / .22), transparent 70%), linear-gradient(180deg, var(--nws-jic-violeta-700) 0%, var(--nws-jic-violeta-titular) 70%, var(--nws-jic-violeta-pie) 100%); color: var(--naotech-app-background); }
+.nws-lpvw--certificados .nws-mob__status { color: var(--naotech-app-background); }
+.nws-lp .nws-lpvw--certificados .nws-lpvw__volver { flex: none; --pvt-button-font-color: var(--naotech-app-background); --pvt-button-background: rgb(255 255 255 / .18); --pvt-button-background-hover: rgb(255 255 255 / .28); --pvt-button-background-active: rgb(255 255 255 / .28); }
+.nws-lp .nws-lpvw--certificados .nwt-icon-button__content { border-radius: var(--naotech-radius-circle); }
+.nws-fl.nws-lpvw--certificados .nws-lpvw__volver .nwt-icon-button__content { background: rgb(255 255 255 / .2); border-radius: 50%; }
+.nws-lpvw--certificados .nws-lpvw__titulo { color: var(--naotech-app-background); }
+.nws-lpvw--certificados .nws-fl__aviso { display: none; }
+.nws-lpvw--certificados .nws-lpvw__scroll { display: flex; flex-direction: column; }
+.nws-lpvw--certificados .nws-fl__contenido { flex: 1; padding: 0 24px; display: flex; flex-direction: column; justify-content: center; }
+.nws-qr { display: flex; flex-direction: column; align-items: center; padding: 8px 0 28px; text-align: center; color: var(--naotech-app-background); }
+.nws-qr__visor { position: relative; width: min(250px, 72%); aspect-ratio: 1; margin: 0 auto 30px; display: grid; place-items: center; border-radius: 26px; background: rgb(255 255 255 / .07); color: rgb(255 255 255 / .3); overflow: hidden; }
+.nws-qr__codigo { width: 58%; height: 58%; }
+.nws-qr__esq { position: absolute; width: 44px; height: 44px; border: 0 solid #f2c53d; animation: nws-qr-enfoca 2.6s ease-in-out infinite; }
+.nws-qr__esq--a { top: 14px; left: 14px; border-top-width: 5px; border-left-width: 5px; border-top-left-radius: 16px; }
+.nws-qr__esq--b { top: 14px; right: 14px; border-top-width: 5px; border-right-width: 5px; border-top-right-radius: 16px; }
+.nws-qr__esq--c { bottom: 14px; left: 14px; border-bottom-width: 5px; border-left-width: 5px; border-bottom-left-radius: 16px; }
+.nws-qr__esq--d { bottom: 14px; right: 14px; border-bottom-width: 5px; border-right-width: 5px; border-bottom-right-radius: 16px; }
+.nws-qr__linea { position: absolute; left: 12%; right: 12%; top: 12%; height: 3px; border-radius: 3px; background: linear-gradient(90deg, transparent, #f2c53d 18%, #f2c53d 82%, transparent); box-shadow: 0 0 18px 4px rgb(242 197 61 / .55); animation: nws-qr-barre 2.4s ease-in-out infinite alternate; }
+@keyframes nws-qr-barre { from { top: 12%; } to { top: calc(88% - 3px); } }
+@keyframes nws-qr-enfoca { 0%, 100% { transform: scale(1); } 50% { transform: scale(.93); } }
+.nws-fl__contenido .nws-qr__t { max-width: 320px; margin: 0 0 12px; font-size: 24px; line-height: 30px; font-weight: 700; letter-spacing: -0.01em; color: var(--naotech-app-background); }
+.nws-fl__contenido .nws-qr__sub { margin: 0 0 22px; max-width: 280px; font-size: 15px; line-height: 21px; color: rgb(255 255 255 / .86); }
+@media (prefers-reduced-motion: reduce) { .nws-qr__esq, .nws-qr__linea { animation: none; } .nws-qr__linea { top: 50%; } }

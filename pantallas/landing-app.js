@@ -1206,9 +1206,10 @@ window.PANTALLAS['landing-app'] = (function () {
         /* Tarjeta de acceso (hoy abre «Regional de conjuntos»): vista inmersiva; el foco vuelve a la tarjeta */
         var vi = ev.target.closest('[data-vista]');
         if (vi) { vistas.abrir(vi.getAttribute('data-vista'), vi); return; }
-        /* Flutter mantiene Medallas desactivado; Certificados conserva su aviso. */
+        /* Medallas abre la medallería de la Final Nacional; Certificados, el escáner de acreditaciones (demo). */
         var tab = ev.target.closest('.nws-lpx__tabbar [data-tab]');
-        if (tab && tab.getAttribute('data-tab') === 'medallas') { ctx.proximamente('Medallas', tab); return; }
+        if (tab && tab.getAttribute('data-tab') === 'medallas') { vistas.abrir('medalleria', tab); return; }
+        if (tab && tab.getAttribute('data-tab') === 'certificados') { vistas.abrir('certificados', tab); return; }
         if (tab && tab.getAttribute('data-tab') !== 'inicio') {
           var it = L.app.tabs.filter(function (m) { return m.id === tab.getAttribute('data-tab'); })[0];
           if (it && it.toast) {

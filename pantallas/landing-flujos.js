@@ -8,11 +8,29 @@ window.LANDING_FLUJOS = function (S, L) {
   'use strict';
   var F = L.app.flujos, e = S.esc, h = S.h;
   var ESCUDOS = ['#3A48A8', '#8055A3', '#646587', '#F05705', '#434CE4', '#293377'];
+  /* Paradeportes: cada prueba se corre por clasificación funcional (la discapacidad agrupa a quienes compiten entre sí), por eso el mismo nombre
+     se repite en el catálogo, una vez por clase: S en natación; T (pista) y F (campo) en atletismo; BC en boccia. Datos de prueba. */
+  var CLASES = {
+    'Para Natación': ['S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13', 'S14'],
+    'T': ['T11', 'T12', 'T13', 'T20', 'T33', 'T34', 'T35', 'T36', 'T37', 'T38', 'T40', 'T41', 'T42', 'T44', 'T45', 'T46', 'T47', 'T51', 'T52', 'T53', 'T54', 'T64'],
+    'F': ['F11', 'F12', 'F13', 'F20', 'F32', 'F33', 'F34', 'F35', 'F36', 'F37', 'F38', 'F40', 'F41', 'F42', 'F44', 'F46', 'F53', 'F54', 'F55', 'F56', 'F57', 'F64']
+  };
+  function claseFuncional(dep, nombre, n, campo) {
+    if (dep === 'Boccia') { return /^individual/i.test(nombre) ? 'BC' + (1 + n % 4) : /^parejas/i.test(nombre) ? 'BC' + (3 + n % 2) : /^equipos$/i.test(nombre) ? 'BC1 – BC2' : ''; }
+    if (/relevo|triatl|octatl|heptatl/i.test(nombre)) { return ''; }
+    var l = CLASES[dep === 'Para Atletismo' ? (campo.test(nombre) ? 'F' : 'T') : dep] || []; return l.length ? l[n % l.length] : '';
+  }
   /* Final Nacional (datos de prueba): cada prueba del catálogo es un evento en su día, repartidas en orden según la agenda; todas las pruebas traen resultados salvo las del último día de cada deporte, que quedan programadas. */
   F.competencias.forEach(function (c) {
     if (!c.catalogo || c.eventos) { return; }
-    var todas = [], campo = /salto|lanzamiento|impulso|jabalina|disco|bala|martillo/i, i = 0;
-    Object.keys(c.catalogo).forEach(function (cat) { c.catalogo[cat].forEach(function (pr) { todas.push({ nombre: pr, cat: cat }); }); });
+    var todas = [], campo = /salto|lanzamiento|impulso|jabalina|disco|bala|martillo|club/i, i = 0;
+    Object.keys(c.catalogo).forEach(function (cat) {
+      var visto = {};
+      c.catalogo[cat].forEach(function (pr) {
+        var n = visto[pr] = (visto[pr] || 0) + 1, cl = c.para ? claseFuncional(c.deporte, pr, n - 1, campo) : c.deporte === 'Levantamiento de pesas' ? ['Arranque', 'Envión', 'Total'][(n - 1) % 3] : '';
+        todas.push({ nombre: cl ? pr + ' · ' + cl : pr, cat: cat });
+      });
+    });
     c.eventos = [];
     c.dias.forEach(function (d, n) { var j; for (j = 0; j < c.cuenta[n] && i < todas.length; j++, i++) { var q = todas[i]; c.eventos.push({ nombre: q.nombre, cat: q.cat, clave: q.nombre + '|' + q.cat, dia: d, marca: campo.test(q.nombre) ? { tipo: 'distancia', base: 5, paso: 0.15 } : { tipo: 'tiempo', base: 12, paso: 0.2 }, mitad: 2, hits: 1, estado: n === c.dias.length - 1 && c.dias.length > 1 ? 'Programado' : 'Finalizado' }); } });
   });
@@ -71,7 +89,10 @@ window.LANDING_FLUJOS = function (S, L) {
   function regional(k) { return L.app.regionales.items[+String(k || '').split(':').pop() || 0]; }
   /* Las competencias de la Final Nacional (`fase: 'final'`) solo salen en su tarjeta; las regionales, en las demás. */
   function esFinal(k) { var it = regional(k); return !!(it && it.fase === 'final'); }
-  function deRegional(c, k) { return c.tipo === (String(k || '').indexOf('individuales:') === 0 ? 'individual' : 'equipo') && (c.fase === 'final') === esFinal(k); }
+  /* Paradeportes es una tarjeta más de la Final: sus deportes son individuales (`para: true`) y salen solo ahí, no en «Individual». */
+  function esPara(k) { return String(k || '').indexOf('paradeportes:') === 0; }
+  function esIndiv(k) { return String(k || '').indexOf('individuales:') === 0 || esPara(k); }
+  function deRegional(c, k) { return c.tipo === (esIndiv(k) ? 'individual' : 'equipo') && (c.fase === 'final') === esFinal(k) && !!c.para === esPara(k); }
   function eje(c, k) { return c.fase !== 'final' && deRegional(c, 'individuales:0') && String(k).indexOf('individuales:') === 0 ? c.prueba : c.deporte; }
   function deportesRegional(k) { return F.competencias.filter(function (c) { return deRegional(c, k); }).map(function (c) { return eje(c, k); }); }
   function categoriasRegional(k) { return F.competencias.filter(function (c) { return deRegional(c, k); }).map(function (c) { return c.categoria; }); }
@@ -81,7 +102,7 @@ window.LANDING_FLUJOS = function (S, L) {
   function vista(id, k, st) {
     var eyebrow = null, t, sub = null, violeta = false, b, x, foto = null, naranja = false, barraLogo = false, pie = null, zona = null, resumen = null, zonaLista = false;
     if (id === 'regional') {
-      x = regional(k); t = x.fase === 'final' ? (String(k).indexOf('individuales:') === 0 ? 'Final nacional individual' : 'Final nacional de conjuntos') : String(k).indexOf('individuales:') === 0 ? 'Regional de atletismo' : 'Regional de conjuntos'; sub = x.nombre.replace(/^Regional /, '') + ' - Sede ' + x.ciudad; violeta = true; st.regSub = sub; st.regK = k; st.regTitulo = t;
+      x = regional(k); t = x.fase === 'final' ? (esPara(k) ? 'Final nacional paradeportes' : String(k).indexOf('individuales:') === 0 ? 'Final nacional individual' : 'Final nacional de conjuntos') : String(k).indexOf('individuales:') === 0 ? 'Regional de atletismo' : 'Regional de conjuntos'; sub = x.nombre.replace(/^Regional /, '') + ' - Sede ' + x.ciudad; violeta = true; st.regSub = sub; st.regK = k; st.regTitulo = t;
       b = +st.tab ? tabs(F.regionalTabs, st) : '';
       if (+st.tab === 1) {
         b += h('p', { class: 'nws-fl__intro' }, e('Explora las sedes donde se realizarán las competencias.')) + select('Departamento', 'departamento', [sede(0).departamento], st);
@@ -132,6 +153,11 @@ window.LANDING_FLUJOS = function (S, L) {
         + cardP('Datos del representante', [celdaP('Nombre representante', 'Representante de ejemplo'), celdaP('Tipo de documento', 'No asignado'), celdaP('Número de documento', 'No asignado')]);
       pie = h('button', { type: 'button', class: 'nws-fl__pie-it nws-fl__pie-it--act', 'aria-current': 'page' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Perfil</span>')
         + h('button', { type: 'button', class: 'nws-fl__pie-it', 'data-flujo': 'inscritos', 'data-clave': '' }, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Inscritos</span>');
+    } else if (id === 'medalleria') {
+      t = 'Medallería 2026'; b = medalleriaHtml();
+      pie = pieTabbar('medallas');
+    } else if (id === 'certificados') {
+      t = 'Certificados'; b = escanerHtml();   /* inmersiva: sin barra de pestañas; se sale con el botón de volver */
     } else if (id === 'inscritos') {
       t = 'Inscritos'; barraLogo = true;
       /* listas de inscritos (registered_sportman_and_team_and_support_staff_screen.dart y sportsman_registered_list.dart) */
@@ -242,7 +268,7 @@ window.LANDING_FLUJOS = function (S, L) {
         + h('ul', { class: 'nws-fl__lista' }, x.zonas.map(function (z) { return h('li', null, e(z)); })));
     } else if (id === 'competencias') {
       t = 'Todas las competencias'; x = regional(k);
-      var nombreReg = (String(k).indexOf('individuales:') === 0 ? 'Regional de individuales' : 'Regional de conjuntos') + ' · ' + x.nombre.replace(/^Regional /, '');
+      var nombreReg = (esPara(k) ? 'Final nacional paradeportes' : String(k).indexOf('individuales:') === 0 ? 'Regional de individuales' : 'Regional de conjuntos') + ' · ' + x.nombre.replace(/^Regional /, '');
       b = tarjeta('nws-fl__cabecera-reg', h('div', { class: 'nws-fl__reg-fila' }, h('span', { class: 'nws-fl__reg-ico', 'aria-hidden': 'true' }, h('img', { class: 'nws-fl__reg-img', src: ICONO_PIN, alt: '' })),
           h('div', { class: 'nws-fl__reg-tx' }, h('p', { class: 'nws-fl__reg-t' }, e(nombreReg)), h('p', { class: 'nws-fl__reg-sub' }, 'Todas las competencias')))
         + dias(st))
@@ -808,12 +834,12 @@ window.LANDING_FLUJOS = function (S, L) {
   function tablaDatos(c, ev) {
     var tipo = tablaDe(c, ev), pool = F.atletas, sem = semilla(ev.clave), hecho = ev.estado === 'Finalizado', n = tipo === 'rr' ? 6 : 8, gente = [], i, k = 0;
     for (i = 0; i < n; i++) { gente.push(pool[(sem + i * 3) % pool.length]); }
-    var punt = { 'rondas': ['1 – 0', '½ – ½', '0 – 1'], 'rr': ['4 – 2', '3 – 3', '1 – 5'], 'grupos': ['3 – 1', '3 – 2', '1 – 3'] }[tipo];
+    var punt = { 'rondas': ['1 – 0', '½ – ½', '0 – 1'], 'rr': ['5 – 2', '3 – 3', '1 – 6'], 'grupos': ['3 – 1', '3 – 2', '1 – 3'] }[tipo];
     var ptsG = tipo === 'rondas' ? [1, 0.5, 0] : [2, 0, 0], ptsP = tipo === 'rondas' ? [0, 0.5, 1] : [0, 0, 2];
     var tot = {}; gente.forEach(function (a) { tot[a.nombre] = { a: a, pj: 0, pg: 0, pts: 0 }; });
     var jugar = function (a, b) {
       if (!hecho) { return { a: a, b: b }; }
-      var w = (sem + k++) % 5, r = tipo === 'rondas' ? (w === 0 ? 1 : w < 3 ? 0 : 2) : (w === 0 && tipo === 'rr' ? 1 : w < 3 ? 0 : 2);
+      var w = (sem + k++) % 5, r = tipo === 'rondas' ? (w === 0 ? 1 : w < 3 ? 0 : 2) : (w < 3 ? 0 : 2);
       if (tipo === 'grupos' && r === 1) { r = 0; }
       tot[a.nombre].pj++; tot[b.nombre].pj++; tot[a.nombre].pts += ptsG[r]; tot[b.nombre].pts += ptsP[r];
       if (r === 0) { tot[a.nombre].pg++; } else if (r === 2) { tot[b.nombre].pg++; }
@@ -850,14 +876,16 @@ window.LANDING_FLUJOS = function (S, L) {
   }
   function medalleroHtml(gen, fin, estado, ctx) {
     var tit = fin ? 'Medallero' : 'Resultados';
-    var pd = function (n) {
-      var a = gen[n - 1];
+    /* Deportes de combate (taekwondo, boxeo, karate, judo): dos bronces, uno por cada semifinalista que pierde (`pos` 3 repetido). Plata · Oro · Bronce · Bronce. */
+    var dosBronces = fin && !!gen[3] && gen[3].pos === 3;
+    var pd = function (n, i) {
+      var a = gen[i == null ? n - 1 : i];
       return h(ctx ? 'button' : 'div', Object.assign({ class: 'nws-fl__pd nws-fl__pd--' + n }, ctx ? { type: 'button', 'data-flujo': 'deportista', 'data-clave': claveMed(a, n, ctx, fin), 'aria-label': 'Ver perfil de ' + a.nombre } : {}),
         fin ? h('span', { class: 'nws-fl__pd-av nws-fl__pd-av--med' }, h('img', { class: 'nws-fl__pd-m', src: MEDALLA[n], alt: ['Oro', 'Plata', 'Bronce'][n - 1] })) : h('span', { class: 'nws-fl__pd-av' }, h('i', null, ICO_USR), h('span', { class: 'nws-fl__pd-m' }, n)),
         h('b', null, e(a.nombre)), h('small', null, e(a.departamento)), a.marca ? h('span', { class: 'nws-fl__pd-v' }, e(a.marca)) : '');
     };
     return h('div', { class: 'nws-fl__cab-r' }, h('h2', { class: 'nws-fl__explora' }, tit), estadoPill(estado))
-      + h('div', { class: 'nws-fl__pdio', role: 'group', 'aria-label': tit }, pd(2) + pd(1) + pd(3))
+      + h('div', { class: S.cls('nws-fl__pdio', dosBronces && 'nws-fl__pdio--4'), role: 'group', 'aria-label': tit }, dosBronces ? pd(2, 1) + pd(1, 0) + pd(3, 2) + pd(3, 3) : pd(2) + pd(1) + pd(3))
       + h('h2', { class: 'nws-fl__explora' }, 'Posiciones')
       + h('div', { class: 'nws-fl__rf-l nws-fl__rf-l--caja' }, gen.map(function (a, i) { return filaRes(a, a.pos || i + 1, [a.departamento], true, ctx ? claveMed(a, a.pos || i + 1, ctx, fin) : false); }).join(''));
   }
@@ -937,6 +965,176 @@ window.LANDING_FLUJOS = function (S, L) {
   var ICONO_DEPORTE = { 'Atletismo': 'assets/landing/icons/atletismo.svg', 'Para Atletismo': 'assets/landing/icons/atletismo.svg', 'Baloncesto': 'assets/landing/icons/baloncesto.svg', 'Baloncesto 3x3': 'assets/landing/icons/baloncesto-x3.svg', 'Fútbol': 'assets/landing/icons/futbol.svg', 'Fútbol sala': 'assets/landing/icons/futbol-sala.svg', 'Fútbol de Salón': 'assets/landing/icons/futbol-sala.svg', 'Voleibol': 'assets/landing/icons/voleibol.svg', 'Ajedrez Integrado': 'assets/landing/icons/ajedrez.svg', 'Bádminton': 'assets/landing/icons/badminton.svg', 'Balonmano': 'assets/landing/icons/balonmano.svg', 'Boccia': 'assets/landing/icons/boccia.svg', 'Boxeo': 'assets/landing/icons/boxeo.svg', 'Ciclismo Ruta': 'assets/landing/icons/ciclismo.svg', 'Judo': 'assets/landing/icons/judo.svg', 'Karate Do': 'assets/landing/icons/karate.svg', 'Levantamiento de pesas': 'assets/landing/icons/pesas.svg', 'Natación': 'assets/landing/icons/natacion.svg', 'Para Natación': 'assets/landing/icons/natacion.svg', 'Patinaje': 'assets/landing/icons/patinaje.svg', 'Taekwondo': 'assets/landing/icons/taekwondo.svg', 'Tenis de Mesa': 'assets/landing/icons/tenis-de-mesa.svg' };
   var TINTE = { 'Atletismo': 'atl', 'Para Atletismo': 'atl', 'Baloncesto': 'bal', 'Baloncesto 3x3': 'bal', 'Fútbol': 'fut', 'Fútbol sala': 'fut', 'Fútbol de Salón': 'fut', 'Voleibol': 'vol' };
   /* Medallas del SDK (nwt-award, edición Colombia) para el podio de Resultados. */
+  /* La misma barra inferior del inicio (nws-lpx__tabbar con el balón de «Juegos» y el indicador del teléfono), con la pestaña `activa` marcada. */
+  function pieTabbar(activa) {
+    var BALON_T = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6c2.6 3.6 2.6 9.2 0 12.8M18.4 5.6c-2.6 3.6-2.6 9.2 0 12.8"/></svg>';
+    return S.h('div', { class: 'nws-lpx__tabbar' }, S.tabs({ fullWidth: true, theme: 'primary', value: activa, items: L.app.tabs.map(function (q) { return { label: q.label, value: q.id, icon: q.id === 'inicio' ? null : q.icono, iconHtml: q.id === 'inicio' ? BALON_T : null }; }) }))
+      + S.h('div', { class: 'nws-lpx__home', 'aria-hidden': 'true' });
+  }
+  /* Certificados (demo): escáner del QR de la acreditación oficial. No se enciende la cámara: es un visor de ejemplo con el marco, la línea de lectura y la instrucción. */
+  function qrDemo() {
+    var n = 21, q = [], a = 7, i, j;
+    function fijo(x, y) { return (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9); }
+    function finder(x, y) {
+      var fx = x < 8 ? x : x - (n - 7), fy = y < 8 ? y : y - (n - 7);
+      if (x > n - 9) { fx = x - (n - 7); } if (y > n - 9) { fy = y - (n - 7); }
+      return fx >= 0 && fx < 7 && fy >= 0 && fy < 7 && (fx === 0 || fx === 6 || fy === 0 || fy === 6 || (fx > 1 && fx < 5 && fy > 1 && fy < 5));
+    }
+    for (i = 0; i < n; i++) { for (j = 0; j < n; j++) {
+      var on = fijo(j, i) ? finder(j, i) : ((j * 7 + i * 13 + (j * i) % 5 + a) % 3 === 0);
+      if (on) { q.push('<rect x="' + j + '" y="' + i + '" width="1" height="1"/>'); }
+    } }
+    return '<svg class="nws-qr__codigo" viewBox="0 0 21 21" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor">' + q.join('') + '</svg>';
+  }
+  function escanerHtml() {
+    return h('div', { class: 'nws-qr' },
+      h('div', { class: 'nws-qr__visor', role: 'img', 'aria-label': 'Visor para escanear el código QR' },
+        qrDemo(), h('span', { class: 'nws-qr__esq nws-qr__esq--a' }), h('span', { class: 'nws-qr__esq nws-qr__esq--b' }), h('span', { class: 'nws-qr__esq nws-qr__esq--c' }), h('span', { class: 'nws-qr__esq nws-qr__esq--d' }),
+        h('span', { class: 'nws-qr__linea' })),
+      h('h2', { class: 'nws-qr__t' }, 'Acerca y escanea el código QR de tu acreditación oficial'),
+      h('p', { class: 'nws-qr__sub' }, 'Ubícalo dentro del recuadro y mantén firme el teléfono.'));
+  }
+
+  /* ---------- Medallería (Final Nacional): medallas por delegación ----------
+     DATOS DE PRUEBA. Parte de las pruebas individuales del calendario de la Final que ya terminaron al corte (14 de nov), por eso el estado es «En curso»;
+     el reparto de medallas entre las 33 delegaciones y los nombres de quienes las ganan son inventados (deterministas, siempre salen iguales). */
+  var CORTE = '2026-11-14';
+  var DELEGACIONES = [['Bogotá D.C.', 10, 'assets/landing/banderas/bogotadc.webp'], ['Antioquia', 10, 'assets/landing/banderas/antioquia.webp'], ['Valle del Cauca', 9, 'assets/landing/banderas/valledelcauca.webp'], ['Atlántico', 5, 'assets/landing/banderas/atlantico.webp'], ['Santander', 5, 'assets/landing/banderas/santander.webp'], ['Cundinamarca', 5, 'assets/landing/banderas/cundinamarca.webp'], ['Bolívar', 4, 'assets/landing/banderas/bolivar.webp'], ['Caldas', 4, 'assets/landing/banderas/caldas.webp'], ['Nariño', 4, 'assets/landing/banderas/narino.webp'], ['Risaralda', 3, 'assets/landing/banderas/risaralda.webp'], ['Boyacá', 3, 'assets/landing/banderas/boyaca.webp'], ['Tolima', 3, 'assets/landing/banderas/tolima.webp'], ['Huila', 3, 'assets/landing/banderas/huila.webp'], ['Meta', 3, 'assets/landing/banderas/meta.webp'], ['Norte de Santander', 3, 'assets/landing/banderas/nortedesantander.webp'], ['Córdoba', 3, 'assets/landing/banderas/cordoba.webp'], ['Cauca', 3, 'assets/landing/banderas/cauca.webp'], ['Quindío', 3, 'assets/landing/banderas/quindio.webp'], ['Magdalena', 2, 'assets/landing/banderas/magdalena.webp'], ['Cesar', 2, 'assets/landing/banderas/cesar.webp'], ['Sucre', 2, 'assets/landing/banderas/sucre.webp'], ['Casanare', 2, 'assets/landing/banderas/casanare.webp'], ['Caquetá', 2, 'assets/landing/banderas/caqueta.webp'], ['Chocó', 2, 'assets/landing/banderas/choco.webp'], ['La Guajira', 2, 'assets/landing/banderas/laguajira.webp'], ['Putumayo', 2, 'assets/landing/banderas/putumayo.webp'], ['Arauca', 2, 'assets/landing/banderas/arauca.webp'], ['San Andrés y Providencia', 1, 'assets/landing/banderas/sanandresyprovidencia.webp'], ['Amazonas', 1, 'assets/landing/banderas/amazonas.webp'], ['Guaviare', 1, 'assets/landing/banderas/guaviare.webp'], ['Guainía', 1, 'assets/landing/banderas/guainia.webp'], ['Vaupés', 1, 'assets/landing/banderas/vaupes.webp'], ['Vichada', 1, 'assets/landing/banderas/vichada.webp']];
+  var NOM_H = ['Elian', 'Tomás', 'Darío', 'Andrés', 'Mateo', 'Samuel', 'Santiago', 'Nicolás', 'Emilio', 'Juan', 'Sebastián', 'Gael'];
+  var NOM_M = ['Camila', 'Isabela', 'Valeria', 'Sofía', 'Daniela', 'Paula', 'Sara', 'Laura', 'Mariana', 'Lucía', 'Salomé', 'Antonia'];
+  var APE = ['Brisaclara', 'Nubecalma', 'Arenaluz', 'Soltenue', 'Vientonuevo', 'Rocíoalto', 'Pradoazul', 'Orillaclara', 'Albaserena', 'Lunaverde', 'Cieloalto', 'Riosereno', 'Montealba', 'Cumbreazul',
+    'Lagoplata', 'Solnaciente', 'Arenablanca', 'Pinarverde', 'Costaclara', 'Fuentedorada', 'Vallemar', 'Caminoalto', 'Praderaviva', 'Brisamar'];
+  var MARCA_LLAVE = { 'Taekwondo': ['2 – 0', '2 – 1'], 'Boxeo': ['3 – 0', '2 – 1'], 'Karate Do': ['5 – 2', '4 – 3'], 'Judo': ['Ippon', 'Waza-ari'], 'Bádminton': ['21 – 15', '21 – 18'] };
+  var MEDAL = null;
+  /* La prueba es la del catálogo de la Final: en paradeportes se le quita la clase funcional (S, T, F, BC) que le agrega este prototipo. */
+  var CLASE_FIN = /\s·\s(?:S\d+|T\d+|F\d+|BC\d(?:\s–\s?BC\d)?)$/;
+  function basePrueba(c, n) { return c.para ? n.replace(CLASE_FIN, '') : n; }
+  function azar(sem) { var a = sem >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function medalleria() {
+    if (MEDAL) { return MEDAL; }
+    var deps = {};
+    DELEGACIONES.forEach(function (d) { deps[d[0]] = { nombre: d[0], bandera: d[2], peso: d[1], m: [0, 0, 0], lista: [], mapa: {} }; });
+    F.competencias.forEach(function (c) {
+      if (c.fase !== 'final' || c.tipo !== 'individual') { return; }
+      (c.eventos || []).forEach(function (ev) {
+        if (ev.estado !== 'Finalizado' || ev.dia > CORTE) { return; }
+        var rnd = azar(semilla(c.id + '|' + (ev.clave || ev.nombre))), pool = DELEGACIONES.slice(), puestos = llaveDe(c, ev) ? 4 : 3, i, k;
+        var nombres = /mujer|femenin/i.test(ev.cat) ? NOM_M : /hombre|masculin/i.test(ev.cat) ? NOM_H : NOM_H.concat(NOM_M), dist = ev.marca && ev.marca.tipo === 'distancia';
+        for (i = 0; i < puestos; i++) {
+          var tot = pool.reduce(function (n, d) { return n + d[1]; }, 0), r = rnd() * tot, q = 0;
+          while (q < pool.length - 1 && r >= pool[q][1]) { r -= pool[q][1]; q++; }
+          var dep = deps[pool.splice(q, 1)[0][0]], pos = i < 3 ? i + 1 : 3, marca = '';
+          if (llaveDe(c, ev)) { marca = i === 0 ? MARCA_LLAVE[c.deporte][rnd() < .5 ? 0 : 1] : ''; }
+          else if (tablaDe(c, ev)) { marca = (6 - i) + ' pts'; }
+          else if (c.deporte === 'Levantamiento de pesas') { marca = Math.round(70 + rnd() * 70 - (pos - 1) * 7) + ' kg'; }
+          else if (ev.marca) { k = (pos - 1) * 1.3 + rnd() * .5; marca = fmtMarca(ev.marca, dist ? ev.marca.base + ev.marca.paso * 3 - ev.marca.paso * k : ev.marca.base + ev.marca.paso * k); }
+          dep.m[pos - 1]++;
+          dep.lista.push({ pos: pos, nombre: nombres[Math.floor(rnd() * nombres.length)] + ' ' + APE[Math.floor(rnd() * APE.length)], marca: marca, deporte: c.deporte, cat: ev.cat, prueba: basePrueba(c, ev.nombre) });
+          var mp = dep.mapa[c.deporte] || (dep.mapa[c.deporte] = {}), bn = basePrueba(c, ev.nombre) + '|' + ev.cat; (mp[bn] = mp[bn] || [0, 0, 0])[pos - 1]++;
+        }
+      });
+    });
+    var lista = Object.keys(deps).map(function (k) { var d = deps[k]; d.total = d.m[0] + d.m[1] + d.m[2]; return d; }).filter(function (d) { return d.total > 0; })
+      .sort(function (x, y) { return y.m[0] - x.m[0] || y.m[1] - x.m[1] || y.m[2] - x.m[2] || x.nombre.localeCompare(y.nombre); });
+    var tot = [0, 0, 0]; lista.forEach(function (d) { d.m.forEach(function (n, i) { tot[i] += n; }); });
+    /* Todos los deportes de la Final con todas sus pruebas (también donde no hay medallas todavía): individuales por prueba y conjuntos por categoría. */
+    var deportes = [];
+    F.competencias.forEach(function (c) {
+      if (c.fase !== 'final') { return; }
+      var nom = [], vis = {};
+      if (c.tipo === 'equipo') { pruebasEq(c).forEach(function (pe) { nom.push({ n: c.deporte, cat: pe.edad + ' · ' + pe.sexo, k: c.deporte + '|' + pe.edad + ' · ' + pe.sexo }); }); }
+      else { (c.eventos || []).forEach(function (ev) { var b = basePrueba(c, ev.nombre), k = b + '|' + ev.cat; if (!vis[k]) { vis[k] = 1; nom.push({ n: b, cat: ev.cat, k: k }); } }); }
+      deportes.push({ deporte: c.deporte, pruebas: nom });
+    });
+    MEDAL = { lista: lista, tot: tot, total: tot[0] + tot[1] + tot[2], deportes: deportes };
+    return MEDAL;
+  }
+  function puntoMed(n) { return '<i class="nws-md__pt nws-md__pt--' + n + '" aria-hidden="true"></i>'; }
+  /* Bandera de la delegación (assets/landing/banderas, 16:9); con borde fino porque varias llevan blanco en el borde. */
+  function escudoDep(d) { return h('img', { class: 'nws-md__ban', src: d.bandera, alt: '', draggable: 'false' }); }
+  function contadores(m, cls) { return h('span', { class: 'nws-md__cnt ' + (cls || '') }, [0, 1, 2].map(function (i) { return h('span', { class: 'nws-md__cn' }, puntoMed(i + 1) + h('b', { class: 'nws-md__v', 'data-n': m[i] }, m[i])); }).join('')); }
+  /* Celdas de medallas en las columnas de la tabla: oro, plata, bronce y total (los ceros van más tenues). */
+  function celdasMed(m, total) {
+    return [0, 1, 2].map(function (q) { return h('span', { class: 'nws-md__n' + (m[q] ? '' : ' nws-md__n--cero') }, m[q]); }).join('') + h('span', { class: 'nws-md__n nws-md__n--t' }, total);
+  }
+  /* Detalle de una delegación (sin deportistas y sin tarjetas): los deportes de la Final en los que tiene medallas, como filas planas con las mismas columnas de la tabla.
+     Cada deporte se despliega y, dentro, van todas sus pruebas con el conteo de medallas de esa delegación (las pruebas se pintan al abrir el deporte). */
+  function sumaMed(m) { return m[0] + m[1] + m[2]; }
+  function medalleriaDetalle(nombre) {
+    var M = medalleria(), d = M.lista.filter(function (x) { return x.nombre === nombre; })[0]; if (!d) { return ''; }
+    var filas = M.deportes.map(function (dp) {
+      var mp = d.mapa[dp.deporte] || {}, m = [0, 0, 0];
+      Object.keys(mp).forEach(function (k) { mp[k].forEach(function (n, q) { m[q] += n; }); });
+      return { dp: dp, m: m };
+    }).filter(function (f) { return sumaMed(f.m) > 0; })   /* solo los deportes en los que la delegación tiene medallas */
+      .sort(function (a, b) { return sumaMed(b.m) - sumaMed(a.m) || a.dp.deporte.localeCompare(b.dp.deporte); });
+    return filas.map(function (f) {
+      return h('section', { class: 'nws-md__dep' },
+        h('button', { type: 'button', class: 'nws-md__dep-b nws-md__cols', 'data-md-dep': f.dp.deporte, 'aria-expanded': 'false' },
+          h('img', { class: 'nws-md__dep-ico', src: ICONO_DEPORTE[f.dp.deporte] || ICONO_PIN, alt: '' }),
+          h('span', { class: 'nws-md__dep-n' }, h('b', null, e(f.dp.deporte))),
+          celdasMed(f.m, sumaMed(f.m)),
+          '<svg class="nws-md__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+        h('div', { class: 'nws-md__dep-p', hidden: true }));
+    }).join('');
+  }
+  /* Pastillas de la categoría de una prueba: sexo y edad (Mujer · Juvenil). Una fila por prueba y categoría, como en la referencia. */
+  function pastillasCat(cat) {
+    var p = String(cat).split(' · '), edad = p[0], sexo = p[1] || '';
+    return h('span', { class: 'nws-md__cats' }, [sexo, edad].filter(Boolean).map(function (t) { return h('span', { class: 'nws-md__cat' }, e(t)); }).join(''));
+  }
+  function medalleriaPruebas(nombre, deporte) {
+    var M = medalleria(), d = M.lista.filter(function (x) { return x.nombre === nombre; })[0], dp = M.deportes.filter(function (x) { return x.deporte === deporte; })[0];
+    if (!d || !dp) { return ''; }
+    var mp = d.mapa[deporte] || {};
+    return dp.pruebas.map(function (pr) {
+      var m = mp[pr.k] || [0, 0, 0];
+      return h('div', { class: 'nws-md__pr nws-md__cols' }, h('span', null, ''), h('span', { class: 'nws-md__pr-t' }, h('span', { class: 'nws-md__pr-n' }, e(pr.n)), pastillasCat(pr.cat)), celdasMed(m, sumaMed(m)), h('span', null, ''));
+    }).join('');
+  }
+  function medalleriaHtml() {
+    var M = medalleria(), top = M.lista.slice(0, 3);
+    /* Podio en carrusel: la delegación activa va al centro y grande, las otras dos detrás; se cambia con un toque o deslizando (vistas.js). */
+    var pod = function (n, i) {
+      var d = top[n - 1]; if (!d) { return ''; }
+      return h('button', { type: 'button', class: 'nws-md__pod nws-md__pod--' + n, 'data-md-pod': i, 'data-pos': i === 1 ? 'c' : i === 0 ? 'l' : 'r', 'aria-pressed': i === 1 ? 'true' : 'false', 'aria-label': n + '.º lugar, ' + d.nombre + ', ' + d.total + ' medallas' },
+        h('span', { class: 'nws-md__pod-brillo', 'aria-hidden': 'true' }),
+        h('img', { class: 'nws-md__pod-m', src: MEDALLA[n], alt: '' }),
+        h('span', { class: 'nws-md__pod-n' }, escudoDep(d), h('b', null, e(d.nombre))),
+        contadores(d.m, 'nws-md__cnt--pod'), h('small', { class: 'nws-md__pod-t' }, h('b', { class: 'nws-md__v', 'data-n': d.total }, d.total), ' medallas'));
+    };
+    var filas = M.lista.map(function (d, i) {
+      return h('div', { class: 'nws-md__item' },
+        h('button', { type: 'button', class: 'nws-md__fila nws-md__cols', 'data-md-fila': d.nombre, 'aria-expanded': 'false' },
+          h('span', { class: 'nws-md__pos' }, i + 1), h('span', { class: 'nws-md__nom' }, escudoDep(d), h('b', null, e(d.nombre))),
+          celdasMed(d.m, d.total),
+          '<svg class="nws-md__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+        h('div', { class: 'nws-md__det', 'data-md-det': d.nombre, hidden: true }));
+    }).join('');
+    /* Arriba, el fondo violeta inmersivo con el podio (círculo y aros de la marca moviéndose detrás); debajo, la hoja blanca con el resumen y la tabla. */
+    return h('div', { class: 'nws-md' },
+      h('div', { class: 'nws-md__hero' }, h('div', { class: 'nws-md__hero-in' },
+        h('img', { class: 'nws-md__deco nws-md__deco--circulo', src: 'assets/landing/final-conj-circulo.webp', alt: '', draggable: 'false' }),
+        h('img', { class: 'nws-md__deco nws-md__deco--aros', src: 'assets/landing/final-conj-aros.webp', alt: '', draggable: 'false' }),
+        h('h1', { class: 'nws-md__t' }, 'Medallería 2026'),
+        h('h2', { class: 'nws-md__h nws-md__h--hero' }, 'Podio de delegaciones'),
+        h('div', { class: 'nws-md__stage', role: 'group', 'aria-label': 'Podio de delegaciones', 'data-md-stage': true }, pod(2, 0) + pod(1, 1) + pod(3, 2)))),
+      h('div', { class: 'nws-md__hoja' },
+        /* Franja fija del resumen: título con el ícono de expandir todo y los totales en cuatro casillas. */
+        h('div', { class: 'nws-md__resumen' },
+          h('div', { class: 'nws-md__res-fila' }, h('h2', { class: 'nws-md__h nws-md__h--res' }, 'Resumen total de medallas'),
+            /* Expandir o contraer todas las delegaciones: solo ícono (dos flechas), al lado del título. */
+            h('button', { type: 'button', class: 'nws-md__todo', 'data-md-todo': true, 'aria-label': 'Expandir todo', title: 'Expandir todo' },
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l5 5 5-5M7 13l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>')),
+          h('div', { class: 'nws-md__tot4', role: 'group', 'aria-label': 'Total de medallas' },
+            [['Oro', 1, M.tot[0]], ['Plata', 2, M.tot[1]], ['Bronce', 3, M.tot[2]], ['Total', 0, M.total]].map(function (q) {
+              return h('div', { class: 'nws-md__t4' + (q[1] ? '' : ' nws-md__t4--total') },
+                h('b', { class: 'nws-md__v', 'data-n': q[2] }, q[2]), h('span', { class: 'nws-md__t4-l' }, (q[1] ? puntoMed(q[1]) : '') + q[0]));
+            }).join('')),
+          h('div', { class: 'nws-md__cab nws-md__cols', role: 'row' }, h('span', null, '#'), h('span', null, 'Delegación'), puntoMed(1), puntoMed(2), puntoMed(3), h('span', { class: 'nws-md__cab-t' }, 'Total'), h('span', null, ''))),
+        /* Panel de la lista: se desplaza aparte del resumen, que queda fijo encima con su línea divisoria. */
+        h('div', { class: 'nws-md__lista' }, h('div', { class: 'nws-md__tabla', role: 'table', 'aria-label': 'Medallas por delegación' }, filas))));
+  }
   var MEDALLA = { 1: 'assets/landing/icons/medalla-oro-anim.svg', 2: 'assets/landing/icons/medalla-plata-anim.svg', 3: 'assets/landing/icons/medalla-bronce-anim.svg' };
   /* Sistema de competencia por deporte individual: fases en orden y nombre de la primera pestaña de la prueba. */
   var SISTEMA = {
@@ -1155,7 +1353,7 @@ window.LANDING_FLUJOS = function (S, L) {
       + h('div', { class: 'nws-fl__semana', 'aria-hidden': 'true' }, ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(function (d) { return h('span', null, d); }).join(''))
       + h('div', { class: 'nws-fl__grilla', role: 'group', 'aria-label': 'Calendario regional de ejemplo' }, filas));
   }
-  return { vista: vista, calendarioRegional: calendarioRegional, multiSelect: multiSelect, hayFiltros: hayFiltros, etiquetaMulti: etiquetaMulti,
+  return { vista: vista, medalleriaDetalle: medalleriaDetalle, medalleriaPruebas: medalleriaPruebas, calendarioRegional: calendarioRegional, multiSelect: multiSelect, hayFiltros: hayFiltros, etiquetaMulti: etiquetaMulti,
     destinoTab: function (id, k, tab) {
       if (id !== 'competencia') { return null; }
       var c = competencia(k);
